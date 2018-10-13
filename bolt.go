@@ -67,8 +67,7 @@ type BoltOptions struct {
 }
 
 // DefaultBoltOptions is a BoltOptions object with default values.
-// BucketName: "default"
-// Path: "bolt.db"
+// BucketName: "default", Path: "bolt.db"
 var DefaultBoltOptions = BoltOptions{
 	BucketName: "default",
 	Path:       "bolt.db",
