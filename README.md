@@ -50,13 +50,13 @@ Implementations ([![PRs Welcome](https://img.shields.io/badge/PRs-welcome-bright
     - [X] [Redis](https://github.com/antirez/redis)
     - [ ] [Consul](https://github.com/hashicorp/consul)
     - [ ] [etcd](https://github.com/etcd-io/etcd)
-        - Not advertised as general KV store, but can be used as one(https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
+        - Not advertised as general KV store, but can be used as one
     - [ ] [Memcached](https://github.com/memcached/memcached)
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
     - [ ] [LedisDB](https://github.com/siddontang/ledisdb)
         - Similar to Redis, with several backing stores
     - [ ] [TiKV](https://github.com/tikv/tikv)
-        - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF]
+        - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
 - Cloud
     - [ ] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
     - [ ] [Amazon SimpleDB](https://aws.amazon.com/simpledb/)
