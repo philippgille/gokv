@@ -1,0 +1,20 @@
+services:
+  - redis-server
+
+git:
+  depth: 1
+
+language: go
+
+go:
+  - "1.10"
+
+before_install:
+  - go version
+  - go env
+
+script:
+  # builds
+  - go build github.com/philippgille/gokv/...
+  # tests
+  - go test -v github.com/philippgille/gokv/...
