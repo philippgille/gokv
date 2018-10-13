@@ -4,7 +4,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// RedisClient is a StorageClient implementation for Redis.
+// RedisClient is a gokv.Store implementation for Redis.
 type RedisClient struct {
 	c *redis.Client
 }

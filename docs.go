@@ -1,7 +1,4 @@
 /*
-Package gokv contains storage implementations and related options.
-
-These storage implementations satisfy the wall.StorageClient interface.
-You can use one of them or implement your own.
+Package gokv contains a simple key-value store abstraction and multiple implementations.
 */
 package gokv

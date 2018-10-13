@@ -6,12 +6,11 @@ import (
 	bolt "github.com/coreos/bbolt"
 )
 
-var bucketName = "ln-paywall"
-
-// BoltClient is a StorageClient implementation for bbolt (formerly known as Bolt / Bolt DB).
+// BoltClient is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
 type BoltClient struct {
-	db   *bolt.DB
-	lock *sync.Mutex
+	db         *bolt.DB
+	lock       *sync.Mutex
+	bucketName string
 }
 
 // Set stores the given object for the given key.
@@ -26,7 +25,7 @@ func (c BoltClient) Set(k string, v interface{}) error {
 	defer c.lock.Unlock()
 
 	err = c.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
+		b := tx.Bucket([]byte(c.bucketName))
 		err := b.Put([]byte(k), data)
 		return err
 	})
@@ -41,7 +40,7 @@ func (c BoltClient) Set(k string, v interface{}) error {
 func (c BoltClient) Get(k string, v interface{}) (bool, error) {
 	var data []byte
 	err := c.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(bucketName))
+		b := tx.Bucket([]byte(c.bucketName))
 		data = b.Get([]byte(k))
 		return nil
 	})
@@ -59,41 +58,34 @@ func (c BoltClient) Get(k string, v interface{}) (bool, error) {
 
 // BoltOptions are the options for the BoltClient.
 type BoltOptions struct {
+	// Bucket name for storing the key-value pairs.
+	// Optional ("default" by default).
+	BucketName string
 	// Path of the DB file.
-	// Optional ("ln-paywall.db" by default).
+	// Optional ("bolt.db" by default).
 	Path string
 }
 
 // DefaultBoltOptions is a BoltOptions object with default values.
-// Path: "ln-paywall.db"
+// BucketName: "default"
+// Path: "bolt.db"
 var DefaultBoltOptions = BoltOptions{
-	Path: "ln-paywall.db",
+	BucketName: "default",
+	Path:       "bolt.db",
 }
 
 // NewBoltClient creates a new BoltClient.
 // Note: Bolt uses an exclusive write lock on the database file so it cannot be shared by multiple processes.
-// For preventing clients from cheating (reusing preimages across different endpoints / middlewares that use
-// different Bolt DB files) and for the previous mentioned reason you should use only one BoltClient.
-// For example:
-//  // ...
-//  storageClient, err := storage.NewBoltClient(storage.DefaultBoltOptions) // Uses file "ln-paywall.db"
-//  if err != nil {
-//      panic(err)
-//  }
-//  cheapPaywall := wall.NewGinMiddleware(cheapInvoiceOptions, lnClient, storageClient)
-//  expensivePaywall := wall.NewGinMiddleware(expensiveInvoiceOptions, lnClient, storageClient)
-//  router.GET("/ping", cheapPaywall, pingHandler)
-//  router.GET("/compute", expensivePaywall, computeHandler)
-//  // ...
-// If you want to start an additional web service, this would be an additional process, so you can't use the same
-// DB file. You should look into the other storage options in this case, for example Redis.
+// So when creating multiple Bolt clients you should always use a new database file (by setting a different Path in the BoltOptions).
 //
-// Don't worry about closing the Bolt DB, the middleware opens it once and uses it for the duration of its lifetime.
-// When the web service is stopped, the DB file lock is released automatically.
+// Don't worry about closing the Bolt DB as long as you don't need to close the DB while the process that opened it runs.
 func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
 	result := BoltClient{}
 
 	// Set default values
+	if boltOptions.BucketName == "" {
+		boltOptions.BucketName = DefaultBoltOptions.BucketName
+	}
 	if boltOptions.Path == "" {
 		boltOptions.Path = DefaultBoltOptions.Path
 	}
@@ -107,7 +99,7 @@ func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
 	// Create a bucket if it doesn't exist yet.
 	// In Bolt key/value pairs are stored to and read from buckets.
 	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		_, err := tx.CreateBucketIfNotExists([]byte(boltOptions.BucketName))
 		if err != nil {
 			return err
 		}
@@ -118,8 +110,9 @@ func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
 	}
 
 	result = BoltClient{
-		db:   db,
-		lock: &sync.Mutex{},
+		db:         db,
+		lock:       &sync.Mutex{},
+		bucketName: boltOptions.BucketName,
 	}
 
 	return result, nil
