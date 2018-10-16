@@ -1,7 +1,7 @@
 package gokv_test
 
 import (
-	"math/rand"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"sync"
@@ -13,7 +13,7 @@ import (
 // TestBoltClient tests if reading and writing to the store works properly.
 func TestBoltClient(t *testing.T) {
 	boltOptions := gokv.BoltOptions{
-		Path: generateRandomTempDbPath(),
+		Path: generateRandomTempDbPath(t),
 	}
 	boltClient, err := gokv.NewBoltClient(boltOptions)
 	if err != nil {
@@ -28,7 +28,7 @@ func TestBoltClient(t *testing.T) {
 // The locking is implemented in the bbolt package, but test it nonetheless.
 func TestBoltClientConcurrent(t *testing.T) {
 	boltOptions := gokv.BoltOptions{
-		Path: generateRandomTempDbPath(),
+		Path: generateRandomTempDbPath(t),
 	}
 	boltClient, err := gokv.NewBoltClient(boltOptions)
 	if err != nil {
@@ -62,6 +62,11 @@ func TestBoltClientConcurrent(t *testing.T) {
 	}
 }
 
-func generateRandomTempDbPath() string {
-	return os.TempDir() + "/" + strconv.FormatInt(rand.Int63(), 10) + ".db"
+func generateRandomTempDbPath(t *testing.T) string {
+	path, err := ioutil.TempDir(os.TempDir(), "bolt")
+	if err != nil {
+		t.Errorf("Generating random DB path failed: %v", err)
+	}
+	path += "/bolt.db"
+	return path
 }
