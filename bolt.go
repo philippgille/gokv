@@ -1,15 +1,12 @@
 package gokv
 
 import (
-	"sync"
-
 	bolt "github.com/coreos/bbolt"
 )
 
 // BoltClient is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
 type BoltClient struct {
 	db         *bolt.DB
-	lock       *sync.Mutex
 	bucketName string
 }
 
@@ -20,9 +17,6 @@ func (c BoltClient) Set(k string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	c.lock.Lock()
-	defer c.lock.Unlock()
 
 	err = c.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(c.bucketName))
@@ -110,7 +104,6 @@ func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
 
 	result = BoltClient{
 		db:         db,
-		lock:       &sync.Mutex{},
 		bucketName: boltOptions.BucketName,
 	}
 
