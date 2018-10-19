@@ -33,7 +33,7 @@ type Store interface {
 }
 ```
 
-Implementations ([![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)):
+Implementations ([![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)):
 
 - Local in-memory
     - [X] Go map (`sync.Map`)
@@ -50,7 +50,7 @@ Implementations ([![PRs Welcome](https://img.shields.io/badge/PRs-welcome-bright
     - [X] [Redis](https://github.com/antirez/redis)
     - [ ] [Consul](https://github.com/hashicorp/consul)
     - [ ] [etcd](https://github.com/etcd-io/etcd)
-        - Not advertised as general KV store, but can be used as one
+        - Not advertised as general key-value store, but can be used as one
     - [ ] [Memcached](https://github.com/memcached/memcached)
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
     - [ ] [LedisDB](https://github.com/siddontang/ledisdb)
