@@ -2,6 +2,8 @@ package gokv
 
 import (
 	"github.com/go-redis/redis"
+
+	"github.com/philippgille/gokv/util"
 )
 
 // RedisClient is a gokv.Store implementation for Redis.
@@ -15,7 +17,7 @@ func (c RedisClient) Set(k string, v interface{}) error {
 	// (the Set method takes an interface{}, but the Get method only returns a string,
 	// so it can be assumed that the interface{} parameter type is only for convenience
 	// for a couple of builtin types like int etc.).
-	data, err := toJSON(v)
+	data, err := util.ToJSON(v)
 	if err != nil {
 		return err
 	}
@@ -37,7 +39,7 @@ func (c RedisClient) Get(k string, v interface{}) (bool, error) {
 		return false, err
 	}
 
-	return true, fromJSON([]byte(data), v)
+	return true, util.FromJSON([]byte(data), v)
 }
 
 // RedisOptions are the options for the Redis DB.

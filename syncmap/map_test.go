@@ -5,14 +5,15 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/philippgille/gokv"
+	"github.com/philippgille/gokv/syncmap"
+	"github.com/philippgille/gokv/test"
 )
 
 // TestGoMap tests if reading and writing to the store works properly.
 func TestGoMap(t *testing.T) {
 	goMap := gokv.NewGoMap()
 
-	testStore(goMap, t)
+	test.TestStore(goMap, t)
 }
 
 // TestGoMapConcurrent launches a bunch of goroutines that concurrently work with one GoMap.
@@ -25,14 +26,14 @@ func TestGoMapConcurrent(t *testing.T) {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(goroutineCount) // Must be called before any goroutine is started
 	for i := 0; i < goroutineCount; i++ {
-		go interactWithStore(goMap, strconv.Itoa(i), t, &waitGroup)
+		go test.InteractWithStore(goMap, strconv.Itoa(i), t, &waitGroup)
 	}
 	waitGroup.Wait()
 
 	// Now make sure that all values are in the store
-	expected := foo{}
+	expected := test.Foo{}
 	for i := 0; i < goroutineCount; i++ {
-		actualPtr := new(foo)
+		actualPtr := new(test.Foo)
 		found, err := goMap.Get(strconv.Itoa(i), actualPtr)
 		if err != nil {
 			t.Errorf("An error occurred during the test: %v", err)

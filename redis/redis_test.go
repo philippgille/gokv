@@ -8,7 +8,8 @@ import (
 
 	"github.com/go-redis/redis"
 
-	"github.com/philippgille/gokv"
+	"github.com/philippgille/gokv/redis"
+	"github.com/philippgille/gokv/test"
 )
 
 // Don't use the default number ("0"),
@@ -29,7 +30,7 @@ func TestRedisClient(t *testing.T) {
 	}
 	redisClient := gokv.NewRedisClient(redisOptions)
 
-	testStore(redisClient, t)
+	test.TestStore(redisClient, t)
 }
 
 // TestRedisClientConcurrent launches a bunch of goroutines that concurrently work with the Redis client.
@@ -49,14 +50,14 @@ func TestRedisClientConcurrent(t *testing.T) {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(goroutineCount) // Must be called before any goroutine is started
 	for i := 0; i < goroutineCount; i++ {
-		go interactWithStore(redisClient, strconv.Itoa(i), t, &waitGroup)
+		go test.InteractWithStore(redisClient, strconv.Itoa(i), t, &waitGroup)
 	}
 	waitGroup.Wait()
 
 	// Now make sure that all values are in the store
-	expected := foo{}
+	expected := test.Foo{}
 	for i := 0; i < goroutineCount; i++ {
-		actualPtr := new(foo)
+		actualPtr := new(test.Foo)
 		found, err := redisClient.Get(strconv.Itoa(i), actualPtr)
 		if err != nil {
 			t.Errorf("An error occurred during the test: %v", err)

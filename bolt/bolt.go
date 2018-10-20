@@ -2,6 +2,8 @@ package gokv
 
 import (
 	bolt "github.com/coreos/bbolt"
+
+	"github.com/philippgille/gokv/util"
 )
 
 // BoltClient is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
@@ -13,7 +15,7 @@ type BoltClient struct {
 // Set stores the given object for the given key.
 func (c BoltClient) Set(k string, v interface{}) error {
 	// First turn the passed object into something that Bolt can handle
-	data, err := toJSON(v)
+	data, err := util.ToJSON(v)
 	if err != nil {
 		return err
 	}
@@ -47,7 +49,7 @@ func (c BoltClient) Get(k string, v interface{}) (bool, error) {
 		return false, nil
 	}
 
-	return true, fromJSON(data, v)
+	return true, util.FromJSON(data, v)
 }
 
 // BoltOptions are the options for the BoltClient.

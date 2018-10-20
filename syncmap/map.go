@@ -2,6 +2,8 @@ package gokv
 
 import (
 	"sync"
+
+	"github.com/philippgille/gokv/util"
 )
 
 // GoMap is a gokv.Store implementation for a simple Go sync.Map.
@@ -11,7 +13,7 @@ type GoMap struct {
 
 // Set stores the given object for the given key.
 func (m GoMap) Set(k string, v interface{}) error {
-	data, err := toJSON(v)
+	data, err := util.ToJSON(v)
 	if err != nil {
 		return err
 	}
@@ -27,7 +29,7 @@ func (m GoMap) Get(k string, v interface{}) (bool, error) {
 		return false, nil
 	}
 
-	return true, fromJSON(data.([]byte), v)
+	return true, util.FromJSON(data.([]byte), v)
 }
 
 // NewGoMap creates a new GoMap.
