@@ -1,4 +1,4 @@
-package gokv_test
+package bolt_test
 
 import (
 	"io/ioutil"
@@ -13,10 +13,10 @@ import (
 
 // TestBoltClient tests if reading and writing to the store works properly.
 func TestBoltClient(t *testing.T) {
-	boltOptions := gokv.BoltOptions{
+	boltOptions := bolt.BoltOptions{
 		Path: generateRandomTempDbPath(t),
 	}
-	boltClient, err := gokv.NewBoltClient(boltOptions)
+	boltClient, err := bolt.NewBoltClient(boltOptions)
 	if err != nil {
 		t.Error(err)
 	}
@@ -28,10 +28,10 @@ func TestBoltClient(t *testing.T) {
 // The BoltClient works with a single file, so everything should be locked properly.
 // The locking is implemented in the bbolt package, but test it nonetheless.
 func TestBoltClientConcurrent(t *testing.T) {
-	boltOptions := gokv.BoltOptions{
+	boltOptions := bolt.BoltOptions{
 		Path: generateRandomTempDbPath(t),
 	}
-	boltClient, err := gokv.NewBoltClient(boltOptions)
+	boltClient, err := bolt.NewBoltClient(boltOptions)
 	if err != nil {
 		t.Error(err)
 	}

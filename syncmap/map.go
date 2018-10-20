@@ -1,4 +1,4 @@
-package gokv
+package syncmap
 
 import (
 	"sync"

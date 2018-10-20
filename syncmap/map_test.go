@@ -1,4 +1,4 @@
-package gokv_test
+package syncmap_test
 
 import (
 	"strconv"
@@ -11,7 +11,7 @@ import (
 
 // TestGoMap tests if reading and writing to the store works properly.
 func TestGoMap(t *testing.T) {
-	goMap := gokv.NewGoMap()
+	goMap := syncmap.NewGoMap()
 
 	test.TestStore(goMap, t)
 }
@@ -19,7 +19,7 @@ func TestGoMap(t *testing.T) {
 // TestGoMapConcurrent launches a bunch of goroutines that concurrently work with one GoMap.
 // The GoMap is a sync.Map, so the concurrency should be supported by the used package.
 func TestGoMapConcurrent(t *testing.T) {
-	goMap := gokv.NewGoMap()
+	goMap := syncmap.NewGoMap()
 
 	goroutineCount := 1000
 

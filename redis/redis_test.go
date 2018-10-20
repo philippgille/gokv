@@ -1,4 +1,4 @@
-package gokv_test
+package redis_test
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/go-redis/redis"
+	goredis "github.com/go-redis/redis"
 
 	"github.com/philippgille/gokv/redis"
 	"github.com/philippgille/gokv/test"
@@ -25,10 +25,10 @@ func TestRedisClient(t *testing.T) {
 	}
 
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
-	redisOptions := gokv.RedisOptions{
+	redisOptions := redis.RedisOptions{
 		DB: testDbNumber,
 	}
-	redisClient := gokv.NewRedisClient(redisOptions)
+	redisClient := redis.NewRedisClient(redisOptions)
 
 	test.TestStore(redisClient, t)
 }
@@ -40,10 +40,10 @@ func TestRedisClientConcurrent(t *testing.T) {
 	}
 
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
-	redisOptions := gokv.RedisOptions{
+	redisOptions := redis.RedisOptions{
 		DB: testDbNumber,
 	}
-	redisClient := gokv.NewRedisClient(redisOptions)
+	redisClient := redis.NewRedisClient(redisOptions)
 
 	goroutineCount := 1000
 
@@ -74,9 +74,9 @@ func TestRedisClientConcurrent(t *testing.T) {
 
 // checkRedisConnection returns true if a connection could be made, false otherwise.
 func checkRedisConnection(number int) bool {
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     gokv.DefaultRedisOptions.Address,
-		Password: gokv.DefaultRedisOptions.Password,
+	redisClient := goredis.NewClient(&goredis.Options{
+		Addr:     redis.DefaultRedisOptions.Address,
+		Password: redis.DefaultRedisOptions.Password,
 		DB:       number,
 	})
 	err := redisClient.Ping().Err()
@@ -89,9 +89,9 @@ func checkRedisConnection(number int) bool {
 
 // deleteRedisDb deletes all entries of the given DB
 func deleteRedisDb(number int) error {
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     gokv.DefaultRedisOptions.Address,
-		Password: gokv.DefaultRedisOptions.Password,
+	redisClient := goredis.NewClient(&goredis.Options{
+		Addr:     redis.DefaultRedisOptions.Address,
+		Password: redis.DefaultRedisOptions.Password,
 		DB:       number,
 	})
 	return redisClient.FlushDB().Err()

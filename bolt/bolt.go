@@ -1,4 +1,4 @@
-package gokv
+package bolt
 
 import (
 	bolt "github.com/coreos/bbolt"
