@@ -1,4 +1,4 @@
-package gokv_test
+package test
 
 import (
 	"math/rand"
@@ -9,16 +9,17 @@ import (
 	"github.com/philippgille/gokv"
 )
 
-type foo struct {
+// Foo is just some struct for common tests.
+type Foo struct {
 	Bar string
 }
 
-// testStore tests if reading from and writing to the store works properly.
-func testStore(store gokv.Store, t *testing.T) {
+// TestStore tests if reading from and writing to the store works properly.
+func TestStore(store gokv.Store, t *testing.T) {
 	key := strconv.FormatInt(rand.Int63(), 10)
 
 	// Initially the key shouldn't exist
-	found, err := store.Get(key, new(foo))
+	found, err := store.Get(key, new(Foo))
 	if err != nil {
 		t.Error(err)
 	}
@@ -27,7 +28,7 @@ func testStore(store gokv.Store, t *testing.T) {
 	}
 
 	// Store an object
-	val := foo{
+	val := Foo{
 		Bar: "baz",
 	}
 	err = store.Set(key, val)
@@ -37,7 +38,7 @@ func testStore(store gokv.Store, t *testing.T) {
 
 	// Retrieve the object
 	expected := val
-	actualPtr := new(foo)
+	actualPtr := new(Foo)
 	found, err = store.Get(key, actualPtr)
 	if err != nil {
 		t.Error(err)
@@ -51,24 +52,24 @@ func testStore(store gokv.Store, t *testing.T) {
 	}
 }
 
-// interactWithStore reads from and writes to the DB. Meant to be executed in a goroutine.
+// InteractWithStore reads from and writes to the DB. Meant to be executed in a goroutine.
 // Does NOT check if the DB works correctly (that's done elsewhere),
 // only checks for errors that might occur due to concurrent access.
-func interactWithStore(store gokv.Store, key string, t *testing.T, waitGroup *sync.WaitGroup) {
+func InteractWithStore(store gokv.Store, key string, t *testing.T, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 
 	// Read
-	_, err := store.Get(key, new(foo))
+	_, err := store.Get(key, new(Foo))
 	if err != nil {
 		t.Error(err)
 	}
 	// Write
-	err = store.Set(key, foo{})
+	err = store.Set(key, Foo{})
 	if err != nil {
 		t.Error(err)
 	}
 	// Read
-	_, err = store.Get(key, new(foo))
+	_, err = store.Get(key, new(Foo))
 	if err != nil {
 		t.Error(err)
 	}

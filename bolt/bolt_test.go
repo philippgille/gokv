@@ -1,4 +1,4 @@
-package gokv_test
+package bolt_test
 
 import (
 	"io/ioutil"
@@ -7,30 +7,31 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/philippgille/gokv"
+	"github.com/philippgille/gokv/bolt"
+	"github.com/philippgille/gokv/test"
 )
 
-// TestBoltClient tests if reading and writing to the store works properly.
-func TestBoltClient(t *testing.T) {
-	boltOptions := gokv.BoltOptions{
+// TestStore tests if reading and writing to the store works properly.
+func TestStore(t *testing.T) {
+	options := bolt.Options{
 		Path: generateRandomTempDbPath(t),
 	}
-	boltClient, err := gokv.NewBoltClient(boltOptions)
+	store, err := bolt.NewStore(options)
 	if err != nil {
 		t.Error(err)
 	}
 
-	testStore(boltClient, t)
+	test.TestStore(store, t)
 }
 
-// TestBoltClientConcurrent launches a bunch of goroutines that concurrently work with one BoltClient.
-// The BoltClient works with a single file, so everything should be locked properly.
+// TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
+// The store works with a single file, so everything should be locked properly.
 // The locking is implemented in the bbolt package, but test it nonetheless.
-func TestBoltClientConcurrent(t *testing.T) {
-	boltOptions := gokv.BoltOptions{
+func TestStoreConcurrent(t *testing.T) {
+	options := bolt.Options{
 		Path: generateRandomTempDbPath(t),
 	}
-	boltClient, err := gokv.NewBoltClient(boltOptions)
+	store, err := bolt.NewStore(options)
 	if err != nil {
 		t.Error(err)
 	}
@@ -40,15 +41,15 @@ func TestBoltClientConcurrent(t *testing.T) {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(goroutineCount) // Must be called before any goroutine is started
 	for i := 0; i < goroutineCount; i++ {
-		go interactWithStore(boltClient, strconv.Itoa(i), t, &waitGroup)
+		go test.InteractWithStore(store, strconv.Itoa(i), t, &waitGroup)
 	}
 	waitGroup.Wait()
 
 	// Now make sure that all values are in the store
-	expected := foo{}
+	expected := test.Foo{}
 	for i := 0; i < goroutineCount; i++ {
-		actualPtr := new(foo)
-		found, err := boltClient.Get(strconv.Itoa(i), actualPtr)
+		actualPtr := new(test.Foo)
+		found, err := store.Get(strconv.Itoa(i), actualPtr)
 		if err != nil {
 			t.Errorf("An error occurred during the test: %v", err)
 		}

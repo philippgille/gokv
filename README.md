@@ -26,9 +26,9 @@ type Store interface {
 	// The implementation automatically unmarshalls the value if required.
 	// The unmarshalling source depends on the implementation. It can be JSON, gob etc.
 	// The automatic unmarshalling requires a pointer to a proper type being passed as parameter.
-	// The Get method will populate the fields of the object that the passed pointer
-	// points to with the values of the retrieved object's values.
-	// If no object is found it returns (false, nil).
+	// In case of a struct the Get method will populate the fields of the object that the passed
+	// pointer points to with the values of the retrieved object's values.
+	// If no value is found it returns (false, nil).
 	Get(string, interface{}) (bool, error)
 }
 ```

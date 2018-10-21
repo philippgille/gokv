@@ -1,21 +1,24 @@
-package gokv
+package redis
 
 import (
 	"github.com/go-redis/redis"
+
+	"github.com/philippgille/gokv/util"
 )
 
-// RedisClient is a gokv.Store implementation for Redis.
-type RedisClient struct {
+// Client is a gokv.Store implementation for Redis.
+type Client struct {
 	c *redis.Client
 }
 
 // Set stores the given object for the given key.
-func (c RedisClient) Set(k string, v interface{}) error {
+// Values are marshalled to JSON automatically.
+func (c Client) Set(k string, v interface{}) error {
 	// First turn the passed object into something that Redis can handle
 	// (the Set method takes an interface{}, but the Get method only returns a string,
 	// so it can be assumed that the interface{} parameter type is only for convenience
 	// for a couple of builtin types like int etc.).
-	data, err := toJSON(v)
+	data, err := util.ToJSON(v)
 	if err != nil {
 		return err
 	}
@@ -27,8 +30,11 @@ func (c RedisClient) Set(k string, v interface{}) error {
 	return nil
 }
 
-// Get retrieves the object for the given key and points the passed pointer to it.
-func (c RedisClient) Get(k string, v interface{}) (bool, error) {
+// Get retrieves the stored value for the given key.
+// You need to pass a pointer to the value, so in case of a struct
+// the automatic unmarshalling can populate the fields of the object
+// that v points to with the values of the retrieved object's values.
+func (c Client) Get(k string, v interface{}) (bool, error) {
 	data, err := c.c.Get(k).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -37,11 +43,11 @@ func (c RedisClient) Get(k string, v interface{}) (bool, error) {
 		return false, err
 	}
 
-	return true, fromJSON([]byte(data), v)
+	return true, util.FromJSON([]byte(data), v)
 }
 
-// RedisOptions are the options for the Redis DB.
-type RedisOptions struct {
+// Options are the options for the Redis client.
+type Options struct {
 	// Address of the Redis server, including the port.
 	// Optional ("localhost:6379" by default).
 	Address string
@@ -53,24 +59,24 @@ type RedisOptions struct {
 	DB int
 }
 
-// DefaultRedisOptions is a RedisOptions object with default values.
+// DefaultOptions is an Options object with default values.
 // Address: "localhost:6379", Password: "", DB: 0
-var DefaultRedisOptions = RedisOptions{
+var DefaultOptions = Options{
 	Address: "localhost:6379",
 	// No need to set Password or DB, since their Go zero values are fine for that
 }
 
-// NewRedisClient creates a new RedisClient.
-func NewRedisClient(redisOptions RedisOptions) RedisClient {
+// NewClient creates a new Redis client.
+func NewClient(options Options) Client {
 	// Set default values
-	if redisOptions.Address == "" {
-		redisOptions.Address = DefaultRedisOptions.Address
+	if options.Address == "" {
+		options.Address = DefaultOptions.Address
 	}
-	return RedisClient{
+	return Client{
 		c: redis.NewClient(&redis.Options{
-			Addr:     redisOptions.Address,
-			Password: redisOptions.Password,
-			DB:       redisOptions.DB,
+			Addr:     options.Address,
+			Password: options.Password,
+			DB:       options.DB,
 		}),
 	}
 }
