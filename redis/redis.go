@@ -7,12 +7,12 @@ import (
 )
 
 // RedisClient is a gokv.Store implementation for Redis.
-type RedisClient struct {
+type Client struct {
 	c *redis.Client
 }
 
 // Set stores the given object for the given key.
-func (c RedisClient) Set(k string, v interface{}) error {
+func (c Client) Set(k string, v interface{}) error {
 	// First turn the passed object into something that Redis can handle
 	// (the Set method takes an interface{}, but the Get method only returns a string,
 	// so it can be assumed that the interface{} parameter type is only for convenience
@@ -30,7 +30,7 @@ func (c RedisClient) Set(k string, v interface{}) error {
 }
 
 // Get retrieves the object for the given key and points the passed pointer to it.
-func (c RedisClient) Get(k string, v interface{}) (bool, error) {
+func (c Client) Get(k string, v interface{}) (bool, error) {
 	data, err := c.c.Get(k).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -43,7 +43,7 @@ func (c RedisClient) Get(k string, v interface{}) (bool, error) {
 }
 
 // RedisOptions are the options for the Redis DB.
-type RedisOptions struct {
+type Options struct {
 	// Address of the Redis server, including the port.
 	// Optional ("localhost:6379" by default).
 	Address string
@@ -57,22 +57,22 @@ type RedisOptions struct {
 
 // DefaultRedisOptions is a RedisOptions object with default values.
 // Address: "localhost:6379", Password: "", DB: 0
-var DefaultRedisOptions = RedisOptions{
+var DefaultOptions = Options{
 	Address: "localhost:6379",
 	// No need to set Password or DB, since their Go zero values are fine for that
 }
 
 // NewRedisClient creates a new RedisClient.
-func NewRedisClient(redisOptions RedisOptions) RedisClient {
+func NewClient(options Options) Client {
 	// Set default values
-	if redisOptions.Address == "" {
-		redisOptions.Address = DefaultRedisOptions.Address
+	if options.Address == "" {
+		options.Address = DefaultOptions.Address
 	}
-	return RedisClient{
+	return Client{
 		c: redis.NewClient(&redis.Options{
-			Addr:     redisOptions.Address,
-			Password: redisOptions.Password,
-			DB:       redisOptions.DB,
+			Addr:     options.Address,
+			Password: options.Password,
+			DB:       options.DB,
 		}),
 	}
 }

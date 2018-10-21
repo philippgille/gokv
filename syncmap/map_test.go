@@ -10,23 +10,23 @@ import (
 )
 
 // TestGoMap tests if reading and writing to the store works properly.
-func TestGoMap(t *testing.T) {
-	goMap := syncmap.NewGoMap()
+func TestStore(t *testing.T) {
+	store := syncmap.NewStore()
 
-	test.TestStore(goMap, t)
+	test.TestStore(store, t)
 }
 
 // TestGoMapConcurrent launches a bunch of goroutines that concurrently work with one GoMap.
 // The GoMap is a sync.Map, so the concurrency should be supported by the used package.
-func TestGoMapConcurrent(t *testing.T) {
-	goMap := syncmap.NewGoMap()
+func TestStoreConcurrent(t *testing.T) {
+	store := syncmap.NewStore()
 
 	goroutineCount := 1000
 
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(goroutineCount) // Must be called before any goroutine is started
 	for i := 0; i < goroutineCount; i++ {
-		go test.InteractWithStore(goMap, strconv.Itoa(i), t, &waitGroup)
+		go test.InteractWithStore(store, strconv.Itoa(i), t, &waitGroup)
 	}
 	waitGroup.Wait()
 
@@ -34,7 +34,7 @@ func TestGoMapConcurrent(t *testing.T) {
 	expected := test.Foo{}
 	for i := 0; i < goroutineCount; i++ {
 		actualPtr := new(test.Foo)
-		found, err := goMap.Get(strconv.Itoa(i), actualPtr)
+		found, err := store.Get(strconv.Itoa(i), actualPtr)
 		if err != nil {
 			t.Errorf("An error occurred during the test: %v", err)
 		}

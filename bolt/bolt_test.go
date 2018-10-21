@@ -12,26 +12,26 @@ import (
 )
 
 // TestBoltClient tests if reading and writing to the store works properly.
-func TestBoltClient(t *testing.T) {
-	boltOptions := bolt.BoltOptions{
+func TestStore(t *testing.T) {
+	options := bolt.Options{
 		Path: generateRandomTempDbPath(t),
 	}
-	boltClient, err := bolt.NewBoltClient(boltOptions)
+	store, err := bolt.NewStore(options)
 	if err != nil {
 		t.Error(err)
 	}
 
-	test.TestStore(boltClient, t)
+	test.TestStore(store, t)
 }
 
 // TestBoltClientConcurrent launches a bunch of goroutines that concurrently work with one BoltClient.
 // The BoltClient works with a single file, so everything should be locked properly.
 // The locking is implemented in the bbolt package, but test it nonetheless.
-func TestBoltClientConcurrent(t *testing.T) {
-	boltOptions := bolt.BoltOptions{
+func TestStoreConcurrent(t *testing.T) {
+	options := bolt.Options{
 		Path: generateRandomTempDbPath(t),
 	}
-	boltClient, err := bolt.NewBoltClient(boltOptions)
+	store, err := bolt.NewStore(options)
 	if err != nil {
 		t.Error(err)
 	}
@@ -41,7 +41,7 @@ func TestBoltClientConcurrent(t *testing.T) {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(goroutineCount) // Must be called before any goroutine is started
 	for i := 0; i < goroutineCount; i++ {
-		go test.InteractWithStore(boltClient, strconv.Itoa(i), t, &waitGroup)
+		go test.InteractWithStore(store, strconv.Itoa(i), t, &waitGroup)
 	}
 	waitGroup.Wait()
 
@@ -49,7 +49,7 @@ func TestBoltClientConcurrent(t *testing.T) {
 	expected := test.Foo{}
 	for i := 0; i < goroutineCount; i++ {
 		actualPtr := new(test.Foo)
-		found, err := boltClient.Get(strconv.Itoa(i), actualPtr)
+		found, err := store.Get(strconv.Itoa(i), actualPtr)
 		if err != nil {
 			t.Errorf("An error occurred during the test: %v", err)
 		}

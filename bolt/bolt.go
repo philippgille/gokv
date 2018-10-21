@@ -7,13 +7,13 @@ import (
 )
 
 // BoltClient is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
-type BoltClient struct {
+type Store struct {
 	db         *bolt.DB
 	bucketName string
 }
 
 // Set stores the given object for the given key.
-func (c BoltClient) Set(k string, v interface{}) error {
+func (c Store) Set(k string, v interface{}) error {
 	// First turn the passed object into something that Bolt can handle
 	data, err := util.ToJSON(v)
 	if err != nil {
@@ -33,7 +33,7 @@ func (c BoltClient) Set(k string, v interface{}) error {
 
 // Get retrieves the stored object for the given key and populates the fields of the object that v points to
 // with the values of the retrieved object's values.
-func (c BoltClient) Get(k string, v interface{}) (bool, error) {
+func (c Store) Get(k string, v interface{}) (bool, error) {
 	var data []byte
 	err := c.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(c.bucketName))
@@ -53,7 +53,7 @@ func (c BoltClient) Get(k string, v interface{}) (bool, error) {
 }
 
 // BoltOptions are the options for the BoltClient.
-type BoltOptions struct {
+type Options struct {
 	// Bucket name for storing the key-value pairs.
 	// Optional ("default" by default).
 	BucketName string
@@ -64,7 +64,7 @@ type BoltOptions struct {
 
 // DefaultBoltOptions is a BoltOptions object with default values.
 // BucketName: "default", Path: "bolt.db"
-var DefaultBoltOptions = BoltOptions{
+var DefaultOptions = Options{
 	BucketName: "default",
 	Path:       "bolt.db",
 }
@@ -74,19 +74,19 @@ var DefaultBoltOptions = BoltOptions{
 // So when creating multiple Bolt clients you should always use a new database file (by setting a different Path in the BoltOptions).
 //
 // Don't worry about closing the Bolt DB as long as you don't need to close the DB while the process that opened it runs.
-func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
-	result := BoltClient{}
+func NewStore(options Options) (Store, error) {
+	result := Store{}
 
 	// Set default values
-	if boltOptions.BucketName == "" {
-		boltOptions.BucketName = DefaultBoltOptions.BucketName
+	if options.BucketName == "" {
+		options.BucketName = DefaultOptions.BucketName
 	}
-	if boltOptions.Path == "" {
-		boltOptions.Path = DefaultBoltOptions.Path
+	if options.Path == "" {
+		options.Path = DefaultOptions.Path
 	}
 
 	// Open DB
-	db, err := bolt.Open(boltOptions.Path, 0600, nil)
+	db, err := bolt.Open(options.Path, 0600, nil)
 	if err != nil {
 		return result, err
 	}
@@ -94,7 +94,7 @@ func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
 	// Create a bucket if it doesn't exist yet.
 	// In Bolt key/value pairs are stored to and read from buckets.
 	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(boltOptions.BucketName))
+		_, err := tx.CreateBucketIfNotExists([]byte(options.BucketName))
 		if err != nil {
 			return err
 		}
@@ -104,9 +104,9 @@ func NewBoltClient(boltOptions BoltOptions) (BoltClient, error) {
 		return result, err
 	}
 
-	result = BoltClient{
+	result = Store{
 		db:         db,
-		bucketName: boltOptions.BucketName,
+		bucketName: options.BucketName,
 	}
 
 	return result, nil
