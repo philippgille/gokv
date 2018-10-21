@@ -41,7 +41,7 @@ Implementations ([![PRs Welcome](https://img.shields.io/badge/PRs-welcome-bright
     - [ ] Go map (`map[string]interface{}` with `sync.RWMutex`)
 - Embedded
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
-        - bbolt is a fork of Bolt which was maintained by CoreOS, and now by RedHat (since CoreOS was acquired by them)
+        - bbolt is a fork of Bolt which was maintained by CoreOS, and now by Red Hat (since CoreOS was acquired by them)
         - It's used for example in [etcd](https://github.com/etcd-io/etcd) as underlying persistent store
     - [ ] [BadgerDB](https://github.com/dgraph-io/badger)
         - Very similar to bbolt / Bolt, where bbolt is generally faster for reads, and Badger is generally faster for writes
