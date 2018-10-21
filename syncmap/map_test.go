@@ -9,15 +9,15 @@ import (
 	"github.com/philippgille/gokv/test"
 )
 
-// TestGoMap tests if reading and writing to the store works properly.
+// TestStore tests if reading and writing to the store works properly.
 func TestStore(t *testing.T) {
 	store := syncmap.NewStore()
 
 	test.TestStore(store, t)
 }
 
-// TestGoMapConcurrent launches a bunch of goroutines that concurrently work with one GoMap.
-// The GoMap is a sync.Map, so the concurrency should be supported by the used package.
+// TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
+// The store is a sync.Map, so the concurrency should be supported by the used package.
 func TestStoreConcurrent(t *testing.T) {
 	store := syncmap.NewStore()
 

@@ -11,7 +11,7 @@ import (
 	"github.com/philippgille/gokv/test"
 )
 
-// TestBoltClient tests if reading and writing to the store works properly.
+// TestStore tests if reading and writing to the store works properly.
 func TestStore(t *testing.T) {
 	options := bolt.Options{
 		Path: generateRandomTempDbPath(t),
@@ -24,8 +24,8 @@ func TestStore(t *testing.T) {
 	test.TestStore(store, t)
 }
 
-// TestBoltClientConcurrent launches a bunch of goroutines that concurrently work with one BoltClient.
-// The BoltClient works with a single file, so everything should be locked properly.
+// TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
+// The store works with a single file, so everything should be locked properly.
 // The locking is implemented in the bbolt package, but test it nonetheless.
 func TestStoreConcurrent(t *testing.T) {
 	options := bolt.Options{

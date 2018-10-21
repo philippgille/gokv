@@ -16,7 +16,7 @@ import (
 // which could lead to valuable data being deleted when a developer accidentally runs the test with valuable data in DB 0.
 var testDbNumber = 15 // 16 DBs by default (unchanged config), starting with 0
 
-// TestRedisClient tests if reading and writing to the store works properly.
+// TestClient tests if reading and writing to the store works properly.
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClient(t *testing.T) {
@@ -33,7 +33,7 @@ func TestClient(t *testing.T) {
 	test.TestStore(client, t)
 }
 
-// TestRedisClientConcurrent launches a bunch of goroutines that concurrently work with the Redis client.
+// TestClientConcurrent launches a bunch of goroutines that concurrently work with the Redis client.
 func TestClientConcurrent(t *testing.T) {
 	if !checkRedisConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")

@@ -6,13 +6,14 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
-// BoltClient is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
+// Store is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
 type Store struct {
 	db         *bolt.DB
 	bucketName string
 }
 
-// Set stores the given object for the given key.
+// Set stores the given value for the given key.
+// Values are marshalled to JSON automatically.
 func (c Store) Set(k string, v interface{}) error {
 	// First turn the passed object into something that Bolt can handle
 	data, err := util.ToJSON(v)
@@ -31,8 +32,10 @@ func (c Store) Set(k string, v interface{}) error {
 	return nil
 }
 
-// Get retrieves the stored object for the given key and populates the fields of the object that v points to
-// with the values of the retrieved object's values.
+// Get retrieves the stored value for the given key.
+// You need to pass a pointer to the value, so in case of a struct
+// the automatic unmarshalling can populate the fields of the object
+// that v points to with the values of the retrieved object's values.
 func (c Store) Get(k string, v interface{}) (bool, error) {
 	var data []byte
 	err := c.db.View(func(tx *bolt.Tx) error {
@@ -52,7 +55,7 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 	return true, util.FromJSON(data, v)
 }
 
-// BoltOptions are the options for the BoltClient.
+// Options are the options for the Bolt store.
 type Options struct {
 	// Bucket name for storing the key-value pairs.
 	// Optional ("default" by default).
@@ -62,16 +65,16 @@ type Options struct {
 	Path string
 }
 
-// DefaultBoltOptions is a BoltOptions object with default values.
+// DefaultOptions is an Options object with default values.
 // BucketName: "default", Path: "bolt.db"
 var DefaultOptions = Options{
 	BucketName: "default",
 	Path:       "bolt.db",
 }
 
-// NewBoltClient creates a new BoltClient.
+// NewStore creates a new Bolt store.
 // Note: Bolt uses an exclusive write lock on the database file so it cannot be shared by multiple processes.
-// So when creating multiple Bolt clients you should always use a new database file (by setting a different Path in the BoltOptions).
+// So when creating multiple clients you should always use a new database file (by setting a different Path in the options).
 //
 // Don't worry about closing the Bolt DB as long as you don't need to close the DB while the process that opened it runs.
 func NewStore(options Options) (Store, error) {

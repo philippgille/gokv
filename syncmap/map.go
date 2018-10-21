@@ -6,12 +6,13 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
-// GoMap is a gokv.Store implementation for a simple Go sync.Map.
+// Store is a gokv.Store implementation for a Go sync.Map.
 type Store struct {
 	m *sync.Map
 }
 
 // Set stores the given object for the given key.
+// Values are marshalled to JSON automatically.
 func (m Store) Set(k string, v interface{}) error {
 	data, err := util.ToJSON(v)
 	if err != nil {
@@ -21,8 +22,10 @@ func (m Store) Set(k string, v interface{}) error {
 	return nil
 }
 
-// Get retrieves the stored object for the given key and populates the fields of the object that v points to
-// with the values of the retrieved object's values.
+// Get retrieves the stored value for the given key.
+// You need to pass a pointer to the value, so in case of a struct
+// the automatic unmarshalling can populate the fields of the object
+// that v points to with the values of the retrieved object's values.
 func (m Store) Get(k string, v interface{}) (bool, error) {
 	data, found := m.m.Load(k)
 	if !found {
@@ -32,7 +35,7 @@ func (m Store) Get(k string, v interface{}) (bool, error) {
 	return true, util.FromJSON(data.([]byte), v)
 }
 
-// NewGoMap creates a new GoMap.
+// NewStore creates a new Go sync.Map store.
 func NewStore() Store {
 	return Store{
 		m: &sync.Map{},
