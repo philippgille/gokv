@@ -6,7 +6,7 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
-// Store is a gokv.Store implementation for a Go map.
+// Store is a gokv.Store implementation for a Go map with a sync.RWMutex for concurrent access.
 type Store struct {
 	m    map[string][]byte
 	lock *sync.RWMutex
