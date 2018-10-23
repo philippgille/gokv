@@ -14,7 +14,11 @@ before_install:
   - go env
 
 script:
-  # builds
+  # Build
   - go build github.com/philippgille/gokv/...
-  # tests
-  - go test -v github.com/philippgille/gokv/...
+  # Test and generate code coverage report
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic github.com/philippgille/gokv/...
+
+after_success:
+  # Upload coverage data to codecov.io
+  - bash <(curl -s https://codecov.io/bash)
