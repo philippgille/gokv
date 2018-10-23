@@ -8,7 +8,7 @@ Simple key-value store abstraction and implementations for Go
 Features
 --------
 
-Simple interface:
+### Simple interface
 
 > Note: The interface is not final yet! See [Project status](#project-status) for details.
 
@@ -21,7 +21,9 @@ type Store interface {
 
 There are detailed descriptions of the methods in the [docs](https://www.godoc.org/github.com/philippgille/gokv#Store) and in the [code](https://github.com/philippgille/gokv/blob/master/store.go). You should read them if you plan to write your own `gokv.Store` implementation or if you create a Go package with a method that takes a `gokv.Store` as parameter, so you know exactly what happens in the background.
 
-Implementations ([![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)):
+### Implementations
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 - Local in-memory
     - [X] Go map (`sync.Map`)
