@@ -28,7 +28,7 @@ There are detailed descriptions of the methods in the [docs](https://www.godoc.o
 - Local in-memory
     - [X] Go map (`sync.Map`)
         - Faster then a regular map when there are very few writes but lots of reads
-    - [ ] Go map (`map[string]interface{}` with `sync.RWMutex`)
+    - [X] Go map (`map[string]byte[]` with `sync.RWMutex`)
 - Embedded
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
         - bbolt is a fork of Bolt which was maintained by CoreOS, and now by Red Hat (since CoreOS was acquired by them)
