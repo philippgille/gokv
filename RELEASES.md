@@ -11,6 +11,7 @@ vNext
 - Added: Package `gomap` - A `gokv.Store` implementation for a plain Go map with a `sync.RWMutex` for concurrent access (issue [#11](https://github.com/philippgille/gokv/issues/11))
 - Improved: Every `gokv.Store` implementation resides in its own package now, so when downloading the package of an implementation, for example with `go get github.com/philippgille/gokv/redis`, only the actually required dependencies are downloaded and compiled, making the process much faster. This is especially useful for example when creating Docker images, where in many cases (depending on the `Dockerfile`) the download and compilation are repeated for *each build*. (Issue [#2](https://github.com/philippgille/gokv/issues/2))
 - Improved: The performance of BoltClient should be higher, because unnecessary manual locking was removed. (Issue [#1](https://github.com/philippgille/gokv/issues/1))
+- Fixed: The `gokv.Store` implementation for bbolt / Bolt DB used data from within a Bolt transaction outside of it, without copying the value, which can lead to errors (see [here](https://github.com/etcd-io/bbolt/blob/76a4670663d125b6b89d47ea3cc659a282d87c28/doc.go#L38)) (issue [#13](https://github.com/philippgille/gokv/issues/13))
 
 ### Breaking changes
 

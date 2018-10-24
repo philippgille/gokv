@@ -23,8 +23,7 @@ func (c Store) Set(k string, v interface{}) error {
 
 	err = c.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(c.bucketName))
-		err := b.Put([]byte(k), data)
-		return err
+		return b.Put([]byte(k), data)
 	})
 	if err != nil {
 		return err
@@ -38,14 +37,20 @@ func (c Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 func (c Store) Get(k string, v interface{}) (bool, error) {
 	var data []byte
-	err := c.db.View(func(tx *bolt.Tx) error {
+	c.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(c.bucketName))
-		data = b.Get([]byte(k))
+		txData := b.Get([]byte(k))
+		// txData is only valid during the transaction.
+		// Its value must be copied to make it valid outside of the tx.
+		// TODO: Benchmark if it's faster to copy + close tx,
+		// or to keep the tx open until unmarshalling is done.
+		if txData != nil {
+			// `data = append([]byte{}, txData...)` would also work, but the following is more explicit
+			data = make([]byte, len(txData))
+			copy(data, txData)
+		}
 		return nil
 	})
-	if err != nil {
-		return false, err
-	}
 
 	// If no value was found assign nil to the pointer
 	if data == nil {
