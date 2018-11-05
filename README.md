@@ -16,6 +16,7 @@ Features
 type Store interface {
 	Set(string, interface{}) error
 	Get(string, interface{}) (bool, error)
+	Delete(string) error
 }
 ```
 
@@ -72,7 +73,6 @@ Project status
 
 Planned interface methods until `v1.0.0`:
 
-- `Delete(string) error` or similar
 - `List(interface{}) error` / `GetAll(interface{}) error` or similar
 
 Motivation
@@ -87,7 +87,7 @@ Design decisions
 
 - `gokv` is primarily an abstraction for key-value stores, not caches, so there's no need for cache eviction options and timeouts.
 - The package should be usable without having to write additional code, so structs should be automatically (un-)marshalled, without having to implement `Marshal()` and `Unmarshal()` first. It's still possible to implement those methods to customize the (un-)marshalling, for example to include non-exported fields, or for higher performance (because the `encoding/json` package doesn't have to use reflection).
-- It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
+- It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a boolean return value for the `Delete` method that indicates whether a value was actually deleted (because it was previously present) can be useful, but isn't a must-have, and also it would require some `Store` implementations to implement the check by themselves (because the existing libraries don't support it), which would decrease performance. Or as another example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
     - In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
 - Similar projects name the structs that are implementations of the store interface according to the backing store, for example `boltdb.BoltDB`, but this leads to so called "stuttering" that's discouraged when writing idiomatic Go. That's why `gokv` uses for example `bolt.Store` and `syncmap.Store`. For easier differentiation between embedded DBs and DBs that have a client and a server component though, the first ones are called `Store` and the latter ones are called `Client`, for example `redis.Client`.
 

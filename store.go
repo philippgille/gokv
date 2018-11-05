@@ -17,4 +17,7 @@ type Store interface {
 	// pointer points to with the values of the retrieved object's values.
 	// If no value is found it returns (false, nil).
 	Get(string, interface{}) (bool, error)
+	// Delete deletes the stored value for the given key.
+	// Deleting a non-existing key-value pair does NOT lead to an error.
+	Delete(string) error
 }

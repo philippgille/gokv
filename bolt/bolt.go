@@ -60,6 +60,15 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 	return true, util.FromJSON(data, v)
 }
 
+// Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
+func (c Store) Delete(k string) error {
+	return c.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(c.bucketName))
+		return b.Delete([]byte(k))
+	})
+}
+
 // Options are the options for the Bolt store.
 type Options struct {
 	// Bucket name for storing the key-value pairs.

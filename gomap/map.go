@@ -43,6 +43,13 @@ func (m Store) Get(k string, v interface{}) (bool, error) {
 	return true, util.FromJSON(data, v)
 }
 
+// Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
+func (m Store) Delete(k string) error {
+	delete(m.m, k)
+	return nil
+}
+
 // NewStore creates a new Go sync.Map store.
 func NewStore() Store {
 	return Store{

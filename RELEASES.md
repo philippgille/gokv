@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added: `Delete(string) error` method (issue [#8](https://github.com/philippgille/gokv/issues/8))
+
 v0.2.0 (2018-11-05)
 -------------------
 
