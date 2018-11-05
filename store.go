@@ -18,5 +18,6 @@ type Store interface {
 	// If no value is found it returns (false, nil).
 	Get(string, interface{}) (bool, error)
 	// Delete deletes the stored value for the given key.
+	// Deleting a non-existing key-value pair does NOT lead to an error.
 	Delete(string) error
 }

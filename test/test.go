@@ -27,6 +27,12 @@ func TestStore(store gokv.Store, t *testing.T) {
 		t.Error("A value was found, but no value was expected")
 	}
 
+	// Deleting a non-existing key-value pair should NOT lead to an error
+	err = store.Delete(key)
+	if err != nil {
+		t.Error(err)
+	}
+
 	// Store an object
 	val := Foo{
 		Bar: "baz",
