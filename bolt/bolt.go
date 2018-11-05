@@ -61,6 +61,7 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 }
 
 // Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
 func (c Store) Delete(k string) error {
 	return c.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(c.bucketName))

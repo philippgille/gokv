@@ -44,6 +44,7 @@ func (m Store) Get(k string, v interface{}) (bool, error) {
 }
 
 // Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
 func (m Store) Delete(k string) error {
 	delete(m.m, k)
 	return nil

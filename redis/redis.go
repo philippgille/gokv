@@ -47,6 +47,7 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 }
 
 // Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
 func (c Client) Delete(k string) error {
 	_, err := c.c.Del(k).Result()
 	return err
