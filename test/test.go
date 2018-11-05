@@ -24,7 +24,7 @@ func TestStore(store gokv.Store, t *testing.T) {
 		t.Error(err)
 	}
 	if found {
-		t.Errorf("A value was found, but no value was expected")
+		t.Error("A value was found, but no value was expected")
 	}
 
 	// Store an object
@@ -49,6 +49,20 @@ func TestStore(store gokv.Store, t *testing.T) {
 	actual := *actualPtr
 	if actual != expected {
 		t.Errorf("Expected: %v, but was: %v", expected, actual)
+	}
+
+	// Delete
+	err = store.Delete(key)
+	if err != nil {
+		t.Error(err)
+	}
+	// Key-value pair shouldn't exist anymore
+	found, err = store.Get(key, new(Foo))
+	if err != nil {
+		t.Error(err)
+	}
+	if found {
+		t.Error("A value was found, but no value was expected")
 	}
 }
 
