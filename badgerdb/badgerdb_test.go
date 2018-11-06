@@ -7,16 +7,16 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/philippgille/gokv/bolt"
+	"github.com/philippgille/gokv/badgerdb"
 	"github.com/philippgille/gokv/test"
 )
 
 // TestStore tests if reading and writing to the store works properly.
 func TestStore(t *testing.T) {
-	options := bolt.Options{
-		Path: generateRandomTempDbPath(t),
+	options := badgerdb.Options{
+		Dir: generateRandomTempDBpath(t),
 	}
-	store, err := bolt.NewStore(options)
+	store, err := badgerdb.NewStore(options)
 	if err != nil {
 		t.Error(err)
 	}
@@ -26,12 +26,12 @@ func TestStore(t *testing.T) {
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 // The store works with a single file, so everything should be locked properly.
-// The locking is implemented in the bbolt package, but test it nonetheless.
+// The locking is implemented in the BadgerDB package, but test it nonetheless.
 func TestStoreConcurrent(t *testing.T) {
-	options := bolt.Options{
-		Path: generateRandomTempDbPath(t),
+	options := badgerdb.Options{
+		Dir: generateRandomTempDBpath(t),
 	}
-	store, err := bolt.NewStore(options)
+	store, err := badgerdb.NewStore(options)
 	if err != nil {
 		t.Error(err)
 	}
@@ -63,11 +63,10 @@ func TestStoreConcurrent(t *testing.T) {
 	}
 }
 
-func generateRandomTempDbPath(t *testing.T) string {
-	path, err := ioutil.TempDir(os.TempDir(), "bolt")
+func generateRandomTempDBpath(t *testing.T) string {
+	path, err := ioutil.TempDir(os.TempDir(), "BadgerDB")
 	if err != nil {
 		t.Errorf("Generating random DB path failed: %v", err)
 	}
-	path += "/bolt.db"
 	return path
 }
