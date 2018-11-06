@@ -41,7 +41,8 @@ There are detailed descriptions of the methods in the [docs](https://www.godoc.o
     - [ ] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
 - Distributed
     - [X] [Redis](https://github.com/antirez/redis)
-    - [ ] [Consul](https://github.com/hashicorp/consul)
+    - [X] [Consul](https://github.com/hashicorp/consul)
+        - > Note: Consul doesn't allow values larger than 512 KB
     - [ ] [etcd](https://github.com/etcd-io/etcd)
         - Not advertised as general key-value store, but can be used as one
     - [ ] [Memcached](https://github.com/memcached/memcached)

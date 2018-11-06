@@ -1,5 +1,10 @@
+# Sudo is required for running Docker
+sudo: required
+
 services:
   - redis-server
+  # Docker is required for running some services that aren't provided by Travis CI, e.g. Consul
+  - docker
 
 git:
   depth: 1
@@ -16,6 +21,12 @@ before_install:
 script:
   # Build
   - go build -v github.com/philippgille/gokv/...
+  # Start Consul so it can be used in the tests
+  - docker run -d --rm -p 8500:8500 bitnami/consul
+  # Wait for Consul to start
+  # TODO: Use something like a while-loop with 1s sleep and
+  # curl request to "http://127.0.0.1:8500/v1/status/leader" and loop until the response is a 200 OK with a proper body
+  - sleep 10s
   # Test and generate code coverage report
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic github.com/philippgille/gokv/...
 

@@ -10,6 +10,7 @@ vNext
 
 - Added: Method `Delete(string) error` (issue [#8](https://github.com/philippgille/gokv/issues/8))
 - Added: Package `badgerdb` - A `gokv.Store` implementation for [BadgerDB](https://github.com/dgraph-io/badger) (issue [#16](https://github.com/philippgille/gokv/issues/16))
+- Added: Package `consul` - A `gokv.Store` implementation for [Consul](https://github.com/hashicorp/consul) (issue [#18](https://github.com/philippgille/gokv/issues/18))
 
 v0.2.0 (2018-11-05)
 -------------------
