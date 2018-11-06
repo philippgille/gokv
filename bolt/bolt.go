@@ -52,7 +52,7 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 		return nil
 	})
 
-	// If no value was found assign nil to the pointer
+	// If no value was found return false
 	if data == nil {
 		return false, nil
 	}
