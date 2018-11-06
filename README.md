@@ -34,8 +34,10 @@ There are detailed descriptions of the methods in the [docs](https://www.godoc.o
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
         - bbolt is a fork of Bolt which was maintained by CoreOS, and now by Red Hat (since CoreOS was acquired by them)
         - It's used for example in [etcd](https://github.com/etcd-io/etcd) as underlying persistent store
-    - [ ] [BadgerDB](https://github.com/dgraph-io/badger)
-        - Very similar to bbolt / Bolt, where bbolt is generally faster for reads, and Badger is generally faster for writes
+        - It uses a B+ tree, which generally means that it's very fast for read operations
+    - [X] [BadgerDB](https://github.com/dgraph-io/badger)
+        - It's used for example in [Dgraph](https://github.com/dgraph-io/dgraph), a distributed graph DB
+        - It uses an LSM tree, which generally means that it's very fast for write operations
     - [ ] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
 - Distributed
     - [X] [Redis](https://github.com/antirez/redis)
