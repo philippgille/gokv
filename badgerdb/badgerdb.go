@@ -48,13 +48,11 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 		}
 		return nil
 	})
-	if err != nil {
-		return false, err
-	}
-
 	// If no value was found return false
-	if data == nil {
+	if err == badger.ErrKeyNotFound {
 		return false, nil
+	} else if err != nil {
+		return false, err
 	}
 
 	return true, util.FromJSON(data, v)
