@@ -39,18 +39,19 @@ There are detailed descriptions of the methods in the [docs](https://www.godoc.o
         - It's used for example in [Dgraph](https://github.com/dgraph-io/dgraph), a distributed graph DB
         - It uses an LSM tree, which generally means that it's very fast for write operations
     - [ ] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
-- Distributed
+- Distributed store
     - [X] [Redis](https://github.com/antirez/redis)
     - [X] [Consul](https://github.com/hashicorp/consul)
         - > Note: Consul doesn't allow values larger than 512 KB
     - [ ] [etcd](https://github.com/etcd-io/etcd)
         - Not advertised as general key-value store, but can be used as one
-    - [ ] [Memcached](https://github.com/memcached/memcached)
-    - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
     - [ ] [LedisDB](https://github.com/siddontang/ledisdb)
         - Similar to Redis, with several backing stores
     - [ ] [TiKV](https://github.com/tikv/tikv)
         - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
+- Distributed cache (no presistence *by default*)
+    - [ ] [Memcached](https://github.com/memcached/memcached)
+    - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
     - [ ] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
     - [ ] [Amazon SimpleDB](https://aws.amazon.com/simpledb/)
