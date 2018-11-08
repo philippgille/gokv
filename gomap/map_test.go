@@ -9,11 +9,17 @@ import (
 	"github.com/philippgille/gokv/test"
 )
 
-// TestStore tests if reading and writing to the store works properly.
+// TestStore tests if reading from, writing to and deleting from the store works properly.
+// A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
 func TestStore(t *testing.T) {
 	store := gomap.NewStore()
-
 	test.TestStore(store, t)
+}
+
+// TestTypes tests if setting and getting values works with all Go types.
+func TestTypes(t *testing.T) {
+	store := gomap.NewStore()
+	test.TestTypes(store, t)
 }
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.

@@ -11,17 +11,17 @@ import (
 	"github.com/philippgille/gokv/test"
 )
 
-// TestStore tests if reading and writing to the store works properly.
+// TestStore tests if reading from, writing to and deleting from the store works properly.
+// A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
 func TestStore(t *testing.T) {
-	options := bolt.Options{
-		Path: generateRandomTempDbPath(t),
-	}
-	store, err := bolt.NewStore(options)
-	if err != nil {
-		t.Error(err)
-	}
-
+	store := createStore(t)
 	test.TestStore(store, t)
+}
+
+// TestTypes tests if setting and getting values works with all Go types.
+func TestTypes(t *testing.T) {
+	store := createStore(t)
+	test.TestTypes(store, t)
 }
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
@@ -61,6 +61,17 @@ func TestStoreConcurrent(t *testing.T) {
 			t.Errorf("Expected: %v, but was: %v", expected, actual)
 		}
 	}
+}
+
+func createStore(t *testing.T) bolt.Store {
+	options := bolt.Options{
+		Path: generateRandomTempDbPath(t),
+	}
+	store, err := bolt.NewStore(options)
+	if err != nil {
+		t.Error(err)
+	}
+	return store
 }
 
 func generateRandomTempDbPath(t *testing.T) string {

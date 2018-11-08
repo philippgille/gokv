@@ -16,24 +16,36 @@ import (
 // which could lead to valuable data being deleted when a developer accidentally runs the test with valuable data in DB 0.
 var testDbNumber = 15 // 16 DBs by default (unchanged config), starting with 0
 
-// TestClient tests if reading and writing to the store works properly.
+// TestClient tests if reading from, writing to and deleting from the store works properly.
+// A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClient(t *testing.T) {
 	if !checkRedisConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
-	options := redis.Options{
-		DB: testDbNumber,
-	}
-	client := redis.NewClient(options)
 
+	client := createClient(t)
 	test.TestStore(client, t)
 }
 
+// TestTypes tests if setting and getting values works with all Go types.
+//
+// Note: This test is only executed if the initial connection to Redis works.
+func TestTypes(t *testing.T) {
+	if !checkRedisConnection(testDbNumber) {
+		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
+	}
+	deleteRedisDb(testDbNumber) // Prep for previous test runs
+
+	client := createClient(t)
+	test.TestTypes(client, t)
+}
+
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the Redis client.
+//
+// Note: This test is only executed if the initial connection to Redis works.
 func TestClientConcurrent(t *testing.T) {
 	if !checkRedisConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
@@ -95,4 +107,12 @@ func deleteRedisDb(number int) error {
 		DB:       number,
 	})
 	return client.FlushDB().Err()
+}
+
+func createClient(t *testing.T) redis.Client {
+	options := redis.Options{
+		DB: testDbNumber,
+	}
+	client := redis.NewClient(options)
+	return client
 }
