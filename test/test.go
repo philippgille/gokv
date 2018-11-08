@@ -77,23 +77,23 @@ func TestStore(store gokv.Store, t *testing.T) {
 
 // TestTypes tests if setting and getting values works with all Go types.
 func TestTypes(store gokv.Store, t *testing.T) {
-	b := true
-	f := 1.2
-	i := 1
-	r := '⚡'
-	s := "foo"
+	boolVar := true
+	floatVar := 1.2
+	intVar := 1
+	runeVar := '⚡'
+	stringVar := "foo"
 
-	ba := []bool{true, false}
-	byteA := []byte("foo")
-	ia := []int{1, 2}
-	sa := []string{"foo", "bar"}
+	sliceOfBool := []bool{true, false}
+	sliceOfByte := []byte("foo")
+	sliceOfInt := []int{1, 2}
+	sliceOfString := []string{"foo", "bar"}
 
 	testVals := []struct {
 		subTestName string
 		val         interface{}
 		testGet     func(*testing.T, gokv.Store, string, interface{})
 	}{
-		{"bool", b, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"bool", boolVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(bool)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -102,7 +102,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"float", f, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"float", floatVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(float64)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -111,7 +111,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"int", i, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"int", intVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(int)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -120,7 +120,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"rune", r, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"rune", runeVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(rune)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -129,7 +129,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"string", s, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"string", stringVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(string)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -138,7 +138,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"slice of bool", ba, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of bool", sliceOfBool, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]bool)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -147,7 +147,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of byte", byteA, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of byte", sliceOfByte, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]byte)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -156,7 +156,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of int", ia, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of int", sliceOfInt, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]int)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -165,7 +165,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of string", sa, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of string", sliceOfString, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]string)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)

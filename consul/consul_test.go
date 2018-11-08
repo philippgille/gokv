@@ -70,7 +70,7 @@ func TestClientConcurrent(t *testing.T) {
 			t.Errorf("An error occurred during the test: %v", err)
 		}
 		if !found {
-			t.Errorf("No value was found, but should have been")
+			t.Error("No value was found, but should have been")
 		}
 		actual := *actualPtr
 		if actual != expected {
