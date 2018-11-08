@@ -12,8 +12,13 @@ import (
 // TestStore tests if reading and writing to the store works properly.
 func TestStore(t *testing.T) {
 	store := syncmap.NewStore()
-
 	test.TestStore(store, t)
+}
+
+// TestTypes tests if setting and getting values works with all Go types.
+func TestTypes(t *testing.T) {
+	store := syncmap.NewStore()
+	test.TestTypes(store, t)
 }
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
@@ -39,7 +44,7 @@ func TestStoreConcurrent(t *testing.T) {
 			t.Errorf("An error occurred during the test: %v", err)
 		}
 		if !found {
-			t.Errorf("No value was found, but should have been")
+			t.Error("No value was found, but should have been")
 		}
 		actual := *actualPtr
 		if actual != expected {

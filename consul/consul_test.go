@@ -12,7 +12,8 @@ import (
 	"github.com/philippgille/gokv/test"
 )
 
-// TestClient tests if reading and writing to the store works properly.
+// TestClient tests if reading from, writing to and deleting from the store works properly.
+// A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
 //
 // Note: This test is only executed if the initial connection to Consul works.
 func TestClient(t *testing.T) {
@@ -20,17 +21,25 @@ func TestClient(t *testing.T) {
 		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
 	}
 
-	options := consul.DefaultOptions
-	options.Folder = "test_" + strconv.FormatInt(time.Now().Unix(), 10)
-	client, err := consul.NewClient(options)
-	if err != nil {
-		t.Error(err)
-	}
-
+	client := createClient(t)
 	test.TestStore(client, t)
 }
 
+// TestTypes tests if setting and getting values works with all Go types.
+//
+// Note: This test is only executed if the initial connection to Consul works.
+func TestTypes(t *testing.T) {
+	if !checkConsulConnection() {
+		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
+	}
+
+	client := createClient(t)
+	test.TestTypes(client, t)
+}
+
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the Consul client.
+//
+// Note: This test is only executed if the initial connection to Consul works.
 func TestClientConcurrent(t *testing.T) {
 	if !checkConsulConnection() {
 		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
@@ -61,7 +70,7 @@ func TestClientConcurrent(t *testing.T) {
 			t.Errorf("An error occurred during the test: %v", err)
 		}
 		if !found {
-			t.Errorf("No value was found, but should have been")
+			t.Error("No value was found, but should have been")
 		}
 		actual := *actualPtr
 		if actual != expected {
@@ -81,4 +90,14 @@ func checkConsulConnection() bool {
 		return false
 	}
 	return true
+}
+
+func createClient(t *testing.T) consul.Client {
+	options := consul.DefaultOptions
+	options.Folder = "test_" + strconv.FormatInt(time.Now().Unix(), 10)
+	client, err := consul.NewClient(options)
+	if err != nil {
+		t.Error(err)
+	}
+	return client
 }
