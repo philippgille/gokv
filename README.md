@@ -5,6 +5,18 @@ gokv
 
 Simple key-value store abstraction and implementations for Go
 
+Contents
+--------
+
+1. [Features](#features)
+    1. [Simple interface](#simple-interface)
+    2. [Value types](#value-types)
+    3. [Implementations](#implementations)
+2. [Project status](#project-status)
+3. [Motivation](#motivation)
+4. [Design decisions](#design-decisions)
+5. [Related projects](#related-projects)
+
 Features
 --------
 
