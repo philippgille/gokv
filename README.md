@@ -10,8 +10,8 @@ Contents
 
 1. [Features](#features)
     1. [Simple interface](#simple-interface)
-    2. [Value types](#value-types)
     3. [Implementations](#implementations)
+    2. [Value types](#value-types)
 2. [Project status](#project-status)
 3. [Motivation](#motivation)
 4. [Design decisions](#design-decisions)
@@ -34,25 +34,15 @@ type Store interface {
 
 There are detailed descriptions of the methods in the [docs](https://www.godoc.org/github.com/philippgille/gokv#Store) and in the [code](https://github.com/philippgille/gokv/blob/master/store.go). You should read them if you plan to write your own `gokv.Store` implementation or if you create a Go package with a method that takes a `gokv.Store` as parameter, so you know exactly what happens in the background.
 
-### Value types
-
-Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `interface{}` as parameter), including structs, and automatically (un-)marshals the value.
-
-The kind of (un-)marshalling is left to the implementation. All implementations in `github.com/philippgille/gokv` currently support JSON by using `encoding/json`, but `encoding/gob` will be added as alternative in the future, which will have some advantages and some tradeoffs.
-
-For unexported struct fields to be (un-)marshalled to/from JSON, `UnmarshalJSON(b []byte) error` and `MarshalJSON() ([]byte, error)` need to be implemented as methods of the struct.
-
-To improve performance you can also implement the `UnmarshalJSON()` and `MarshalJSON()` methods so that no reflection is used by the `encoding/json` package. This is the same as if you would use a key-value store package which only accepts `[]byte`, requiring you to (un-)marshal your structs.
-
 ### Implementations
 
-Some databases aren't specifically engineered for storing key-value pairs, but if someone's running them already for other purposes and doesn't want to set up one of the proper key-value stores due to administrative overhead etc., they can of course be used as well. In those cases let's focus on a few of the most popular though.
+Some of the following databases aren't specifically engineered for storing key-value pairs, but if someone's running them already for other purposes and doesn't want to set up one of the proper key-value stores due to administrative overhead etc., they can of course be used as well. In those cases let's focus on a few of the most popular though. This mostly goes for the SQL, NoSQL and NewSQL categories.
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+Feel free to suggest more stores by creating an [issue](https://github.com/philippgille/gokv/issues) or even add an actual implementation - [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com).
 
 - Local in-memory
     - [X] Go map (`sync.Map`)
-        - Faster then a regular map when there are very few writes but lots of reads
+        - Faster then a regular map when there are lots of reads and only very few writes
     - [X] Go map (`map[string]byte[]` with `sync.RWMutex`)
 - Embedded
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
@@ -90,6 +80,16 @@ Some databases aren't specifically engineered for storing key-value pairs, but i
 - NewSQL
     - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
+
+### Value types
+
+Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `interface{}` as parameter), including structs, and automatically (un-)marshals the value.
+
+The kind of (un-)marshalling is left to the implementation. All implementations in `github.com/philippgille/gokv` currently support JSON by using `encoding/json`, but `encoding/gob` will be added as alternative in the future, which will have some advantages and some tradeoffs.
+
+For unexported struct fields to be (un-)marshalled to/from JSON, `UnmarshalJSON(b []byte) error` and `MarshalJSON() ([]byte, error)` need to be implemented as methods of the struct.
+
+To improve performance you can also implement the `UnmarshalJSON()` and `MarshalJSON()` methods so that no reflection is used by the `encoding/json` package. This is the same as if you would use a key-value store package which only accepts `[]byte`, requiring you to (un-)marshal your structs.
 
 Project status
 --------------
