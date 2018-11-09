@@ -12,10 +12,11 @@ Contents
     1. [Simple interface](#simple-interface)
     3. [Implementations](#implementations)
     2. [Value types](#value-types)
-2. [Project status](#project-status)
-3. [Motivation](#motivation)
-4. [Design decisions](#design-decisions)
-5. [Related projects](#related-projects)
+2. [Usage](#usage)
+3. [Project status](#project-status)
+4. [Motivation](#motivation)
+5. [Design decisions](#design-decisions)
+6. [Related projects](#related-projects)
 
 Features
 --------
@@ -90,6 +91,67 @@ The kind of (un-)marshalling is left to the implementation. All implementations 
 For unexported struct fields to be (un-)marshalled to/from JSON, `UnmarshalJSON(b []byte) error` and `MarshalJSON() ([]byte, error)` need to be implemented as methods of the struct.
 
 To improve performance you can also implement the `UnmarshalJSON()` and `MarshalJSON()` methods so that no reflection is used by the `encoding/json` package. This is the same as if you would use a key-value store package which only accepts `[]byte`, requiring you to (un-)marshal your structs.
+
+Usage
+-----
+
+Every implementation has its own `Options` struct, but all implementations have a `NewStore()` / `NewClient()` function that return an object of a sctruct that implements the `gokv.Store` interface. Let's take the implementation for Redis as example, because its one of the most popular distributed key-value stores.
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/philippgille/gokv/redis"
+)
+
+type foo struct {
+    Bar string
+}
+
+func main() {
+    options := redis.DefaultOptions // Address: "localhost:6379", Password: "", DB: 0
+
+    // Create client
+    client := redis.NewClient(options)
+
+    // Store value
+    val := foo{
+        Bar: "baz",
+    }
+    err := client.Set("foo123", val)
+    if err != nil {
+        panic(err)
+    }
+
+    // Retrieve value
+    retrievedVal := new(foo)
+    found, err := client.Get("foo123", retrievedVal)
+    if err != nil {
+        panic(err)
+    }
+    if !found {
+        panic("Value not found")
+    }
+
+    fmt.Printf("foo: %+v", *retrievedVal) // Prints `foo: {Bar:baz}`
+
+    // Delete value
+    err = client.Delete("foo123")
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+As commented in the above code, this code does the following:
+
+1. Store an object of type `foo` in the Redis server running on `localhost:6379` with the key `foo123`
+2. Retrieve the value for the key `foo123`
+    - The check if the value was found isn't needed in this example but is included for demonstration purposes
+3. Print the value. It prints `foo: {Bar:baz}`, which is exactly what was stored before.
+4. Delete the value
 
 Project status
 --------------
