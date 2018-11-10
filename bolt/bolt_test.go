@@ -14,27 +14,39 @@ import (
 // TestStore tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
 func TestStore(t *testing.T) {
-	store := createStore(t)
-	test.TestStore(store, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		store := createStore(t, bolt.JSON)
+		test.TestStore(store, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		store := createStore(t, bolt.Gob)
+		test.TestStore(store, t)
+	})
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
 func TestTypes(t *testing.T) {
-	store := createStore(t)
-	test.TestTypes(store, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		store := createStore(t, bolt.JSON)
+		test.TestTypes(store, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		store := createStore(t, bolt.Gob)
+		test.TestTypes(store, t)
+	})
 }
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 // The store works with a single file, so everything should be locked properly.
 // The locking is implemented in the bbolt package, but test it nonetheless.
 func TestStoreConcurrent(t *testing.T) {
-	options := bolt.Options{
-		Path: generateRandomTempDbPath(t),
-	}
-	store, err := bolt.NewStore(options)
-	if err != nil {
-		t.Error(err)
-	}
+	store := createStore(t, bolt.JSON)
 
 	goroutineCount := 1000
 
@@ -63,9 +75,10 @@ func TestStoreConcurrent(t *testing.T) {
 	}
 }
 
-func createStore(t *testing.T) bolt.Store {
+func createStore(t *testing.T, mf bolt.MarshalFormat) bolt.Store {
 	options := bolt.Options{
-		Path: generateRandomTempDbPath(t),
+		Path:          generateRandomTempDbPath(t),
+		MarshalFormat: mf,
 	}
 	store, err := bolt.NewStore(options)
 	if err != nil {

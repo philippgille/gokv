@@ -69,6 +69,16 @@ func (c Store) Delete(k string) error {
 	})
 }
 
+// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
+type MarshalFormat int
+
+const (
+	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
+	JSON MarshalFormat = iota
+	// Gob is the MarshalFormat for (un-)marshalling to/from gob
+	Gob
+)
+
 // Options are the options for the Bolt store.
 type Options struct {
 	// Bucket name for storing the key-value pairs.
@@ -77,6 +87,9 @@ type Options struct {
 	// Path of the DB file.
 	// Optional ("bolt.db" by default).
 	Path string
+	// (Un-)marshal format.
+	// Optional (JSON by default).
+	MarshalFormat MarshalFormat
 }
 
 // DefaultOptions is an Options object with default values.
@@ -84,6 +97,8 @@ type Options struct {
 var DefaultOptions = Options{
 	BucketName: "default",
 	Path:       "bolt.db",
+	// No need to set MarshalFormat to JSON
+	// because its zero value is fine.
 }
 
 // NewStore creates a new Bolt store.
