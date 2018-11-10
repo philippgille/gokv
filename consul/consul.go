@@ -67,6 +67,16 @@ func (c Client) Delete(k string) error {
 	return err
 }
 
+// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
+type MarshalFormat int
+
+const (
+	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
+	JSON MarshalFormat = iota
+	// Gob is the MarshalFormat for (un-)marshalling to/from gob
+	Gob
+)
+
 // Options are the options for the Consul client.
 type Options struct {
 	// URI scheme for the Consul server.
@@ -79,6 +89,9 @@ type Options struct {
 	// The Consul UI calls this "folder".
 	// Optional (none by default).
 	Folder string
+	// (Un-)marshal format.
+	// Optional (JSON by default).
+	MarshalFormat MarshalFormat
 }
 
 // DefaultOptions is an Options object with default values.
@@ -86,7 +99,8 @@ type Options struct {
 var DefaultOptions = Options{
 	Scheme:  "http",
 	Address: "127.0.0.1:8500",
-	// No need to define Folder, because its zero value is fine
+	// No need to define Folder because its zero value is fine
+	// No need to set MarshalFormat to JSON because its zero value is fine.
 }
 
 // NewClient creates a new Consul client.
