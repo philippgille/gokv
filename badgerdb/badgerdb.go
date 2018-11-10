@@ -1,6 +1,8 @@
 package badgerdb
 
 import (
+	"errors"
+
 	"github.com/dgraph-io/badger"
 
 	"github.com/philippgille/gokv/util"
@@ -8,14 +10,24 @@ import (
 
 // Store is a gokv.Store implementation for BadgerDB.
 type Store struct {
-	db *badger.DB
+	db            *badger.DB
+	marshalFormat MarshalFormat
 }
 
 // Set stores the given value for the given key.
 // Values are marshalled to JSON automatically.
 func (c Store) Set(k string, v interface{}) error {
 	// First turn the passed object into something that BadgerDB can handle
-	data, err := util.ToJSON(v)
+	var data []byte
+	var err error
+	switch c.marshalFormat {
+	case JSON:
+		data, err = util.ToJSON(v)
+	case Gob:
+		data, err = util.ToGob(v)
+	default:
+		return errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 	if err != nil {
 		return err
 	}
@@ -42,6 +54,8 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 		}
 		// item.Value() is only valid within the transaction.
 		// We can either copy it ourselves or use the ValueCopy() method.
+		// TODO: Benchmark if it's faster to copy + close tx,
+		// or to keep the tx open until unmarshalling is done.
 		data, err = item.ValueCopy(nil)
 		if err != nil {
 			return err
@@ -55,7 +69,14 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 		return false, err
 	}
 
-	return true, util.FromJSON(data, v)
+	switch c.marshalFormat {
+	case JSON:
+		return true, util.FromJSON(data, v)
+	case Gob:
+		return true, util.FromGob(data, v)
+	default:
+		return false, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 }
 
 // Delete deletes the stored value for the given key.
@@ -118,7 +139,8 @@ func NewStore(options Options) (Store, error) {
 	}
 
 	result = Store{
-		db: db,
+		db:            db,
+		marshalFormat: options.MarshalFormat,
 	}
 
 	return result, nil

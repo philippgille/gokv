@@ -1,6 +1,8 @@
 package bolt
 
 import (
+	"errors"
+
 	bolt "github.com/etcd-io/bbolt"
 
 	"github.com/philippgille/gokv/util"
@@ -8,15 +10,25 @@ import (
 
 // Store is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
 type Store struct {
-	db         *bolt.DB
-	bucketName string
+	db            *bolt.DB
+	bucketName    string
+	marshalFormat MarshalFormat
 }
 
 // Set stores the given value for the given key.
 // Values are marshalled to JSON automatically.
 func (c Store) Set(k string, v interface{}) error {
 	// First turn the passed object into something that Bolt can handle
-	data, err := util.ToJSON(v)
+	var data []byte
+	var err error
+	switch c.marshalFormat {
+	case JSON:
+		data, err = util.ToJSON(v)
+	case Gob:
+		data, err = util.ToGob(v)
+	default:
+		return errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 	if err != nil {
 		return err
 	}
@@ -57,7 +69,14 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 		return false, nil
 	}
 
-	return true, util.FromJSON(data, v)
+	switch c.marshalFormat {
+	case JSON:
+		return true, util.FromJSON(data, v)
+	case Gob:
+		return true, util.FromGob(data, v)
+	default:
+		return false, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 }
 
 // Delete deletes the stored value for the given key.
@@ -137,8 +156,9 @@ func NewStore(options Options) (Store, error) {
 	}
 
 	result = Store{
-		db:         db,
-		bucketName: options.BucketName,
+		db:            db,
+		bucketName:    options.BucketName,
+		marshalFormat: options.MarshalFormat,
 	}
 
 	return result, nil
