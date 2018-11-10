@@ -112,7 +112,7 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// BucketName: "default", Path: "bolt.db"
+// BucketName: "default", Path: "bolt.db", MarshalFormat: JSON
 var DefaultOptions = Options{
 	BucketName: "default",
 	Path:       "bolt.db",

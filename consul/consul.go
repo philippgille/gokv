@@ -114,7 +114,7 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// Scheme: "http", Address: "127.0.0.1:8500"
+// Scheme: "http", Address: "127.0.0.1:8500", Folder: none, MarshalFormat: JSON
 var DefaultOptions = Options{
 	Scheme:  "http",
 	Address: "127.0.0.1:8500",
