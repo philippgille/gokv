@@ -75,7 +75,7 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 	case Gob:
 		return true, util.FromGob(data, v)
 	default:
-		return false, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
 	}
 }
 
