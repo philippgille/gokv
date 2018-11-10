@@ -10,8 +10,9 @@ Contents
 
 1. [Features](#features)
     1. [Simple interface](#simple-interface)
-    3. [Implementations](#implementations)
-    2. [Value types](#value-types)
+    2. [Implementations](#implementations)
+    3. [Value types](#value-types)
+    4. [Marshal formats](#marshal-formats)
 2. [Usage](#usage)
 3. [Project status](#project-status)
 4. [Motivation](#motivation)
@@ -86,11 +87,28 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
 
 Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `interface{}` as parameter), including structs, and automatically (un-)marshals the value.
 
-The kind of (un-)marshalling is left to the implementation. All implementations in `github.com/philippgille/gokv` currently support JSON by using `encoding/json`, but `encoding/gob` will be added as alternative in the future, which will have some advantages and some tradeoffs.
+The kind of (un-)marshalling is left to the implementation. All implementations in this repository currently support JSON and [gob](https://blog.golang.org/gobs-of-data) by using `encoding/json` and `encoding/gob`. See [Marshal formats](#marshal-formats) for details.
 
-For unexported struct fields to be (un-)marshalled to/from JSON, `UnmarshalJSON(b []byte) error` and `MarshalJSON() ([]byte, error)` need to be implemented as methods of the struct.
+For unexported struct fields to be (un-)marshalled to/from JSON/gob, the respective custom (un-)marshalling methods need to be implemented as methods of the struct (e.g. `MarshalJSON() ([]byte, error)` for custom marshalling into JSON). See [Marshaler](https://godoc.org/encoding/json#Marshaler) and [Unmarshaler](https://godoc.org/encoding/json#Unmarshaler) for JSON, and [GobEncoder](https://godoc.org/encoding/gob#GobEncoder) and [GobDecoder](https://godoc.org/encoding/gob#GobDecoder) for gob.
 
-To improve performance you can also implement the `UnmarshalJSON()` and `MarshalJSON()` methods so that no reflection is used by the `encoding/json` package. This is the same as if you would use a key-value store package which only accepts `[]byte`, requiring you to (un-)marshal your structs.
+To improve performance you can also implement the custom (un-)marshalling methods so that no reflection is used by the `encoding/json` / `encoding/gob` packages. This is not a disadvantage of using a generic key-value store package, it's the same as if you would use a concrete key-value store package which only accepts `[]byte`, requiring you to (un-)marshal your structs.
+
+### Marshal formats
+
+- [X] JSON
+- [X] [gob](https://blog.golang.org/gobs-of-data)
+
+The stores marshal and unmarshal the values when storing / retrieving them. The default format is JSON, but all `gokv.Store` implementations in this repository also support [gob](https://blog.golang.org/gobs-of-data) as alternative, configurable via their `Options`.
+
+The marshal format is up to the implementations though, so package creators using the `gokv.Store` interface as parameter of a function should not make any assumptions about this. If they require any specific format they should inform the package user about this in the GoDoc of the function taking the store interface as parameter.
+
+Differences:
+
+- Depending on the struct, one of the formats might be faster
+- Depending on the struct, one of the formats might lead to a lower storage size
+- Depending on the use case, the custom (un-)marshal methods of one of the formats might be easier to implement
+    - JSON: [`MarshalJSON() ([]byte, error)`](https://godoc.org/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://godoc.org/encoding/json#Unmarshaler)
+    - gob: [`GobEncode() ([]byte, error)`](https://godoc.org/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://godoc.org/encoding/gob#GobDecoder)
 
 Usage
 -----
