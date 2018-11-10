@@ -14,21 +14,39 @@ import (
 // TestStore tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
 func TestStore(t *testing.T) {
-	store := createStore(t)
-	test.TestStore(store, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		store := createStore(t, badgerdb.JSON)
+		test.TestStore(store, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		store := createStore(t, badgerdb.Gob)
+		test.TestStore(store, t)
+	})
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
 func TestTypes(t *testing.T) {
-	store := createStore(t)
-	test.TestTypes(store, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		store := createStore(t, badgerdb.JSON)
+		test.TestTypes(store, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		store := createStore(t, badgerdb.Gob)
+		test.TestTypes(store, t)
+	})
 }
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 // The store works with a single file, so everything should be locked properly.
 // The locking is implemented in the BadgerDB package, but test it nonetheless.
 func TestStoreConcurrent(t *testing.T) {
-	store := createStore(t)
+	store := createStore(t, badgerdb.JSON)
 
 	goroutineCount := 1000
 
@@ -57,9 +75,10 @@ func TestStoreConcurrent(t *testing.T) {
 	}
 }
 
-func createStore(t *testing.T) badgerdb.Store {
+func createStore(t *testing.T, mf badgerdb.MarshalFormat) badgerdb.Store {
 	options := badgerdb.Options{
-		Dir: generateRandomTempDBpath(t),
+		Dir:           generateRandomTempDBpath(t),
+		MarshalFormat: mf,
 	}
 	store, err := badgerdb.NewStore(options)
 	if err != nil {

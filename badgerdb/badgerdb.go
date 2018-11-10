@@ -66,17 +66,32 @@ func (c Store) Delete(k string) error {
 	})
 }
 
+// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
+type MarshalFormat int
+
+const (
+	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
+	JSON MarshalFormat = iota
+	// Gob is the MarshalFormat for (un-)marshalling to/from gob
+	Gob
+)
+
 // Options are the options for the BadgerDB store.
 type Options struct {
 	// Directory for storing the DB files.
 	// Optional ("BadgerDB" by default).
 	Dir string
+	// (Un-)marshal format.
+	// Optional (JSON by default).
+	MarshalFormat MarshalFormat
 }
 
 // DefaultOptions is an Options object with default values.
-// Dir: "BadgerDB"
+// Dir: "BadgerDB", MarshalFormat: JSON
 var DefaultOptions = Options{
 	Dir: "BadgerDB",
+	// No need to set MarshalFormat to JSON
+	// because its zero value is fine.
 }
 
 // NewStore creates a new BadgerDB store.
