@@ -14,8 +14,9 @@ type Client struct {
 	marshalFormat MarshalFormat
 }
 
-// Set stores the given object for the given key.
-// Values are marshalled to JSON automatically.
+// Set stores the given value for the given key.
+// Values are automatically marshalled to JSON or gob (depending on the configuration).
+// The key must not be "" and the value must not be nil.
 func (c Client) Set(k string, v interface{}) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
@@ -50,6 +51,8 @@ func (c Client) Set(k string, v interface{}) error {
 // You need to pass a pointer to the value, so in case of a struct
 // the automatic unmarshalling can populate the fields of the object
 // that v points to with the values of the retrieved object's values.
+// If no value is found it returns (false, nil).
+// The key must not be "" and the pointer must not be nil.
 func (c Client) Get(k string, v interface{}) (bool, error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
@@ -75,6 +78,7 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
+// The key must not be "".
 func (c Client) Delete(k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
