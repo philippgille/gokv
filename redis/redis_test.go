@@ -100,7 +100,14 @@ func TestClientConcurrent(t *testing.T) {
 }
 
 // TestErrors tests some error cases.
+//
+// Note: This test is only executed if the initial connection to Redis works.
 func TestErrors(t *testing.T) {
+	if !checkRedisConnection(testDbNumber) {
+		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
+	}
+	deleteRedisDb(testDbNumber) // Prep for previous test runs
+
 	// Test with a bad MarshalFormat enum value
 
 	client := createClient(t, redis.MarshalFormat(19))

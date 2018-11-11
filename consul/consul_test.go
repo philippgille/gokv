@@ -93,7 +93,13 @@ func TestClientConcurrent(t *testing.T) {
 }
 
 // TestErrors tests some error cases.
+//
+// Note: This test is only executed if the initial connection to Consul works.
 func TestErrors(t *testing.T) {
+	if !checkConsulConnection() {
+		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
+	}
+
 	// Test with a bad MarshalFormat enum value
 
 	client := createClient(t, consul.MarshalFormat(19))
