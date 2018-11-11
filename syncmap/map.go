@@ -1,6 +1,7 @@
 package syncmap
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/philippgille/gokv/util"
@@ -8,16 +9,27 @@ import (
 
 // Store is a gokv.Store implementation for a Go sync.Map.
 type Store struct {
-	m *sync.Map
+	m             *sync.Map
+	marshalFormat MarshalFormat
 }
 
 // Set stores the given object for the given key.
 // Values are marshalled to JSON automatically.
 func (m Store) Set(k string, v interface{}) error {
-	data, err := util.ToJSON(v)
+	var data []byte
+	var err error
+	switch m.marshalFormat {
+	case JSON:
+		data, err = util.ToJSON(v)
+	case Gob:
+		data, err = util.ToGob(v)
+	default:
+		return errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 	if err != nil {
 		return err
 	}
+
 	m.m.Store(k, data)
 	return nil
 }
@@ -32,7 +44,14 @@ func (m Store) Get(k string, v interface{}) (bool, error) {
 		return false, nil
 	}
 
-	return true, util.FromJSON(data.([]byte), v)
+	switch m.marshalFormat {
+	case JSON:
+		return true, util.FromJSON(data.([]byte), v)
+	case Gob:
+		return true, util.FromGob(data.([]byte), v)
+	default:
+		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 }
 
 // Delete deletes the stored value for the given key.
@@ -42,9 +61,34 @@ func (m Store) Delete(k string) error {
 	return nil
 }
 
+// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
+type MarshalFormat int
+
+const (
+	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
+	JSON MarshalFormat = iota
+	// Gob is the MarshalFormat for (un-)marshalling to/from gob
+	Gob
+)
+
+// Options are the options for the Go sync.Map store.
+type Options struct {
+	// (Un-)marshal format.
+	// Optional (JSON by default).
+	MarshalFormat MarshalFormat
+}
+
+// DefaultOptions is an Options object with default values.
+// MarshalFormat: JSON
+var DefaultOptions = Options{
+	// No need to set MarshalFormat to JSON
+	// because its zero value is fine.
+}
+
 // NewStore creates a new Go sync.Map store.
-func NewStore() Store {
+func NewStore(options Options) Store {
 	return Store{
-		m: &sync.Map{},
+		m:             &sync.Map{},
+		marshalFormat: options.MarshalFormat,
 	}
 }

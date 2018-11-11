@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"errors"
+
 	"github.com/go-redis/redis"
 
 	"github.com/philippgille/gokv/util"
@@ -8,7 +10,8 @@ import (
 
 // Client is a gokv.Store implementation for Redis.
 type Client struct {
-	c *redis.Client
+	c             *redis.Client
+	marshalFormat MarshalFormat
 }
 
 // Set stores the given object for the given key.
@@ -18,7 +21,16 @@ func (c Client) Set(k string, v interface{}) error {
 	// (the Set method takes an interface{}, but the Get method only returns a string,
 	// so it can be assumed that the interface{} parameter type is only for convenience
 	// for a couple of builtin types like int etc.).
-	data, err := util.ToJSON(v)
+	var data []byte
+	var err error
+	switch c.marshalFormat {
+	case JSON:
+		data, err = util.ToJSON(v)
+	case Gob:
+		data, err = util.ToGob(v)
+	default:
+		return errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 	if err != nil {
 		return err
 	}
@@ -43,7 +55,14 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 		return false, err
 	}
 
-	return true, util.FromJSON([]byte(data), v)
+	switch c.marshalFormat {
+	case JSON:
+		return true, util.FromJSON([]byte(data), v)
+	case Gob:
+		return true, util.FromGob([]byte(data), v)
+	default:
+		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+	}
 }
 
 // Delete deletes the stored value for the given key.
@@ -52,6 +71,16 @@ func (c Client) Delete(k string) error {
 	_, err := c.c.Del(k).Result()
 	return err
 }
+
+// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
+type MarshalFormat int
+
+const (
+	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
+	JSON MarshalFormat = iota
+	// Gob is the MarshalFormat for (un-)marshalling to/from gob
+	Gob
+)
 
 // Options are the options for the Redis client.
 type Options struct {
@@ -64,13 +93,17 @@ type Options struct {
 	// DB to use.
 	// Optional (0 by default).
 	DB int
+	// (Un-)marshal format.
+	// Optional (JSON by default).
+	MarshalFormat MarshalFormat
 }
 
 // DefaultOptions is an Options object with default values.
-// Address: "localhost:6379", Password: "", DB: 0
+// Address: "localhost:6379", Password: "", DB: 0, MarshalFormat: JSON
 var DefaultOptions = Options{
 	Address: "localhost:6379",
-	// No need to set Password or DB, since their Go zero values are fine for that
+	// No need to set Password, DB or MarshalFormat
+	// because their Go zero values are fine for that.
 }
 
 // NewClient creates a new Redis client.
@@ -85,5 +118,6 @@ func NewClient(options Options) Client {
 			Password: options.Password,
 			DB:       options.DB,
 		}),
+		marshalFormat: options.MarshalFormat,
 	}
 }

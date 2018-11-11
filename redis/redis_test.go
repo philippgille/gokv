@@ -26,8 +26,17 @@ func TestClient(t *testing.T) {
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
-	client := createClient(t)
-	test.TestStore(client, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		client := createClient(t, redis.JSON)
+		test.TestStore(client, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		client := createClient(t, redis.Gob)
+		test.TestStore(client, t)
+	})
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
@@ -39,8 +48,17 @@ func TestTypes(t *testing.T) {
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
-	client := createClient(t)
-	test.TestTypes(client, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		client := createClient(t, redis.JSON)
+		test.TestTypes(client, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		client := createClient(t, redis.Gob)
+		test.TestTypes(client, t)
+	})
 }
 
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the Redis client.
@@ -50,12 +68,9 @@ func TestClientConcurrent(t *testing.T) {
 	if !checkRedisConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
-	options := redis.Options{
-		DB: testDbNumber,
-	}
-	client := redis.NewClient(options)
+
+	client := createClient(t, redis.JSON)
 
 	goroutineCount := 1000
 
@@ -84,6 +99,23 @@ func TestClientConcurrent(t *testing.T) {
 	}
 }
 
+// TestErrors tests some error cases.
+func TestErrors(t *testing.T) {
+	// Test with a bad MarshalFormat enum value
+
+	client := createClient(t, redis.MarshalFormat(19))
+	err := client.Set("foo", "bar")
+	if err == nil {
+		t.Error("An error should have occurred, but didn't")
+	}
+	// TODO: store some value for "foo", so retrieving the value works.
+	// Just the unmarshalling should fail.
+	// _, err = client.Get("foo", new(string))
+	// if err == nil {
+	// 	t.Error("An error should have occurred, but didn't")
+	// }
+}
+
 // checkRedisConnection returns true if a connection could be made, false otherwise.
 func checkRedisConnection(number int) bool {
 	client := goredis.NewClient(&goredis.Options{
@@ -109,9 +141,10 @@ func deleteRedisDb(number int) error {
 	return client.FlushDB().Err()
 }
 
-func createClient(t *testing.T) redis.Client {
+func createClient(t *testing.T, mf redis.MarshalFormat) redis.Client {
 	options := redis.Options{
-		DB: testDbNumber,
+		DB:            testDbNumber,
+		MarshalFormat: mf,
 	}
 	client := redis.NewClient(options)
 	return client

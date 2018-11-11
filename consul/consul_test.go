@@ -21,8 +21,17 @@ func TestClient(t *testing.T) {
 		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
 	}
 
-	client := createClient(t)
-	test.TestStore(client, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		client := createClient(t, consul.JSON)
+		test.TestStore(client, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		client := createClient(t, consul.Gob)
+		test.TestStore(client, t)
+	})
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
@@ -33,8 +42,17 @@ func TestTypes(t *testing.T) {
 		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
 	}
 
-	client := createClient(t)
-	test.TestTypes(client, t)
+	// Test with JSON
+	t.Run("JSON", func(t *testing.T) {
+		client := createClient(t, consul.JSON)
+		test.TestTypes(client, t)
+	})
+
+	// Test with gob
+	t.Run("gob", func(t *testing.T) {
+		client := createClient(t, consul.Gob)
+		test.TestTypes(client, t)
+	})
 }
 
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the Consul client.
@@ -45,12 +63,7 @@ func TestClientConcurrent(t *testing.T) {
 		t.Skip("No connection to Consul could be established. Probably not running in a proper test environment.")
 	}
 
-	options := consul.DefaultOptions
-	options.Folder = "test_" + strconv.FormatInt(time.Now().Unix(), 10)
-	client, err := consul.NewClient(options)
-	if err != nil {
-		t.Error(err)
-	}
+	client := createClient(t, consul.JSON)
 
 	goroutineCount := 1000
 
@@ -79,6 +92,23 @@ func TestClientConcurrent(t *testing.T) {
 	}
 }
 
+// TestErrors tests some error cases.
+func TestErrors(t *testing.T) {
+	// Test with a bad MarshalFormat enum value
+
+	client := createClient(t, consul.MarshalFormat(19))
+	err := client.Set("foo", "bar")
+	if err == nil {
+		t.Error("An error should have occurred, but didn't")
+	}
+	// TODO: store some value for "foo", so retrieving the value works.
+	// Just the unmarshalling should fail.
+	// _, err = client.Get("foo", new(string))
+	// if err == nil {
+	// 	t.Error("An error should have occurred, but didn't")
+	// }
+}
+
 // checkConsulConnection returns true if a connection could be made, false otherwise.
 func checkConsulConnection() bool {
 	client, err := api.NewClient(api.DefaultConfig())
@@ -92,9 +122,10 @@ func checkConsulConnection() bool {
 	return true
 }
 
-func createClient(t *testing.T) consul.Client {
+func createClient(t *testing.T, mf consul.MarshalFormat) consul.Client {
 	options := consul.DefaultOptions
 	options.Folder = "test_" + strconv.FormatInt(time.Now().Unix(), 10)
+	options.MarshalFormat = mf
 	client, err := consul.NewClient(options)
 	if err != nil {
 		t.Error(err)

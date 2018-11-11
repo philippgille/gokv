@@ -9,8 +9,14 @@ vNext
 -----
 
 - Added: Method `Delete(string) error` (issue [#8](https://github.com/philippgille/gokv/issues/8))
+- Added: All `gokv.Store` implementations in this package now also support [gob](https://blog.golang.org/gobs-of-data) as marshal format as alternative to JSON (issue [#22](https://github.com/philippgille/gokv/issues/22))
+    - Part of this addition are a new field in the existing `Options` structs, called `MarshalFormat`, as well as the related `MarshalFormat` enum (custom type + related `const` values) in each implementation package
 - Added: Package `badgerdb` - A `gokv.Store` implementation for [BadgerDB](https://github.com/dgraph-io/badger) (issue [#16](https://github.com/philippgille/gokv/issues/16))
 - Added: Package `consul` - A `gokv.Store` implementation for [Consul](https://github.com/hashicorp/consul) (issue [#18](https://github.com/philippgille/gokv/issues/18))
+
+### Breaking changes
+
+- Changed: The `NewStore()` function in `gomap` and `syncmap` now has an `Option` parameter. Required for issue [#22](https://github.com/philippgille/gokv/issues/22).
 
 v0.2.0 (2018-11-05)
 -------------------
