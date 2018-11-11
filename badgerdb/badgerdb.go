@@ -17,6 +17,10 @@ type Store struct {
 // Set stores the given value for the given key.
 // Values are marshalled to JSON automatically.
 func (c Store) Set(k string, v interface{}) error {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
 	// First turn the passed object into something that BadgerDB can handle
 	var data []byte
 	var err error
@@ -46,6 +50,10 @@ func (c Store) Set(k string, v interface{}) error {
 // the automatic unmarshalling can populate the fields of the object
 // that v points to with the values of the retrieved object's values.
 func (c Store) Get(k string, v interface{}) (bool, error) {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return false, err
+	}
+
 	var data []byte
 	err := c.db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(k))
@@ -82,6 +90,10 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 func (c Store) Delete(k string) error {
+	if err := util.CheckKey(k); err != nil {
+		return err
+	}
+
 	return c.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(k))
 	})

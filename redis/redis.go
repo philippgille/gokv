@@ -17,6 +17,10 @@ type Client struct {
 // Set stores the given object for the given key.
 // Values are marshalled to JSON automatically.
 func (c Client) Set(k string, v interface{}) error {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
 	// First turn the passed object into something that Redis can handle
 	// (the Set method takes an interface{}, but the Get method only returns a string,
 	// so it can be assumed that the interface{} parameter type is only for convenience
@@ -47,6 +51,10 @@ func (c Client) Set(k string, v interface{}) error {
 // the automatic unmarshalling can populate the fields of the object
 // that v points to with the values of the retrieved object's values.
 func (c Client) Get(k string, v interface{}) (bool, error) {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return false, err
+	}
+
 	data, err := c.c.Get(k).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -68,6 +76,10 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 func (c Client) Delete(k string) error {
+	if err := util.CheckKey(k); err != nil {
+		return err
+	}
+
 	_, err := c.c.Del(k).Result()
 	return err
 }

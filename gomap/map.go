@@ -17,6 +17,10 @@ type Store struct {
 // Set stores the given object for the given key.
 // Values are marshalled to JSON automatically.
 func (m Store) Set(k string, v interface{}) error {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
 	var data []byte
 	var err error
 	switch m.marshalFormat {
@@ -42,6 +46,10 @@ func (m Store) Set(k string, v interface{}) error {
 // the automatic unmarshalling can populate the fields of the object
 // that v points to with the values of the retrieved object's values.
 func (m Store) Get(k string, v interface{}) (bool, error) {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return false, err
+	}
+
 	m.lock.RLock()
 	data, found := m.m[k]
 	// Unlock right after reading instead of with defer(),
@@ -65,6 +73,10 @@ func (m Store) Get(k string, v interface{}) (bool, error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 func (m Store) Delete(k string) error {
+	if err := util.CheckKey(k); err != nil {
+		return err
+	}
+
 	delete(m.m, k)
 	return nil
 }

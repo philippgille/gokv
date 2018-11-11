@@ -18,6 +18,10 @@ type Client struct {
 // Set stores the given value for the given key.
 // Values are marshalled to JSON automatically.
 func (c Client) Set(k string, v interface{}) error {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
 	// First turn the passed object into something that Consul can handle
 	var data []byte
 	var err error
@@ -53,6 +57,10 @@ func (c Client) Set(k string, v interface{}) error {
 // the automatic unmarshalling can populate the fields of the object
 // that v points to with the values of the retrieved object's values.
 func (c Client) Get(k string, v interface{}) (bool, error) {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return false, err
+	}
+
 	if c.folder != "" {
 		k = c.folder + "/" + k
 	}
@@ -79,6 +87,10 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 func (c Client) Delete(k string) error {
+	if err := util.CheckKey(k); err != nil {
+		return err
+	}
+
 	if c.folder != "" {
 		k = c.folder + "/" + k
 	}

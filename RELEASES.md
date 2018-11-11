@@ -17,6 +17,8 @@ vNext
 ### Breaking changes
 
 - Changed: The `NewStore()` function in `gomap` and `syncmap` now has an `Option` parameter. Required for issue [#22](https://github.com/philippgille/gokv/issues/22).
+- Changed: Passing an empty string as key to `Set()`, `Get()` or `Delete()` now results in an error
+- Changed: Passing `nil` as value parameter to `Set()` or as pointer to `Get()` now results in an error. This change leads to a consistent behaviour across the different marshal formats (otherwise for example `encoding/json` marshals `nil` to `null` while `encoding/gob` returns an error).
 
 v0.2.0 (2018-11-05)
 -------------------
