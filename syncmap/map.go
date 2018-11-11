@@ -29,7 +29,7 @@ func (m Store) Set(k string, v interface{}) error {
 	case Gob:
 		data, err = util.ToGob(v)
 	default:
-		return errors.New("The store seems to be configured with a marshal format that's not implemented yet")
+		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
 	}
 	if err != nil {
 		return err
