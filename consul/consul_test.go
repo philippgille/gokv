@@ -92,6 +92,23 @@ func TestClientConcurrent(t *testing.T) {
 	}
 }
 
+// TestErrors tests some error cases.
+func TestErrors(t *testing.T) {
+	// Test with a bad MarshalFormat enum value
+
+	client := createClient(t, consul.MarshalFormat(19))
+	err := client.Set("foo", "bar")
+	if err == nil {
+		t.Error("An error should have occurred, but didn't")
+	}
+	// TODO: store some value for "foo", so retrieving the value works.
+	// Just the unmarshalling should fail.
+	// _, err = client.Get("foo", new(string))
+	// if err == nil {
+	// 	t.Error("An error should have occurred, but didn't")
+	// }
+}
+
 // checkConsulConnection returns true if a connection could be made, false otherwise.
 func checkConsulConnection() bool {
 	client, err := api.NewClient(api.DefaultConfig())

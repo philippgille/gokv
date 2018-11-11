@@ -72,6 +72,23 @@ func TestStoreConcurrent(t *testing.T) {
 	}
 }
 
+// TestErrors tests some error cases.
+func TestErrors(t *testing.T) {
+	// Test with a bad MarshalFormat enum value
+
+	store := createStore(t, gomap.MarshalFormat(19))
+	err := store.Set("foo", "bar")
+	if err == nil {
+		t.Error("An error should have occurred, but didn't")
+	}
+	// TODO: store some value for "foo", so retrieving the value works.
+	// Just the unmarshalling should fail.
+	// _, err = store.Get("foo", new(string))
+	// if err == nil {
+	// 	t.Error("An error should have occurred, but didn't")
+	// }
+}
+
 func createStore(t *testing.T, mf gomap.MarshalFormat) gomap.Store {
 	options := gomap.Options{
 		MarshalFormat: mf,
