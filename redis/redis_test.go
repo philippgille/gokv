@@ -121,6 +121,81 @@ func TestErrors(t *testing.T) {
 	// if err == nil {
 	// 	t.Error("An error should have occurred, but didn't")
 	// }
+
+	// Test empty key
+	err = client.Set("", "bar")
+	if err == nil {
+		t.Error("Expected an error")
+	}
+	_, err = client.Get("", new(string))
+	if err == nil {
+		t.Error("Expected an error")
+	}
+	err = client.Delete("")
+	if err == nil {
+		t.Error("Expected an error")
+	}
+}
+
+// TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
+//
+// Note: This test is only executed if the initial connection to Redis works.
+func TestNil(t *testing.T) {
+	if !checkRedisConnection(testDbNumber) {
+		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
+	}
+	deleteRedisDb(testDbNumber) // Prep for previous test runs
+
+	// Test setting nil
+
+	t.Run("set nil with JSON marshalling", func(t *testing.T) {
+		client := createClient(t, redis.JSON)
+		err := client.Set("foo", nil)
+		if err == nil {
+			t.Error("Expected an error")
+		}
+	})
+
+	t.Run("set nil with Gob marshalling", func(t *testing.T) {
+		client := createClient(t, redis.Gob)
+		err := client.Set("foo", nil)
+		if err == nil {
+			t.Error("Expected an error")
+		}
+	})
+
+	// Test passing nil or pointer to nil value for retrieval
+
+	createTest := func(mf redis.MarshalFormat) func(t *testing.T) {
+		return func(t *testing.T) {
+			client := createClient(t, mf)
+
+			// Prep
+			err := client.Set("foo", test.Foo{Bar: "baz"})
+			if err != nil {
+				t.Error(err)
+			}
+
+			_, err = client.Get("foo", nil) // actually nil
+			if err == nil {
+				t.Error("An error was expected")
+			}
+
+			var i interface{} // actually nil
+			_, err = client.Get("foo", i)
+			if err == nil {
+				t.Error("An error was expected")
+			}
+
+			var valPtr *test.Foo // nil value
+			_, err = client.Get("foo", valPtr)
+			if err == nil {
+				t.Error("An error was expected")
+			}
+		}
+	}
+	t.Run("get with nil / nil value parameter", createTest(redis.JSON))
+	t.Run("get with nil / nil value parameter", createTest(redis.Gob))
 }
 
 // checkRedisConnection returns true if a connection could be made, false otherwise.

@@ -90,6 +90,74 @@ func TestErrors(t *testing.T) {
 	// if err == nil {
 	// 	t.Error("An error should have occurred, but didn't")
 	// }
+
+	// Test empty key
+	err = store.Set("", "bar")
+	if err == nil {
+		t.Error("Expected an error")
+	}
+	_, err = store.Get("", new(string))
+	if err == nil {
+		t.Error("Expected an error")
+	}
+	err = store.Delete("")
+	if err == nil {
+		t.Error("Expected an error")
+	}
+}
+
+// TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
+func TestNil(t *testing.T) {
+	// Test setting nil
+
+	t.Run("set nil with JSON marshalling", func(t *testing.T) {
+		store := createStore(t, badgerdb.JSON)
+		err := store.Set("foo", nil)
+		if err == nil {
+			t.Error("Expected an error")
+		}
+	})
+
+	t.Run("set nil with Gob marshalling", func(t *testing.T) {
+		store := createStore(t, badgerdb.Gob)
+		err := store.Set("foo", nil)
+		if err == nil {
+			t.Error("Expected an error")
+		}
+	})
+
+	// Test passing nil or pointer to nil value for retrieval
+
+	createTest := func(mf badgerdb.MarshalFormat) func(t *testing.T) {
+		return func(t *testing.T) {
+			store := createStore(t, mf)
+
+			// Prep
+			err := store.Set("foo", test.Foo{Bar: "baz"})
+			if err != nil {
+				t.Error(err)
+			}
+
+			_, err = store.Get("foo", nil) // actually nil
+			if err == nil {
+				t.Error("An error was expected")
+			}
+
+			var i interface{} // actually nil
+			_, err = store.Get("foo", i)
+			if err == nil {
+				t.Error("An error was expected")
+			}
+
+			var valPtr *test.Foo // nil value
+			_, err = store.Get("foo", valPtr)
+			if err == nil {
+				t.Error("An error was expected")
+			}
+		}
+	}
+	t.Run("get with nil / nil value parameter", createTest(badgerdb.JSON))
+	t.Run("get with nil / nil value parameter", createTest(badgerdb.Gob))
 }
 
 func createStore(t *testing.T, mf badgerdb.MarshalFormat) badgerdb.Store {
