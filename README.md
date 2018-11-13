@@ -57,10 +57,15 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [ ] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
 - Distributed store
     - [X] [Redis](https://github.com/antirez/redis)
+        - Probably [the most popular distributed key-value store](https://db-engines.com/en/ranking/key-value+store)
     - [X] [Consul](https://github.com/hashicorp/consul)
+        - Probably the most popular service registry. Has a key-value store as additional feature.
+        - [Official comparison with ZooKeeper, doozerd and etcd](https://github.com/hashicorp/consul/blob/df91388b7b69e1dc5bfda76f2e67b658a99324ad/website/source/intro/vs/zookeeper.html.md)
         - > Note: Consul doesn't allow values larger than 512 KB
     - [ ] [etcd](https://github.com/etcd-io/etcd)
-        - Not advertised as general key-value store, but can be used as one
+        - It's used for example in [Kubernetes](https://github.com/kubernetes/kubernetes)
+        - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
+        - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md)
     - [ ] [TiKV](https://github.com/tikv/tikv)
         - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
     - [ ] [LedisDB](https://github.com/siddontang/ledisdb)
@@ -184,13 +189,15 @@ Planned interface methods until `v1.0.0`:
 Motivation
 ----------
 
-When creating a package you want the package to be usable by as many developers as possible. Let's look at a specific example: You want to create a paywall middleware for the Gin web framework. You need some database to store state. You can't use a Go map, because its data is not persisted across web service restarts. You can't use an embedded DB like bbolt, BadgerDB or SQLite, because that would restrict the web service to one instance, but nowadays every web service is designed with high horizontal scalability in mind. If you use Redis or Consul though, you would force the package user (the developer who creates the actual web service with Gin and your middleware) to run and administrate a Redis or Consul server, even if she might never have used it before and doesn't know how to manage their persistence and security models.
+When creating a package you want the package to be usable by as many developers as possible. Let's look at a specific example: You want to create a paywall middleware for the Gin web framework. You need some database to store state. You can't use a Go map, because its data is not persisted across web service restarts. You can't use an embedded DB like bbolt, BadgerDB or SQLite, because that would restrict the web service to one instance, but nowadays every web service is designed with high horizontal scalability in mind. If you use Redis, MongoDB or PostgreSQL though, you would force the package user (the developer who creates the actual web service with Gin and your middleware) to run and administrate the server, even if she might never have used it before and doesn't know how to configure them for high performance and security.
+
+Any decision for a specific database would limit the package's usability.
 
 One solution would be a custom interface where you would leave the implementation to the package user. But that would require the developer to dive into the details of the Go package of the chosen key-value store. And if the developer wants to switch the store, or maybe use one for local testing and another for production, she would need to write *multiple* implementations.
 
 `gokv` is the solution for these problems. Package *creators* use the `gokv.Store` interface as parameter and can call its methods within their code, leaving the decision which actual store to use to the package user. Package *users* pick one of the implementations, for example `github.com/philippgille/gokv/redis` for Redis and pass the `redis.Client` created by `redis.NewClient(...)` as parameter. Package users can also develop their own implementations if they need to.
 
-`gokv` can of course also be used by application / web service developers who just don't want to dive into the sometimes complicated usage of some key-value store packages.
+`gokv` doesn't just have to be used to satisfy some `gokv.Store` parameter. It can of course also be used by application / web service developers who just don't want to dive into the sometimes complicated usage of some key-value store packages.
 
 Initially it was developed as `storage` package within the project [ln-paywall](https://github.com/philippgille/ln-paywall) to provide the users of ln-paywall with multiple storage options, but at some point it made sense to turn it into a repository of its own.
 
@@ -200,7 +207,7 @@ Design decisions
 ----------------
 
 - `gokv` is primarily an abstraction for key-value stores, not caches, so there's no need for cache eviction options and timeouts.
-- The package should be usable without having to write additional code, so structs should be automatically (un-)marshalled, without having to implement `MarshalJSON()` and `UnmarshalJSON()` first. It's still possible to implement these methods to customize the (un-)marshalling, for example to include unexported fields, or for higher performance (because the `encoding/json` package doesn't have to use reflection).
+- The package should be usable without having to write additional code, so structs should be (un-)marshalled automatically, without having to implement `MarshalJSON()` / `GobEncode()` and `UnmarshalJSON()` / `GobDecode()` first. It's still possible to implement these methods to customize the (un-)marshalling, for example to include unexported fields, or for higher performance (because the `encoding/json` / `encoding/gob` package doesn't have to use reflection).
 - It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a boolean return value for the `Delete` method that indicates whether a value was actually deleted (because it was previously present) can be useful, but isn't a must-have, and also it would require some `Store` implementations to implement the check by themselves (because the existing libraries don't support it), which would unnecessarily decrease performance for those who don't need it. Or as another example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
     - In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
 - Similar projects name the structs that are implementations of the store interface according to the backing store, for example `boltdb.BoltDB`, but this leads to so called "stuttering" that's discouraged when writing idiomatic Go. That's why `gokv` uses for example `bolt.Store` and `syncmap.Store`. For easier differentiation between embedded DBs and DBs that have a client and a server component though, the first ones are called `Store` and the latter ones are called `Client`, for example `redis.Client`.
