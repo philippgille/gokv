@@ -62,7 +62,7 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
         - Probably the most popular service registry. Has a key-value store as additional feature.
         - [Official comparison with ZooKeeper, doozerd and etcd](https://github.com/hashicorp/consul/blob/df91388b7b69e1dc5bfda76f2e67b658a99324ad/website/source/intro/vs/zookeeper.html.md)
         - > Note: Consul doesn't allow values larger than 512 KB
-    - [ ] [etcd](https://github.com/etcd-io/etcd)
+    - [X] [etcd](https://github.com/etcd-io/etcd)
         - It's used for example in [Kubernetes](https://github.com/kubernetes/kubernetes)
         - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
         - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md)
@@ -233,4 +233,4 @@ Related projects
     - Single contributor
     - No releases (makes it harder to use with package managers like dep)
     - Only 2-7 stars (depending on the repository, as of 2018-10-13)
-    - No support for Consul, Bolt DB / bbolt, BadgerDB, ...
+    - No support for Consul, etcd, Bolt DB / bbolt, BadgerDB, ...

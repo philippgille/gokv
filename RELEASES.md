@@ -13,6 +13,7 @@ vNext
     - Part of this addition are a new field in the existing `Options` structs, called `MarshalFormat`, as well as the related `MarshalFormat` enum (custom type + related `const` values) in each implementation package
 - Added: Package `badgerdb` - A `gokv.Store` implementation for [BadgerDB](https://github.com/dgraph-io/badger) (issue [#16](https://github.com/philippgille/gokv/issues/16))
 - Added: Package `consul` - A `gokv.Store` implementation for [Consul](https://github.com/hashicorp/consul) (issue [#18](https://github.com/philippgille/gokv/issues/18))
+- Added: Package `etcd` - A `gokv.Store` implementation for [etcd](https://github.com/etcd-io/etcd) (issue [#24](https://github.com/philippgille/gokv/issues/24))
 
 ### Breaking changes
 
