@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+v0.3.0 (2018-11-17)
+-------------------
+
 - Added: Method `Delete(string) error` (issue [#8](https://github.com/philippgille/gokv/issues/8))
 - Added: All `gokv.Store` implementations in this package now also support [gob](https://blog.golang.org/gobs-of-data) as marshal format as alternative to JSON (issue [#22](https://github.com/philippgille/gokv/issues/22))
     - Part of this addition are a new field in the existing `Options` structs, called `MarshalFormat`, as well as the related `MarshalFormat` enum (custom type + related `const` values) in each implementation package
