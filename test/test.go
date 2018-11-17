@@ -105,10 +105,10 @@ func TestTypes(store gokv.Store, t *testing.T) {
 	// Omit slice of rune
 	sliceOfString := []string{"foo", "bar"}
 
-	sliceOfSliceOfString := [][]string{[]string{"foo", "bar"}}
+	sliceOfSliceOfString := [][]string{{"foo", "bar"}}
 
-	sliceOfStruct := []Foo{Foo{Bar: "baz"}}
-	sliceOfPrivateStruct := []privateFoo{privateFoo{Bar: "baz"}}
+	sliceOfStruct := []Foo{{Bar: "baz"}}
+	sliceOfPrivateStruct := []privateFoo{{Bar: "baz"}}
 
 	testVals := []struct {
 		subTestName string
