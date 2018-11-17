@@ -118,7 +118,7 @@ Differences:
 Usage
 -----
 
-Every implementation has its own `Options` struct, but all implementations have a `NewStore()` / `NewClient()` function that return an object of a sctruct that implements the `gokv.Store` interface. Let's take the implementation for Redis as example, because its one of the most popular distributed key-value stores.
+Every implementation has its own `Options` struct, but all implementations have a `NewStore()` / `NewClient()` function that returns an object of a sctruct that implements the `gokv.Store` interface. Let's take the implementation for Redis as example, which is probably the most popular distributed key-value store.
 
 ```go
 package main
@@ -201,7 +201,7 @@ One solution would be a custom interface where you would leave the implementatio
 
 Initially it was developed as `storage` package within the project [ln-paywall](https://github.com/philippgille/ln-paywall) to provide the users of ln-paywall with multiple storage options, but at some point it made sense to turn it into a repository of its own.
 
-Before doing so I examined existing Go packages with a similar purpose (see [Related projects](#related-projects), but none of them fit my needs. They either had too few implementations, or they didn't automatically marshal / unmarshal passed structs, or the interface had too many methods, making the project seem too complex to maintain and extend, proven by some that were abandoned or forked (splitting the community with it).
+Before doing so I examined existing Go packages with a similar purpose (see [Related projects](#related-projects)), but none of them fit my needs. They either had too few implementations, or they didn't automatically marshal / unmarshal passed structs, or the interface had too many methods, making the project seem too complex to maintain and extend, proven by some that were abandoned or forked (splitting the community with it).
 
 Design decisions
 ----------------
@@ -209,7 +209,7 @@ Design decisions
 - `gokv` is primarily an abstraction for key-value stores, not caches, so there's no need for cache eviction options and timeouts.
 - The package should be usable without having to write additional code, so structs should be (un-)marshalled automatically, without having to implement `MarshalJSON()` / `GobEncode()` and `UnmarshalJSON()` / `GobDecode()` first. It's still possible to implement these methods to customize the (un-)marshalling, for example to include unexported fields, or for higher performance (because the `encoding/json` / `encoding/gob` package doesn't have to use reflection).
 - It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a boolean return value for the `Delete` method that indicates whether a value was actually deleted (because it was previously present) can be useful, but isn't a must-have, and also it would require some `Store` implementations to implement the check by themselves (because the existing libraries don't support it), which would unnecessarily decrease performance for those who don't need it. Or as another example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
-    - In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
+    - > Note: In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
 - Similar projects name the structs that are implementations of the store interface according to the backing store, for example `boltdb.BoltDB`, but this leads to so called "stuttering" that's discouraged when writing idiomatic Go. That's why `gokv` uses for example `bolt.Store` and `syncmap.Store`. For easier differentiation between embedded DBs and DBs that have a client and a server component though, the first ones are called `Store` and the latter ones are called `Client`, for example `redis.Client`.
 
 Related projects
