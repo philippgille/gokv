@@ -168,6 +168,6 @@ func NewClient(options Options) (Client, error) {
 		}
 		return result, nil
 	case <-time.After(3 * time.Second):
-		return result, errors.New("A timeout occured while trying to connect to the etcd server")
+		return result, errors.New("A timeout occurred while trying to connect to the etcd server")
 	}
 }
