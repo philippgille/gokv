@@ -1,6 +1,7 @@
 package dynamodb
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -182,6 +183,12 @@ type Options struct {
 	// Optional (read from shared credentials file or environment variable if not set).
 	// Environment variable: "AWS_SECRET_ACCESS_KEY".
 	AWSsecretAccessKey string
+	// CustomEndpoint allows you to set a custom DynamoDB service endpoint.
+	// This is especially useful if you're running a "DynamoDB local" Docker container for local testing.
+	// Typical value for the Docker container: "http://localhost:8000".
+	// See https://hub.docker.com/r/amazon/dynamodb-local/.
+	// Optional ("" by default)
+	CustomEndpoint string
 	// (Un-)marshal format.
 	// Optional (JSON by default).
 	MarshalFormat MarshalFormat
@@ -191,14 +198,14 @@ type Options struct {
 // Region: "" (use shared config file or environment variable), TableName: "gokv",
 // AWSaccessKeyID: "" (use shared credentials file or enviroment variable),
 // AWSsecretAccessKey: "" (use shared credentials file or enviroment variable),
-// MarshalFormat: JSON
+// CustomEndpoint: "", MarshalFormat: JSON
 var DefaultOptions = Options{
 	TableName:            "gokv",
 	ReadCapacityUnits:    5,
 	WriteCapacityUnits:   5,
 	WaitForTableCreation: aws.Bool(true),
-	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey or MarshalFormat
-	// because their Go zero values are fine.
+	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
+	// MarshalFormat or CustomEndpoint because their Go zero values are fine.
 }
 
 // NewClient creates a new DynamoDB client.
@@ -241,6 +248,9 @@ func NewClient(options Options) (Client, error) {
 	if creds != nil {
 		config = config.WithCredentials(creds)
 	}
+	if options.CustomEndpoint != "" {
+		config = config.WithEndpoint(options.CustomEndpoint)
+	}
 	// Use shared config file...
 	sessionOpts := session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -255,10 +265,13 @@ func NewClient(options Options) (Client, error) {
 
 	// Create table if it doesn't exist.
 	// Also serves as connection test.
+	// Use context for timeout.
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	describeTableInput := awsdynamodb.DescribeTableInput{
 		TableName: &options.TableName,
 	}
-	_, err = svc.DescribeTable(&describeTableInput)
+	_, err = svc.DescribeTableWithContext(timeoutCtx, &describeTableInput)
 	if err != nil {
 		awsErr, ok := err.(awserr.Error)
 		if !ok {
