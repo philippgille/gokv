@@ -18,13 +18,19 @@ before_install:
   - go version
   - go env
 
+env:
+  global:
+    # Limited access AWS IAM user credentials required for being allowed to use the "DynamoDB local" Docker container
+    - secure: "hcEAiDFhrx1+vHYc8XIuhBDkVKOv37sIFAozzB3O5QamwQ/oSDykdQlyDN0FqGKmarXGOA1PBHrdyLFCkcjdVs03Dfxj8TXYTdkrKP1pBwi7eDgepY2HEmC7STZ6dHP7/70XZmCG6I3Z/sRjJjLULo4BIl2gRdn1QfvEtTTWizRMRY72pG1MDiZdqi305CsxBkMitcfQMojx+UvigzdNcZe02VqXxB25vHTfLtFxRhPpIXc/n7FLfewP57ByjkydD/Szo0Z3WX018Y7Dcv1OzmZl2uHuTfxud5l+tGo8wHfaILVCACYMi3XkhSocerBVn8ilUGjNGAEGIYkAZLUCYLDEnrm6453z7P0hLmtbPwQfexmCfRkBYvF+GdGkPGP8VZHirJojmiR0QBWwC5lnSCIiLDQn/i0UvPdKzIH+2vTrSoymUn65fxR3bnhsEiv9fw2eYDWIHwvXk4B73q4FsX5iq/4LzbyAHGmnAUeBnLlb4/u5tW8gjT/RRwuo/6F9arnxFofXkUUMxc8zWsMwWNiQ8H7E1J7U2AGFnwbxA9GIinQRy6DXpOlyeHc0gKYcVfK+zu72t/SRwWyaTETmSEbNHy54gcXSo7qKe6f0Z47CxuGBu1Dx9yJg+lb/Wt7feUvbZdEuJMJaSEpN4zyWwl97xZ4PEm7TgAxZZgj8s4A="
+
 script:
   # Build
   - go build -v github.com/philippgille/gokv/...
-  # Start Consul and etcd so they can be used in the tests
+  # Start Consul, etcd and "DynamoDB local" so they can be used in the tests
   - docker run -d --rm -p 8500:8500 bitnami/consul
   - docker run -d --rm -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
-  # Wait for Consul and etcd to start
+  - docker run -d --rm -p 8000:8000 amazon/dynamodb-local
+  # Wait for Consul, etcd and "DynamoDB local" to start
   # TODO: Use something like a while-loop with 1s sleep and for
   # Consul: curl request to "http://127.0.0.1:8500/v1/status/leader" and loop until the response is a 200 OK with a proper body
   - sleep 10s
