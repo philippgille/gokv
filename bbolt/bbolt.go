@@ -1,4 +1,4 @@
-package bolt
+package bbolt
 
 import (
 	"errors"
@@ -23,7 +23,7 @@ func (c Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	// First turn the passed object into something that Bolt can handle
+	// First turn the passed object into something that bbolt can handle
 	var data []byte
 	var err error
 	switch c.marshalFormat {
@@ -114,13 +114,13 @@ const (
 	Gob
 )
 
-// Options are the options for the Bolt store.
+// Options are the options for the bbolt store.
 type Options struct {
 	// Bucket name for storing the key-value pairs.
 	// Optional ("default" by default).
 	BucketName string
 	// Path of the DB file.
-	// Optional ("bolt.db" by default).
+	// Optional ("bbolt.db" by default).
 	Path string
 	// (Un-)marshal format.
 	// Optional (JSON by default).
@@ -128,19 +128,19 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// BucketName: "default", Path: "bolt.db", MarshalFormat: JSON
+// BucketName: "default", Path: "bbolt.db", MarshalFormat: JSON
 var DefaultOptions = Options{
 	BucketName: "default",
-	Path:       "bolt.db",
+	Path:       "bbolt.db",
 	// No need to set MarshalFormat to JSON
 	// because its zero value is fine.
 }
 
-// NewStore creates a new Bolt store.
-// Note: Bolt uses an exclusive write lock on the database file so it cannot be shared by multiple processes.
+// NewStore creates a new bbolt store.
+// Note: bbolt uses an exclusive write lock on the database file so it cannot be shared by multiple processes.
 // So when creating multiple clients you should always use a new database file (by setting a different Path in the options).
 //
-// Don't worry about closing the Bolt DB as long as you don't need to close the DB while the process that opened it runs.
+// Don't worry about closing the bbolt database as long as you don't need to close the DB while the process that opened it runs.
 func NewStore(options Options) (Store, error) {
 	result := Store{}
 
@@ -159,7 +159,7 @@ func NewStore(options Options) (Store, error) {
 	}
 
 	// Create a bucket if it doesn't exist yet.
-	// In Bolt key/value pairs are stored to and read from buckets.
+	// In bbolt key/value pairs are stored to and read from buckets.
 	err = db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(options.BucketName))
 		if err != nil {

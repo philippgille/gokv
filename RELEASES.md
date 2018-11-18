@@ -11,6 +11,10 @@ vNext
 - Added: Package `dynamodb` - A `gokv.Store` implementation for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) (issue [#28](https://github.com/philippgille/gokv/issues/28))
 - Fixed spelling in error message when using the etcd implementation and the etcd server is unreachable
 
+### Breaking changes
+
+- Renamed `bolt` package to `bbolt` to reflect the fact that the maintained fork is used. Also changed all other occurrences of "bolt" (e.g. in GoDoc comments etc.).
+
 v0.3.0 (2018-11-17)
 -------------------
 
