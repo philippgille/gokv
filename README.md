@@ -65,7 +65,7 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [X] [etcd](https://github.com/etcd-io/etcd)
         - It's used for example in [Kubernetes](https://github.com/kubernetes/kubernetes)
         - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
-        - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md)
+        - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md).
     - [ ] [TiKV](https://github.com/tikv/tikv)
         - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
     - [ ] [LedisDB](https://github.com/siddontang/ledisdb)
@@ -74,7 +74,8 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [ ] [Memcached](https://github.com/memcached/memcached)
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
-    - [ ] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
+    - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
+        - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
     - [ ] [Amazon SimpleDB](https://aws.amazon.com/simpledb/)
     - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
     - [ ] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
