@@ -13,6 +13,12 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
+// "k" is used as table column name for the key.
+var keyAttrName = "k"
+
+// "v" is used as table column name for the value.
+var valAttrName = "v"
+
 // Client is a gokv.Store implementation for DynamoDB.
 type Client struct {
 	c             *awsdynamodb.DynamoDB
@@ -44,10 +50,10 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	item := make(map[string]*awsdynamodb.AttributeValue)
-	item["k"] = &awsdynamodb.AttributeValue{
+	item[keyAttrName] = &awsdynamodb.AttributeValue{
 		S: &k,
 	}
-	item["v"] = &awsdynamodb.AttributeValue{
+	item[valAttrName] = &awsdynamodb.AttributeValue{
 		B: data,
 	}
 	putItemInput := awsdynamodb.PutItemInput{
@@ -73,7 +79,7 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 	}
 
 	key := make(map[string]*awsdynamodb.AttributeValue)
-	key["k"] = &awsdynamodb.AttributeValue{
+	key[keyAttrName] = &awsdynamodb.AttributeValue{
 		S: &k,
 	}
 	getItemInput := awsdynamodb.GetItemInput{
@@ -87,7 +93,7 @@ func (c Client) Get(k string, v interface{}) (bool, error) {
 		// Return false if the key-value pair doesn't exist
 		return false, nil
 	}
-	attributeVal := getItemOutput.Item["v"]
+	attributeVal := getItemOutput.Item[valAttrName]
 	if attributeVal == nil {
 		// Return false if there's no value
 		// TODO: Maybe return an error? Behaviour should be consistent across all implementations.
@@ -114,7 +120,7 @@ func (c Client) Delete(k string) error {
 	}
 
 	key := make(map[string]*awsdynamodb.AttributeValue)
-	key["k"] = &awsdynamodb.AttributeValue{
+	key[keyAttrName] = &awsdynamodb.AttributeValue{
 		S: &k,
 	}
 	deleteItemInput := awsdynamodb.DeleteItemInput{
@@ -258,7 +264,6 @@ func NewClient(options Options) (Client, error) {
 		if !ok {
 			return result, err
 		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException {
-			keyAttrName := "k"
 			keyAttrType := "S" // For "string"
 			keyType := "HASH"  // As opposed to "RANGE"
 			createTableInput := awsdynamodb.CreateTableInput{
