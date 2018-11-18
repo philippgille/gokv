@@ -1,9 +1,11 @@
 package dynamodb_test
 
 import (
+	"context"
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
@@ -13,6 +15,10 @@ import (
 	"github.com/philippgille/gokv/dynamodb"
 	"github.com/philippgille/gokv/test"
 )
+
+// For "DynamoDB local" Docker container.
+// See https://hub.docker.com/r/amazon/dynamodb-local/.
+var customEndpoint = "http://localhost:8000"
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
@@ -193,17 +199,19 @@ func TestNil(t *testing.T) {
 
 // checkDynamoDBconnection returns true if a connection could be made, false otherwise.
 func checkDynamoDBconnection() bool {
-	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID))
+	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID).WithEndpoint(customEndpoint))
 	if err != nil {
 		return false
 	}
 	svc := awsdynamodb.New(sess)
 
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	limit := int64(1)
 	listTablesInput := awsdynamodb.ListTablesInput{
 		Limit: &limit,
 	}
-	_, err = svc.ListTables(&listTablesInput)
+	_, err = svc.ListTablesWithContext(timeoutCtx, &listTablesInput)
 	if err != nil {
 		return false
 	}
@@ -212,8 +220,9 @@ func checkDynamoDBconnection() bool {
 
 func createClient(t *testing.T, mf dynamodb.MarshalFormat) dynamodb.Client {
 	options := dynamodb.Options{
-		Region:        endpoints.EuCentral1RegionID,
-		MarshalFormat: mf,
+		Region:         endpoints.EuCentral1RegionID,
+		CustomEndpoint: customEndpoint,
+		MarshalFormat:  mf,
 	}
 	client, err := dynamodb.NewClient(options)
 	if err != nil {
