@@ -200,7 +200,7 @@ func checkMongoDBconnection() bool {
 }
 
 func createClient(t *testing.T, mf mongodb.MarshalFormat) mongodb.Client {
-	options := mongodb.DefaultOptions
+	options := mongodb.Options{}
 	options.MarshalFormat = mf
 	client, err := mongodb.NewClient(options)
 	if err != nil {
