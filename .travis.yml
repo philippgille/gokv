@@ -2,9 +2,10 @@
 sudo: required
 
 services:
-  - redis-server
   # Docker is required for running some services that aren't provided by Travis CI, e.g. Consul
   - docker
+  - redis-server
+  - mongodb
 
 git:
   depth: 1

@@ -87,7 +87,7 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
         - Also usable for [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/)
     - [ ] [PostgreSQL](https://www.postgresql.org/)
 - NoSQL
-    - [ ] [MongoDB](https://www.mongodb.com/)
+    - [X] [MongoDB](https://www.mongodb.com/)
         - By far [the most popular non-relational database](https://db-engines.com/en/ranking)
 - NewSQL
     - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
@@ -222,12 +222,12 @@ Related projects
 
 - [libkv](https://github.com/docker/libkv)
     - Uses `[]byte` as value, no automatic (un-)marshalling of structs
-    - No support for Redis, BadgerDB, Go map, AWS DynamoDB, ...
+    - No support for Redis, BadgerDB, Go map, MongoDB, AWS DynamoDB, ...
     - Not actively maintained anymore (3 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
 - [valkeyrie](https://github.com/abronan/valkeyrie)
     - Fork of libkv
     - Same disadvantage: Uses `[]byte` as value, no automatic (un-)marshalling of structs
-    - No support for BadgerDB, Go map, AWS DynamoDB, ...
+    - No support for BadgerDB, Go map, MongoDB, AWS DynamoDB, ...
 - [gokvstores](https://github.com/ulule/gokvstores)
     - Only supports Redis and local in-memory cache
     - Not actively maintained anymore (4 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
@@ -238,4 +238,4 @@ Related projects
     - Single contributor
     - No releases (makes it harder to use with package managers like dep)
     - Only 2-7 stars (depending on the repository, as of 2018-10-13)
-    - No support for Consul, etcd, bbolt / Bolt, BadgerDB, AWS DynamoDB, ...
+    - No support for Consul, etcd, bbolt / Bolt, BadgerDB, MongoDB, AWS DynamoDB, ...
