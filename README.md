@@ -57,7 +57,7 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [ ] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
 - Distributed store
     - [X] [Redis](https://github.com/antirez/redis)
-        - Probably [the most popular distributed key-value store](https://db-engines.com/en/ranking/key-value+store)
+        - [The most popular distributed key-value store](https://db-engines.com/en/ranking/key-value+store)
     - [X] [Consul](https://github.com/hashicorp/consul)
         - Probably the most popular service registry. Has a key-value store as additional feature.
         - [Official comparison with ZooKeeper, doozerd and etcd](https://github.com/hashicorp/consul/blob/df91388b7b69e1dc5bfda76f2e67b658a99324ad/website/source/intro/vs/zookeeper.html.md)
@@ -68,8 +68,6 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
         - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md).
     - [ ] [TiKV](https://github.com/tikv/tikv)
         - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
-    - [ ] [LedisDB](https://github.com/siddontang/ledisdb)
-        - Similar to Redis, with several backing stores
 - Distributed cache (no presistence *by default*)
     - [ ] [Memcached](https://github.com/memcached/memcached)
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
@@ -81,14 +79,14 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [ ] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
     - [ ] [Google Cloud Datastore](https://cloud.google.com/datastore/)
 - SQL
-    - [ ] [MySQL](https://www.mysql.com/)
-        - Probably [the most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
+    - [ ] [MySQL](https://github.com/mysql/mysql-server)
+        - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
     - [ ] [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server)
         - Also usable for [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/)
-    - [ ] [PostgreSQL](https://www.postgresql.org/)
+    - [ ] [PostgreSQL](https://github.com/postgres/postgres)
 - NoSQL
-    - [X] [MongoDB](https://www.mongodb.com/)
-        - By far [the most popular non-relational database](https://db-engines.com/en/ranking)
+    - [X] [MongoDB](https://github.com/mongodb/mongo)
+        - [The most popular non-relational database](https://db-engines.com/en/ranking)
 - NewSQL
     - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
@@ -123,7 +121,7 @@ Differences:
 Usage
 -----
 
-Every implementation has its own `Options` struct, but all implementations have a `NewStore()` / `NewClient()` function that returns an object of a sctruct that implements the `gokv.Store` interface. Let's take the implementation for Redis as example, which is probably the most popular distributed key-value store.
+Every implementation has its own `Options` struct, but all implementations have a `NewStore()` / `NewClient()` function that returns an object of a sctruct that implements the `gokv.Store` interface. Let's take the implementation for Redis as example, which is the most popular distributed key-value store.
 
 ```go
 package main
