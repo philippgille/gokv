@@ -129,6 +129,7 @@ package main
 import (
     "fmt"
 
+    "github.com/philippgille/gokv"
     "github.com/philippgille/gokv/redis"
 )
 
@@ -142,18 +143,25 @@ func main() {
     // Create client
     client := redis.NewClient(options)
 
+    // Store, retrieve, print and delete a value
+    interactWithStore(client)
+}
+
+// interactWithStore stores, retrieves, prints and deletes a value.
+// It's completely independent of the store implementation.
+func interactWithStore(store gokv.Store) {
     // Store value
     val := foo{
         Bar: "baz",
     }
-    err := client.Set("foo123", val)
+    err := store.Set("foo123", val)
     if err != nil {
         panic(err)
     }
 
     // Retrieve value
     retrievedVal := new(foo)
-    found, err := client.Get("foo123", retrievedVal)
+    found, err := store.Get("foo123", retrievedVal)
     if err != nil {
         panic(err)
     }
@@ -164,20 +172,30 @@ func main() {
     fmt.Printf("foo: %+v", *retrievedVal) // Prints `foo: {Bar:baz}`
 
     // Delete value
-    err = client.Delete("foo123")
+    err = store.Delete("foo123")
     if err != nil {
         panic(err)
     }
 }
 ```
 
-As commented in the above code, this code does the following:
+As described in the comments, that code does the following:
 
-1. Store an object of type `foo` in the Redis server running on `localhost:6379` with the key `foo123`
-2. Retrieve the value for the key `foo123`
+1. Create a client for Redis
+2. Call `interactWithStore()`, which requires a `gokv.Store` as parameter. This method then:
+    1. Stores an object of type `foo` in the Redis server running on `localhost:6379` with the key `foo123`
+    2. Retrieves the value for the key `foo123`
     - The check if the value was found isn't needed in this example but is included for demonstration purposes
-3. Print the value. It prints `foo: {Bar:baz}`, which is exactly what was stored before.
-4. Delete the value
+    3. Prints the value. It prints `foo: {Bar:baz}`, which is exactly what was stored before.
+    4. Deletes the value
+
+Now let's say you don't want to use Redis but Consul instead. You just have to make three simple changes:
+
+1. Replace the import of `"github.com/philippgille/gokv/redis"` by `"github.com/philippgille/gokv/consul"`
+2. Replace `redis.DefaultOptions` by `consul.DefaultOptions`
+3. Replace `redis.NewClient(options)` by `consul.NewClient(options)`
+
+Everything else works the same way. `interactWithStore()` is completely unaffected.
 
 Project status
 --------------

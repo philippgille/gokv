@@ -11,6 +11,7 @@ Example code for using Redis:
 	import (
 		"fmt"
 
+		"github.com/philippgille/gokv"
 		"github.com/philippgille/gokv/redis"
 	)
 
@@ -24,18 +25,25 @@ Example code for using Redis:
 		// Create client
 		client := redis.NewClient(options)
 
+		// Store, retrieve, print and delete a value
+		interactWithStore(client)
+	}
+
+	// interactWithStore stores, retrieves, prints and deletes a value.
+	// It's completely independent of the store implementation.
+	func interactWithStore(store gokv.Store) {
 		// Store value
 		val := foo{
 			Bar: "baz",
 		}
-		err := client.Set("foo123", val)
+		err := store.Set("foo123", val)
 		if err != nil {
 			panic(err)
 		}
 
 		// Retrieve value
 		retrievedVal := new(foo)
-		found, err := client.Get("foo123", retrievedVal)
+		found, err := store.Get("foo123", retrievedVal)
 		if err != nil {
 			panic(err)
 		}
@@ -46,7 +54,7 @@ Example code for using Redis:
 		fmt.Printf("foo: %+v", *retrievedVal) // Prints `foo: {Bar:baz}`
 
 		// Delete value
-		err = client.Delete("foo123")
+		err = store.Delete("foo123")
 		if err != nil {
 			panic(err)
 		}
