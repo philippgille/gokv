@@ -87,9 +87,12 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
 - NoSQL
     - [X] [MongoDB](https://github.com/mongodb/mongo)
         - [The most popular non-relational database](https://db-engines.com/en/ranking)
+    - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
 - NewSQL
     - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
+        - [Official comparison with MongoDB and PostgreSQL](https://www.cockroachlabs.com/docs/stable/cockroachdb-in-comparison.html)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
+    - [ ] [Apache Ignite](https://github.com/apache/ignite)
 
 ### Value types
 
@@ -207,6 +210,10 @@ Planned interface methods until `v1.0.0`:
 - `List(interface{}) error` / `GetAll(interface{}) error` or similar
 - `Close() error` or similar
 
+The interface might even change until `v1.0.0`. For example one consideration is to change `Get(string, interface{}) (bool, error)` to `Get(string, interface{}) error` (no boolean return value anymore), with the `error` being something like `gokv.ErrNotFound // "Key-value pair not found"` to fulfill the additional role of indicating that the key-value pair wasn't found. But at the moment we prefer the current method signature.
+
+Also, more interfaces might be added. For example so that there's a `SimpleStore` and an `AdvancedStore`, with the first one containing only the basic methods and the latter one with advanced features such as key-value pair lifetimes (deletion of key-value pairs after a given time), notification of value changes via Go channels etc. But currently the focus is simplicity, see [Design decisions](#design-decisions).
+
 Motivation
 ----------
 
@@ -227,7 +234,8 @@ Before doing so I examined existing Go packages with a similar purpose (see [Rel
 Design decisions
 ----------------
 
-- `gokv` is primarily an abstraction for key-value stores, not caches, so there's no need for cache eviction options and timeouts.
+- `gokv` is primarily an abstraction for **key-value stores**, not caches, so there's no need for cache eviction and timeouts.
+    - It's still possible to have cache eviction. In some cases you can configure it on the server, or in case of Memcached it's even the default. Or you can have an implementation-specific `Option` that configures the key-value store client to set a timeout on some key-value pair when storing it in the server. But this should be implementation-specific and not be part of the interface methods, which would require *every* implementation to support cache eviction.
 - The package should be usable without having to write additional code, so structs should be (un-)marshalled automatically, without having to implement `MarshalJSON()` / `GobEncode()` and `UnmarshalJSON()` / `GobDecode()` first. It's still possible to implement these methods to customize the (un-)marshalling, for example to include unexported fields, or for higher performance (because the `encoding/json` / `encoding/gob` package doesn't have to use reflection).
 - It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a boolean return value for the `Delete` method that indicates whether a value was actually deleted (because it was previously present) can be useful, but isn't a must-have, and also it would require some `Store` implementations to implement the check by themselves (because the existing libraries don't support it), which would unnecessarily decrease performance for those who don't need it. Or as another example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
     - > Note: In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
