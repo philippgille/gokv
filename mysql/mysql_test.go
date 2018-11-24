@@ -190,6 +190,35 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(mysql.Gob))
 }
 
+// TestDBcreation tests if the DB gets created successfully when the DSN doesn't contain one.
+// The other tests call createClient, which doesn't use any DSN,
+// which leads to the gokv implementation to use "root@/gokv" by default.
+func TestDBcreation(t *testing.T) {
+	options := mysql.Options{
+		DataSourceName: "root@/",
+	}
+	client, err := mysql.NewClient(options)
+	if err != nil {
+		t.Error(err)
+	}
+	err = client.Set("foo", "bar")
+	if err != nil {
+		t.Error(err)
+	}
+	actualPtr := new(string)
+	found, err := client.Get("foo", actualPtr)
+	if !found {
+		t.Error("Value not found, but should've been.")
+	}
+	if err != nil {
+		t.Error(err)
+	}
+	actual := *actualPtr
+	if actual != "bar" {
+		t.Errorf("Expected %v, but was: %v", "bar", actual)
+	}
+}
+
 // checkMySQLconnection returns true if a connection could be made, false otherwise.
 func checkMySQLconnection() bool {
 	db, err := sql.Open("mysql", "root@/")
