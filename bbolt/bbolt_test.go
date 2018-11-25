@@ -167,7 +167,7 @@ func createStore(t *testing.T, mf bbolt.MarshalFormat) bbolt.Store {
 	}
 	store, err := bbolt.NewStore(options)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return store
 }
@@ -175,7 +175,7 @@ func createStore(t *testing.T, mf bbolt.MarshalFormat) bbolt.Store {
 func generateRandomTempDbPath(t *testing.T) string {
 	path, err := ioutil.TempDir(os.TempDir(), "bbolt")
 	if err != nil {
-		t.Errorf("Generating random DB path failed: %v", err)
+		t.Fatalf("Generating random DB path failed: %v", err)
 	}
 	path += "/bbolt.db"
 	return path

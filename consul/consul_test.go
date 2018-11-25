@@ -214,7 +214,7 @@ func createClient(t *testing.T, mf consul.MarshalFormat) consul.Client {
 	options.MarshalFormat = mf
 	client, err := consul.NewClient(options)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return client
 }

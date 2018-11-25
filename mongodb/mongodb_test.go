@@ -207,7 +207,7 @@ func createClient(t *testing.T, mf mongodb.MarshalFormat) mongodb.Client {
 	options.MarshalFormat = mf
 	client, err := mongodb.NewClient(options)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return client
 }

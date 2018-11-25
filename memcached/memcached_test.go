@@ -213,7 +213,7 @@ func createClient(t *testing.T, mf memcached.MarshalFormat) memcached.Client {
 	options.MarshalFormat = mf
 	client, err := memcached.NewClient(options)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return client
 }

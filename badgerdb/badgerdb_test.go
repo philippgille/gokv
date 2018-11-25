@@ -167,7 +167,7 @@ func createStore(t *testing.T, mf badgerdb.MarshalFormat) badgerdb.Store {
 	}
 	store, err := badgerdb.NewStore(options)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return store
 }
@@ -175,7 +175,7 @@ func createStore(t *testing.T, mf badgerdb.MarshalFormat) badgerdb.Store {
 func generateRandomTempDBpath(t *testing.T) string {
 	path, err := ioutil.TempDir(os.TempDir(), "BadgerDB")
 	if err != nil {
-		t.Errorf("Generating random DB path failed: %v", err)
+		t.Fatalf("Generating random DB path failed: %v", err)
 	}
 	return path
 }

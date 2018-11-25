@@ -237,7 +237,7 @@ func createClient(t *testing.T, mf etcd.MarshalFormat) etcd.Client {
 	options.MarshalFormat = mf
 	client, err := etcd.NewClient(options)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	return client
 }
