@@ -1,6 +1,7 @@
 package mongodb_test
 
 import (
+	"log"
 	"strconv"
 	"sync"
 	"testing"
@@ -15,7 +16,7 @@ import (
 //
 // Note: This test is only executed if the initial connection to MongoDB works.
 func TestClient(t *testing.T) {
-	if !checkMongoDBconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MongoDB could be established. Probably not running in a proper test environment.")
 	}
 
@@ -36,7 +37,7 @@ func TestClient(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MongoDB works.
 func TestTypes(t *testing.T) {
-	if !checkMongoDBconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MongoDB could be established. Probably not running in a proper test environment.")
 	}
 
@@ -57,7 +58,7 @@ func TestTypes(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MongoDB works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkMongoDBconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MongoDB could be established. Probably not running in a proper test environment.")
 	}
 
@@ -94,7 +95,7 @@ func TestClientConcurrent(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MongoDB works.
 func TestErrors(t *testing.T) {
-	if !checkMongoDBconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MongoDB could be established. Probably not running in a proper test environment.")
 	}
 
@@ -131,7 +132,7 @@ func TestErrors(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MongoDB works.
 func TestNil(t *testing.T) {
-	if !checkMongoDBconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MongoDB could be established. Probably not running in a proper test environment.")
 	}
 
@@ -187,13 +188,15 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(mongodb.Gob))
 }
 
-// checkMongoDBconnection returns true if a connection could be made, false otherwise.
-func checkMongoDBconnection() bool {
+// checkConnection returns true if a connection could be made, false otherwise.
+func checkConnection() bool {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
 	if err = session.Ping(); err != nil {
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
 	return true

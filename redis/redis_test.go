@@ -21,7 +21,7 @@ var testDbNumber = 15 // 16 DBs by default (unchanged config), starting with 0
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClient(t *testing.T) {
-	if !checkRedisConnection(testDbNumber) {
+	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
@@ -43,7 +43,7 @@ func TestClient(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestTypes(t *testing.T) {
-	if !checkRedisConnection(testDbNumber) {
+	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
@@ -65,7 +65,7 @@ func TestTypes(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkRedisConnection(testDbNumber) {
+	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
@@ -103,7 +103,7 @@ func TestClientConcurrent(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestErrors(t *testing.T) {
-	if !checkRedisConnection(testDbNumber) {
+	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
@@ -141,7 +141,7 @@ func TestErrors(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestNil(t *testing.T) {
-	if !checkRedisConnection(testDbNumber) {
+	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
 	deleteRedisDb(testDbNumber) // Prep for previous test runs
@@ -198,8 +198,8 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(redis.Gob))
 }
 
-// checkRedisConnection returns true if a connection could be made, false otherwise.
-func checkRedisConnection(number int) bool {
+// checkConnection returns true if a connection could be made, false otherwise.
+func checkConnection(number int) bool {
 	client := goredis.NewClient(&goredis.Options{
 		Addr:     redis.DefaultOptions.Address,
 		Password: redis.DefaultOptions.Password,
@@ -207,7 +207,7 @@ func checkRedisConnection(number int) bool {
 	})
 	err := client.Ping().Err()
 	if err != nil {
-		log.Printf("An error occurred during testing the connection to Redis: %v\n", err)
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
 	return true

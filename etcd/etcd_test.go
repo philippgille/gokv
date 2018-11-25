@@ -2,6 +2,7 @@ package etcd_test
 
 import (
 	"context"
+	"log"
 	"strconv"
 	"sync"
 	"testing"
@@ -18,7 +19,7 @@ import (
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestClient(t *testing.T) {
-	if !checkETCDconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
 	}
 
@@ -39,7 +40,7 @@ func TestClient(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestTypes(t *testing.T) {
-	if !checkETCDconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
 	}
 
@@ -60,7 +61,7 @@ func TestTypes(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkETCDconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
 	}
 
@@ -97,7 +98,7 @@ func TestClientConcurrent(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestErrors(t *testing.T) {
-	if !checkETCDconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
 	}
 
@@ -134,7 +135,7 @@ func TestErrors(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestNil(t *testing.T) {
-	if !checkETCDconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
 	}
 
@@ -190,8 +191,8 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(etcd.Gob))
 }
 
-// checkETCDconnection returns true if a connection could be made, false otherwise.
-func checkETCDconnection() bool {
+// checkConnection returns true if a connection could be made, false otherwise.
+func checkConnection() bool {
 	// The behaviour for New() seems to be inconsistent.
 	// It should block at most for the specified time in DialTimeout.
 	// In our case though New() doesn't block, but instead the following call does.
@@ -208,11 +209,16 @@ func checkETCDconnection() bool {
 	go func() {
 		cli, err := clientv3.New(config)
 		if err != nil {
+			log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 			okChan <- false
 			return
 		}
 		statusRes, err := cli.Status(context.Background(), "localhost:2379")
-		if err != nil || statusRes == nil {
+		if err != nil {
+			log.Printf("An error occurred during testing the connection to the server: %v\n", err)
+			okChan <- false
+			return
+		} else if statusRes == nil {
 			okChan <- false
 			return
 		}

@@ -2,7 +2,7 @@ package mysql_test
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"strconv"
 	"sync"
 	"testing"
@@ -18,7 +18,7 @@ import (
 //
 // Note: This test is only executed if the initial connection to MySQL works.
 func TestClient(t *testing.T) {
-	if !checkMySQLconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
 	}
 
@@ -39,7 +39,7 @@ func TestClient(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MySQL works.
 func TestTypes(t *testing.T) {
-	if !checkMySQLconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
 	}
 
@@ -60,7 +60,7 @@ func TestTypes(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MySQL works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkMySQLconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
 	}
 
@@ -97,7 +97,7 @@ func TestClientConcurrent(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MySQL works.
 func TestErrors(t *testing.T) {
-	if !checkMySQLconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
 	}
 
@@ -134,7 +134,7 @@ func TestErrors(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to MySQL works.
 func TestNil(t *testing.T) {
-	if !checkMySQLconnection() {
+	if !checkConnection() {
 		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
 	}
 
@@ -219,17 +219,17 @@ func TestDBcreation(t *testing.T) {
 	}
 }
 
-// checkMySQLconnection returns true if a connection could be made, false otherwise.
-func checkMySQLconnection() bool {
+// checkConnection returns true if a connection could be made, false otherwise.
+func checkConnection() bool {
 	db, err := sql.Open("mysql", "root@/")
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
 
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
 
