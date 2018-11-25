@@ -10,6 +10,7 @@ vNext
 
 - Added: Package `mongodb` - A `gokv.Store` implementation for [MongoDB](https://github.com/mongodb/mongo) (issue [#27](https://github.com/philippgille/gokv/issues/27))
 - Added: Package `dynamodb` - A `gokv.Store` implementation for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) (issue [#28](https://github.com/philippgille/gokv/issues/28))
+- Added: Package `memcached` - A `gokv.Store` implementation for [Memcached](https://github.com/memcached/memcached) (issue [#31](https://github.com/philippgille/gokv/issues/31))
 - Added: Package `mysql` - A `gokv.Store` implementation for [MySQL](https://github.com/mysql/mysql-server) (issue [#32](https://github.com/philippgille/gokv/issues/32))
 - Fixed spelling in error message when using the etcd implementation and the etcd server is unreachable
 

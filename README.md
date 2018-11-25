@@ -69,7 +69,8 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [ ] [TiKV](https://github.com/tikv/tikv)
         - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
 - Distributed cache (no presistence *by default*)
-    - [ ] [Memcached](https://github.com/memcached/memcached)
+    - [X] [Memcached](https://github.com/memcached/memcached)
+        - > Note: Memcached is meant to be used as LRU (Least Recently Used) cache, which means items automatically *expire* and are deleted from the server after not being used for a while. See [Memcached Wiki: Forgetting is a feature](https://github.com/memcached/memcached/wiki/Overview#forgetting-is-a-feature).
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
     - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
@@ -188,7 +189,7 @@ As described in the comments, that code does the following:
 2. Call `interactWithStore()`, which requires a `gokv.Store` as parameter. This method then:
     1. Stores an object of type `foo` in the Redis server running on `localhost:6379` with the key `foo123`
     2. Retrieves the value for the key `foo123`
-    - The check if the value was found isn't needed in this example but is included for demonstration purposes
+        - The check if the value was found isn't needed in this example but is included for demonstration purposes
     3. Prints the value. It prints `foo: {Bar:baz}`, which is exactly what was stored before.
     4. Deletes the value
 

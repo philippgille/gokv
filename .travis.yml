@@ -6,6 +6,7 @@ services:
   - docker
   - redis-server
   - mongodb
+  - memcached
   - mysql
 
 git:
