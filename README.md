@@ -244,18 +244,19 @@ Design decisions
 - It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a boolean return value for the `Delete` method that indicates whether a value was actually deleted (because it was previously present) can be useful, but isn't a must-have, and also it would require some `Store` implementations to implement the check by themselves (because the existing libraries don't support it), which would unnecessarily decrease performance for those who don't need it. Or as another example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
     - > Note: In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
 - Similar projects name the structs that are implementations of the store interface according to the backing store, for example `boltdb.BoltDB`, but this leads to so called "stuttering" that's discouraged when writing idiomatic Go. That's why `gokv` uses for example `bbolt.Store` and `syncmap.Store`. For easier differentiation between embedded DBs and DBs that have a client and a server component though, the first ones are called `Store` and the latter ones are called `Client`, for example `redis.Client`.
+- All errors are implementation-specific. We could introduce a `gokv.StoreError` type and define some constants like a `SetError` or something more specific like a `TimeoutError`, but non-specific errors don't help the package user, and specific errors would make it very hard to create and especially maintain a `gokv.Store` implementation. You would need to know exactly in which cases the package (that the implementation uses) returns errors, what the errors mean (to "translate" them) and keep up with changes and additions of errors in the package. So instead, errors are just forwarded. For example, if you use the `dynamodb` package, the returned errors will be errors from the `"github.com/aws/aws-sdk-go` package.
 
 Related projects
 ----------------
 
 - [libkv](https://github.com/docker/libkv)
     - Uses `[]byte` as value, no automatic (un-)marshalling of structs
-    - No support for Redis, BadgerDB, Go map, MongoDB, AWS DynamoDB, MySQL, ...
+    - No support for Redis, BadgerDB, Go map, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
     - Not actively maintained anymore (3 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
 - [valkeyrie](https://github.com/abronan/valkeyrie)
     - Fork of libkv
     - Same disadvantage: Uses `[]byte` as value, no automatic (un-)marshalling of structs
-    - No support for BadgerDB, Go map, MongoDB, AWS DynamoDB, MySQL, ...
+    - No support for BadgerDB, Go map, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
 - [gokvstores](https://github.com/ulule/gokvstores)
     - Only supports Redis and local in-memory cache
     - Not actively maintained anymore (4 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
@@ -266,4 +267,4 @@ Related projects
     - Single contributor
     - No releases (makes it harder to use with package managers like dep)
     - Only 2-7 stars (depending on the repository, as of 2018-10-13)
-    - No support for Consul, etcd, bbolt / Bolt, BadgerDB, MongoDB, AWS DynamoDB, MySQL, ...
+    - No support for Consul, etcd, bbolt / Bolt, BadgerDB, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
