@@ -12,11 +12,13 @@ vNext
 - Added: Package `dynamodb` - A `gokv.Store` implementation for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) (issue [#28](https://github.com/philippgille/gokv/issues/28))
 - Added: Package `memcached` - A `gokv.Store` implementation for [Memcached](https://github.com/memcached/memcached) (issue [#31](https://github.com/philippgille/gokv/issues/31))
 - Added: Package `mysql` - A `gokv.Store` implementation for [MySQL](https://github.com/mysql/mysql-server) (issue [#32](https://github.com/philippgille/gokv/issues/32))
+- Added: The factory function `redis.NewClient()` now checks if the connection to the Redis server works and otherwise returns an error.
 - Fixed spelling in error message when using the etcd implementation and the etcd server is unreachable
 
 ### Breaking changes
 
 - Renamed `bolt` package to `bbolt` to reflect the fact that the maintained fork is used. Also changed all other occurrences of "bolt" (e.g. in GoDoc comments etc.).
+- Due to the above mentioned addition to the Redis client factory function, the function signature changed from `func NewClient(options Options) Client` to `func NewClient(options Options) (Client, error)`.
 
 v0.3.0 (2018-11-17)
 -------------------

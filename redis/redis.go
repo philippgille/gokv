@@ -123,17 +123,27 @@ var DefaultOptions = Options{
 }
 
 // NewClient creates a new Redis client.
-func NewClient(options Options) Client {
+func NewClient(options Options) (Client, error) {
+	result := Client{}
+
 	// Set default values
 	if options.Address == "" {
 		options.Address = DefaultOptions.Address
 	}
-	return Client{
-		c: redis.NewClient(&redis.Options{
-			Addr:     options.Address,
-			Password: options.Password,
-			DB:       options.DB,
-		}),
-		marshalFormat: options.MarshalFormat,
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     options.Address,
+		Password: options.Password,
+		DB:       options.DB,
+	})
+
+	err := client.Ping().Err()
+	if err != nil {
+		return result, err
 	}
+
+	result.c = client
+	result.marshalFormat = options.MarshalFormat
+
+	return result, nil
 }
