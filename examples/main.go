@@ -15,7 +15,10 @@ func main() {
 	options := redis.DefaultOptions // Address: "localhost:6379", Password: "", DB: 0
 
 	// Create client
-	client := redis.NewClient(options)
+	client, err := redis.NewClient(options)
+	if err != nil {
+		panic(err)
+	}
 
 	// Store, retrieve, print and delete a value
 	interactWithStore(client)
