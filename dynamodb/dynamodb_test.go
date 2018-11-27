@@ -200,7 +200,7 @@ func TestNil(t *testing.T) {
 
 // TestClose tests if the close method returns any errors.
 //
-// Note: This test is only executed if the initial connection to Consul works.
+// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestClose(t *testing.T) {
 	if !checkConnection() {
 		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
