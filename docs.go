@@ -30,6 +30,12 @@ Example code for using Redis:
 
 		// Store, retrieve, print and delete a value
 		interactWithStore(client)
+
+		// Close client
+		err = client.Close()
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	// interactWithStore stores, retrieves, prints and deletes a value.
