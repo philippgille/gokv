@@ -157,6 +157,15 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(gomap.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+func TestClose(t *testing.T) {
+	store := createStore(t, gomap.JSON)
+	err := store.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func createStore(t *testing.T, mf gomap.MarshalFormat) gomap.Store {
 	options := gomap.Options{
 		MarshalFormat: mf,

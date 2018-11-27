@@ -100,6 +100,12 @@ func (c Client) Delete(k string) error {
 	return err
 }
 
+// Close closes the client.
+// In the Memcached implementation this doesn't have any effect.
+func (c Client) Close() error {
+	return nil
+}
+
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
 type MarshalFormat int
 

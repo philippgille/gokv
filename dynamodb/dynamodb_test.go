@@ -198,6 +198,21 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(dynamodb.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+//
+// Note: This test is only executed if the initial connection to DynamoDB works.
+func TestClose(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
+	}
+
+	client := createClient(t, dynamodb.JSON)
+	err := client.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
 	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID).WithEndpoint(customEndpoint))

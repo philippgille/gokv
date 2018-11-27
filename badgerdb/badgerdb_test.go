@@ -160,6 +160,15 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(badgerdb.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+func TestClose(t *testing.T) {
+	store := createStore(t, badgerdb.JSON)
+	err := store.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func createStore(t *testing.T, mf badgerdb.MarshalFormat) badgerdb.Store {
 	options := badgerdb.Options{
 		Dir:           generateRandomTempDBpath(t),
