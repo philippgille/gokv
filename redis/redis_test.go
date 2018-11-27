@@ -228,6 +228,9 @@ func createClient(t *testing.T, mf redis.MarshalFormat) redis.Client {
 		DB:            testDbNumber,
 		MarshalFormat: mf,
 	}
-	client := redis.NewClient(options)
+	client, err := redis.NewClient(options)
+	if err != nil {
+		t.Fatal(err)
+	}
 	return client
 }
