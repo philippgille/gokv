@@ -3,8 +3,6 @@ package dynamodb_test
 import (
 	"context"
 	"log"
-	"strconv"
-	"sync"
 	"testing"
 	"time"
 
@@ -76,29 +74,7 @@ func TestClientConcurrent(t *testing.T) {
 
 	goroutineCount := 1000
 
-	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(goroutineCount) // Must be called before any goroutine is started
-	for i := 0; i < goroutineCount; i++ {
-		go test.InteractWithStore(client, strconv.Itoa(i), t, &waitGroup)
-	}
-	waitGroup.Wait()
-
-	// Now make sure that all values are in the store
-	expected := test.Foo{}
-	for i := 0; i < goroutineCount; i++ {
-		actualPtr := new(test.Foo)
-		found, err := client.Get(strconv.Itoa(i), actualPtr)
-		if err != nil {
-			t.Errorf("An error occurred during the test: %v", err)
-		}
-		if !found {
-			t.Error("No value was found, but should have been")
-		}
-		actual := *actualPtr
-		if actual != expected {
-			t.Errorf("Expected: %v, but was: %v", expected, actual)
-		}
-	}
+	test.TestConcurrentInteractions(t, goroutineCount, client)
 }
 
 // TestErrors tests some error cases.
