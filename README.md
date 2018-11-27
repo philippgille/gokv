@@ -30,7 +30,8 @@ Features
 type Store interface {
 	Set(string, interface{}) error
 	Get(string, interface{}) (bool, error)
-	Delete(string) error
+    Delete(string) error
+    Close() error
 }
 ```
 
@@ -218,7 +219,6 @@ Project status
 Planned interface methods until `v1.0.0`:
 
 - `List(interface{}) error` / `GetAll(interface{}) error` or similar
-- `Close() error` or similar
 
 The interface might even change until `v1.0.0`. For example one consideration is to change `Get(string, interface{}) (bool, error)` to `Get(string, interface{}) error` (no boolean return value anymore), with the `error` being something like `gokv.ErrNotFound // "Key-value pair not found"` to fulfill the additional role of indicating that the key-value pair wasn't found. But at the moment we prefer the current method signature.
 

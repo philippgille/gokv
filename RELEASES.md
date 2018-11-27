@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added: method `Close() error` (issue [#36](https://github.com/philippgille/gokv/issues/36))
 - Added: Package `mongodb` - A `gokv.Store` implementation for [MongoDB](https://github.com/mongodb/mongo) (issue [#27](https://github.com/philippgille/gokv/issues/27))
 - Added: Package `dynamodb` - A `gokv.Store` implementation for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) (issue [#28](https://github.com/philippgille/gokv/issues/28))
 - Added: Package `memcached` - A `gokv.Store` implementation for [Memcached](https://github.com/memcached/memcached) (issue [#31](https://github.com/philippgille/gokv/issues/31))
@@ -17,6 +18,7 @@ vNext
 
 ### Breaking changes
 
+- The added `Close() error` method (see above) means that previous implementations of `gokv.Store` are not compatible with the interface anymore.
 - Renamed `bolt` package to `bbolt` to reflect the fact that the maintained fork is used. Also changed all other occurrences of "bolt" (e.g. in GoDoc comments etc.).
 - Due to the above mentioned addition to the Redis client factory function, the function signature changed from `func NewClient(options Options) Client` to `func NewClient(options Options) (Client, error)`.
 
@@ -32,6 +34,7 @@ v0.3.0 (2018-11-17)
 
 ### Breaking changes
 
+- The added `Delete(string) error` method (see above) means that previous implementations of `gokv.Store` are not compatible with the interface anymore.
 - Changed: The `NewStore()` function in `gomap` and `syncmap` now has an `Option` parameter. Required for issue [#22](https://github.com/philippgille/gokv/issues/22).
 - Changed: Passing an empty string as key to `Set()`, `Get()` or `Delete()` now results in an error
 - Changed: Passing `nil` as value parameter to `Set()` or as pointer to `Get()` now results in an error. This change leads to a consistent behaviour across the different marshal formats (otherwise for example `encoding/json` marshals `nil` to `null` while `encoding/gob` returns an error).
