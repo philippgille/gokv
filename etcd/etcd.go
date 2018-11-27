@@ -91,6 +91,12 @@ func (c Client) Delete(k string) error {
 	return err
 }
 
+// Close closes the client.
+// It must be called to shut down all connections to the etcd server.
+func (c Client) Close() error {
+	return c.c.Close()
+}
+
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
 type MarshalFormat int
 

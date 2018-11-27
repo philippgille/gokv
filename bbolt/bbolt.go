@@ -104,6 +104,12 @@ func (c Store) Delete(k string) error {
 	})
 }
 
+// Close closes the store.
+// It must be called to make sure that all open transactions finish and to release all DB resources.
+func (c Store) Close() error {
+	return c.db.Close()
+}
+
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
 type MarshalFormat int
 

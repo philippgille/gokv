@@ -124,6 +124,12 @@ func (c Client) Delete(k string) error {
 	return nil
 }
 
+// Close closes the client.
+// In the MongoDB implementation this doesn't have any effect.
+func (c Client) Close() error {
+	return nil
+}
+
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
 type MarshalFormat int
 

@@ -85,6 +85,16 @@ func (m Store) Delete(k string) error {
 	return nil
 }
 
+// Close closes the store.
+// When called, the store's pointer to the internal Go map is set to nil,
+// leading to the map being free for garbage collection.
+func (m Store) Close() error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.m = nil
+	return nil
+}
+
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
 type MarshalFormat int
 
