@@ -37,7 +37,9 @@ type item struct {
 
 // Client is a gokv.Store implementation for MongoDB.
 type Client struct {
-	c             *mgo.Collection
+	c *mgo.Collection
+	// Only needed for closing.
+	session       *mgo.Session
 	marshalFormat MarshalFormat
 }
 
@@ -125,8 +127,9 @@ func (c Client) Delete(k string) error {
 }
 
 // Close closes the client.
-// In the MongoDB implementation this doesn't have any effect.
+// It must be called to release any open resources.
 func (c Client) Close() error {
+	c.session.Close()
 	return nil
 }
 
@@ -192,6 +195,7 @@ func NewClient(options Options) (Client, error) {
 	c := session.DB(options.DatabaseName).C(options.CollectionName)
 
 	result.c = c
+	result.session = session
 	result.marshalFormat = options.MarshalFormat
 
 	return result, nil
