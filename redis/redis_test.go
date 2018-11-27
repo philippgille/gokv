@@ -198,6 +198,22 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(redis.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+//
+// Note: This test is only executed if the initial connection to Redis works.
+func TestClose(t *testing.T) {
+	if !checkConnection(testDbNumber) {
+		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
+	}
+	deleteRedisDb(testDbNumber) // Prep for previous test runs
+
+	client := createClient(t, redis.JSON)
+	err := client.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection(number int) bool {
 	client := goredis.NewClient(&goredis.Options{

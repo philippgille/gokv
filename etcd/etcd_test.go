@@ -191,6 +191,21 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(etcd.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+//
+// Note: This test is only executed if the initial connection to etcd works.
+func TestClose(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
+	}
+
+	client := createClient(t, etcd.JSON)
+	err := client.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
 	// The behaviour for New() seems to be inconsistent.

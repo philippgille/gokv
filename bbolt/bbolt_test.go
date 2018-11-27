@@ -160,6 +160,15 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(bbolt.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+func TestClose(t *testing.T) {
+	store := createStore(t, bbolt.JSON)
+	err := store.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func createStore(t *testing.T, mf bbolt.MarshalFormat) bbolt.Store {
 	options := bbolt.Options{
 		Path:          generateRandomTempDbPath(t),

@@ -219,6 +219,21 @@ func TestDBcreation(t *testing.T) {
 	}
 }
 
+// TestClose tests if the close method returns any errors.
+//
+// Note: This test is only executed if the initial connection to MySQL works.
+func TestClose(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
+	}
+
+	client := createClient(t, mysql.JSON)
+	err := client.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
 	db, err := sql.Open("mysql", "root@/")

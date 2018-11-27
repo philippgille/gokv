@@ -156,6 +156,15 @@ func TestNil(t *testing.T) {
 	t.Run("get with nil / nil value parameter", createTest(syncmap.Gob))
 }
 
+// TestClose tests if the close method returns any errors.
+func TestClose(t *testing.T) {
+	store := createStore(t, syncmap.JSON)
+	err := store.Close()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func createStore(t *testing.T, mf syncmap.MarshalFormat) syncmap.Store {
 	options := syncmap.Options{
 		MarshalFormat: mf,
