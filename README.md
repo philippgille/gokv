@@ -266,11 +266,18 @@ Related projects
 - [gokvstores](https://github.com/ulule/gokvstores)
     - Only supports Redis and local in-memory cache
     - Not actively maintained anymore (4 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
-    - Only 13 stars (as of 2018-10-13)
+    - 13 stars (as of 2018-10-13)
 - [gokv](https://github.com/gokv)
-    - Requires a `json.Marshaler` / `json.Unmarshaler` as parameter, so you always need to explicitly implement their methods for your structs, and also you can't use gob for (un-)marshaling.
-    - Separate repo for each implementation, which has advantages and disadvantages
-    - Single contributor
-    - No releases (makes it harder to use with package managers like dep)
-    - Only 2-7 stars (depending on the repository, as of 2018-10-13)
+    - Requires a `json.Marshaler` / `json.Unmarshaler` as parameter, so you always need to explicitly implement their methods for your structs, and also you can't use gob or other formats for (un-)marshaling.
     - No support for Consul, etcd, bbolt / Bolt, BadgerDB, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
+    - Separate repo for each implementation, which has advantages and disadvantages
+    - No releases (makes it harder to use with package managers like dep)
+    - 2-7 stars (depending on the repository, as of 2018-10-13)
+
+Others:
+
+- [gladkikhartem/gokv](https://github.com/gladkikhartem/gokv): No `Delete()` method, no Redis, embedded DBs etc., no Git tags / releases, no stars (as of 2018-11-28)
+- [bradberger/gokv](https://github.com/bradberger/gokv): Not maintained (no commits in the last 22 months), no Redis, Consul etc., no Git tags / releases, 1 star (as of 2018-11-28)
+- [ppacher/gokv](https://github.com/ppacher/gokv): Not maintained (no commits in the last 22 months), no Redis, embedded DBs etc., no automatic (un-)marshalling, 1 star (as of 2018-11-28)
+    - Nice CLI though!
+- [kapitan-k/gokvstore](https://github.com/kapitan-k/gokvstore): Not actively maintained (no commits in the last 10+ months), RocksDB only, requires cgo, no automatic (un-)marshalling, no Git tags/ releases, 1 star (as of 2018-11-28)
