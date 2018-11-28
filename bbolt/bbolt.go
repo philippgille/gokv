@@ -60,7 +60,7 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 	}
 
 	var data []byte
-	c.db.View(func(tx *bolt.Tx) error {
+	err := c.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(c.bucketName))
 		txData := b.Get([]byte(k))
 		// txData is only valid during the transaction.
@@ -74,6 +74,9 @@ func (c Store) Get(k string, v interface{}) (bool, error) {
 		}
 		return nil
 	})
+	if err != nil {
+		return false, nil
+	}
 
 	// If no value was found return false
 	if data == nil {
