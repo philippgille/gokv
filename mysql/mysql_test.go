@@ -210,6 +210,30 @@ func TestClose(t *testing.T) {
 	}
 }
 
+func TestDefaultMaxOpenConnections(t *testing.T) {
+	options := mysql.Options{}
+	client, err := mysql.NewClient(options)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = client.Set("foo", "bar")
+	if err != nil {
+		t.Error(err)
+	}
+	vPtr := new(string)
+	found, err := client.Get("foo", vPtr)
+	if err != nil {
+		t.Error(err)
+	}
+	if !found {
+		t.Error("A value should have been found, but wasn't.")
+	}
+	if *vPtr != "bar" {
+		t.Errorf("Expectec %v, but was %v", "bar", *vPtr)
+	}
+}
+
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
 	db, err := sql.Open("mysql", "root@/")
