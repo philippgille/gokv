@@ -102,6 +102,15 @@ func TestErrors(t *testing.T) {
 	if err == nil {
 		t.Error("Expected an error")
 	}
+
+	// Test bad connection string
+	options := mongodb.Options{
+		ConnectionString: "forceError!",
+	}
+	_, err = mongodb.NewClient(options)
+	if err.Error() != "no reachable servers" {
+		t.Errorf(`Expected a "no reachable servers" error, but instead got: %v`, err)
+	}
 }
 
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
