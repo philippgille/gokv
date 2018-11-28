@@ -202,8 +202,8 @@ type Options struct {
 
 // DefaultOptions is an Options object with default values.
 // Region: "" (use shared config file or environment variable), TableName: "gokv",
-// AWSaccessKeyID: "" (use shared credentials file or enviroment variable),
-// AWSsecretAccessKey: "" (use shared credentials file or enviroment variable),
+// AWSaccessKeyID: "" (use shared credentials file or environment variable),
+// AWSsecretAccessKey: "" (use shared credentials file or environment variable),
 // CustomEndpoint: "", MarshalFormat: JSON
 var DefaultOptions = Options{
 	TableName:            "gokv",
