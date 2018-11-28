@@ -183,6 +183,39 @@ func TestClose(t *testing.T) {
 	}
 }
 
+// TestDefaultTimeout tests if the client works with the default timeout.
+// Currently, the createClient() method is used in other tests,
+// which sets the timeout to 2 seconds due to errors during the concurrency test.
+//
+// Note: This test is only executed if the initial connection to Memcached works.
+func TestDefaultTimeout(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to Memcached could be established. Probably not running in a proper test environment.")
+	}
+
+	options := memcached.Options{}
+	client, err := memcached.NewClient(options)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = client.Set("foo", "bar")
+	if err != nil {
+		t.Error(err)
+	}
+	vPtr := new(string)
+	found, err := client.Get("foo", vPtr)
+	if err != nil {
+		t.Error(err)
+	}
+	if !found {
+		t.Error("A value should have been found, but wasn't.")
+	}
+	if *vPtr != "bar" {
+		t.Errorf("Expectec %v, but was %v", "bar", *vPtr)
+	}
+}
+
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
 	mc := memcache.New("localhost:11211")
