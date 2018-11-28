@@ -3,6 +3,7 @@ package dynamodb_test
 import (
 	"context"
 	"log"
+	"strings"
 	"testing"
 	"time"
 
@@ -111,6 +112,32 @@ func TestErrors(t *testing.T) {
 	err = client.Delete("")
 	if err == nil {
 		t.Error("Expected an error")
+	}
+
+	// Test client creation with bad options
+	options := dynamodb.Options{
+		AWSaccessKeyID: "foo",
+	}
+	client, err = dynamodb.NewClient(options)
+	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
+		t.Error("An error was expected, but didn't occur.")
+	}
+	options = dynamodb.Options{
+		AWSsecretAccessKey: "foo",
+	}
+	client, err = dynamodb.NewClient(options)
+	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
+		t.Error("An error was expected, but didn't occur.")
+	}
+	// Bad credentials on actual AWS DynamoDB endpoint (no custom endpoint for local Docker container)
+	options = dynamodb.Options{
+		AWSaccessKeyID:     "foo",
+		AWSsecretAccessKey: "bar",
+		Region:             endpoints.UsWest2RegionID,
+	}
+	_, err = dynamodb.NewClient(options)
+	if strings.Index(err.Error(), "UnrecognizedClientException: The security token included in the request is invalid.") != 0 {
+		t.Errorf("An UnrecognizedClientException was expected, but it seems like it didn't occur. Instead, the error was: %v", err)
 	}
 }
 
