@@ -48,7 +48,7 @@ func (m Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (m Store) Get(k string, v interface{}) (bool, error) {
+func (m Store) Get(k string, v interface{}) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}

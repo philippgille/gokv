@@ -71,14 +71,14 @@ func (c Client) Set(k string, v interface{}) error {
 // The length of the key must not exceed 255 characters.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (c Client) Get(k string, v interface{}) (bool, error) {
+func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
 	// TODO: Consider using RawBytes.
 	dataPtr := new([]byte)
-	err := c.getStmt.QueryRow(k).Scan(dataPtr)
+	err = c.getStmt.QueryRow(k).Scan(dataPtr)
 	// If no value was found return false
 	if err == sql.ErrNoRows {
 		return false, nil
