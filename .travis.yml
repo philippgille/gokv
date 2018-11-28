@@ -23,8 +23,9 @@ before_install:
 
 env:
   global:
-    # Limited access AWS IAM user credentials required for being allowed to use the "DynamoDB local" Docker container
-    - secure: "hcEAiDFhrx1+vHYc8XIuhBDkVKOv37sIFAozzB3O5QamwQ/oSDykdQlyDN0FqGKmarXGOA1PBHrdyLFCkcjdVs03Dfxj8TXYTdkrKP1pBwi7eDgepY2HEmC7STZ6dHP7/70XZmCG6I3Z/sRjJjLULo4BIl2gRdn1QfvEtTTWizRMRY72pG1MDiZdqi305CsxBkMitcfQMojx+UvigzdNcZe02VqXxB25vHTfLtFxRhPpIXc/n7FLfewP57ByjkydD/Szo0Z3WX018Y7Dcv1OzmZl2uHuTfxud5l+tGo8wHfaILVCACYMi3XkhSocerBVn8ilUGjNGAEGIYkAZLUCYLDEnrm6453z7P0hLmtbPwQfexmCfRkBYvF+GdGkPGP8VZHirJojmiR0QBWwC5lnSCIiLDQn/i0UvPdKzIH+2vTrSoymUn65fxR3bnhsEiv9fw2eYDWIHwvXk4B73q4FsX5iq/4LzbyAHGmnAUeBnLlb4/u5tW8gjT/RRwuo/6F9arnxFofXkUUMxc8zWsMwWNiQ8H7E1J7U2AGFnwbxA9GIinQRy6DXpOlyeHc0gKYcVfK+zu72t/SRwWyaTETmSEbNHy54gcXSo7qKe6f0Z47CxuGBu1Dx9yJg+lb/Wt7feUvbZdEuJMJaSEpN4zyWwl97xZ4PEm7TgAxZZgj8s4A="
+    # "DynamoDB local" accepts any credentials
+    - AWS_ACCESS_KEY_ID=user
+    - AWS_SECRET_ACCESS_KEY=secret
 
 script:
   # Build
