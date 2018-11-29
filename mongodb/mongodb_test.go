@@ -3,6 +3,7 @@ package mongodb_test
 import (
 	"log"
 	"testing"
+	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/philippgille/gokv/mongodb"
@@ -190,7 +191,7 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	session, err := mgo.Dial("localhost")
+	session, err := mgo.DialWithTimeout("localhost", 2*time.Second)
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false

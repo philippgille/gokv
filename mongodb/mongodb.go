@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"errors"
+	"time"
 
 	"github.com/globalsign/mgo"
 
@@ -188,7 +189,7 @@ func NewClient(options Options) (Client, error) {
 		options.CollectionName = DefaultOptions.CollectionName
 	}
 
-	session, err := mgo.Dial(options.ConnectionString)
+	session, err := mgo.DialWithTimeout(options.ConnectionString, 2*time.Second)
 	if err != nil {
 		return result, err
 	}
