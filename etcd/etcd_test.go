@@ -184,47 +184,39 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	// The behaviour for New() seems to be inconsistent.
-	// It should block at most for the specified time in DialTimeout.
-	// In our case though New() doesn't block, but instead the following call does.
-	// Maybe it's just the specific version we're using.
-	// See https://github.com/etcd-io/etcd/issues/9829#issuecomment-438434795.
-	// Use own timeout as workaround.
-	// TODO: Remove workaround after etcd behaviour has been fixed or clarified.
+	// clientv3.New() should block when a DialTimeout is set,
+	// according to https://github.com/etcd-io/etcd/issues/9829.
+	// TODO: But it doesn't.
 	//cli, err := clientv3.NewFromURL("localhost:2379")
 	config := clientv3.Config{
 		Endpoints:   []string{"localhost:2379"},
 		DialTimeout: 2 * time.Second,
 	}
-	okChan := make(chan bool, 1)
-	go func() {
-		cli, err := clientv3.New(config)
-		if err != nil {
-			log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-			okChan <- false
-			return
-		}
-		statusRes, err := cli.Status(context.Background(), "localhost:2379")
-		if err != nil {
-			log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-			okChan <- false
-			return
-		} else if statusRes == nil {
-			okChan <- false
-			return
-		}
-		okChan <- true
-	}()
-	select {
-	case <-okChan:
-		return true
-	case <-time.After(3 * time.Second):
+
+	cli, err := clientv3.New(config)
+	if err != nil {
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
+
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	statusRes, err := cli.Status(ctxWithTimeout, "localhost:2379")
+	if err != nil {
+		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
+		return false
+	} else if statusRes == nil {
+		return false
+	}
+	return true
 }
 
 func createClient(t *testing.T, mf etcd.MarshalFormat) etcd.Client {
-	options := etcd.DefaultOptions
+	timeout := 2 * time.Second
+	options := etcd.Options{
+		Timeout:       &timeout,
+		MarshalFormat: mf,
+	}
 	options.MarshalFormat = mf
 	client, err := etcd.NewClient(options)
 	if err != nil {

@@ -15,6 +15,7 @@ vNext
 - Added: Package `mysql` - A `gokv.Store` implementation for [MySQL](https://github.com/mysql/mysql-server) (issue [#32](https://github.com/philippgille/gokv/issues/32))
 - Added: The factory function `redis.NewClient()` now checks if the connection to the Redis server works and otherwise returns an error.
 - Added: The `test` package now has the function `func TestConcurrentInteractions(t *testing.T, goroutineCount int, store gokv.Store)` that you can use to test your `gokv.Store` implementation with concurrent interactions.
+- Improved: The `etcd.Client` timeout implementation was improved.
 - Fixed: The `Get()` method of the `bbolt` store ignored errors if they occurred during the retrieval of the value
 - Fixed: Spelling in error message when using the etcd implementation and the etcd server is unreachable
 

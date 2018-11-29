@@ -10,9 +10,12 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
+var defaultTimeout = 200 * time.Millisecond
+
 // Client is a gokv.Store implementation for etcd.
 type Client struct {
 	c             *clientv3.Client
+	timeOut       time.Duration
 	marshalFormat MarshalFormat
 }
 
@@ -39,7 +42,9 @@ func (c Client) Set(k string, v interface{}) error {
 		return err
 	}
 
-	_, err = c.c.Put(context.Background(), k, string(data))
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	_, err = c.c.Put(ctxWithTimeout, k, string(data))
 	if err != nil {
 		return err
 	}
@@ -58,7 +63,9 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	getRes, err := c.c.Get(context.Background(), k)
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	getRes, err := c.c.Get(ctxWithTimeout, k)
 	if err != nil {
 		return false, err
 	}
@@ -87,7 +94,9 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	_, err := c.c.Delete(context.Background(), k)
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	_, err := c.c.Delete(ctxWithTimeout, k)
 	return err
 }
 
@@ -112,15 +121,19 @@ type Options struct {
 	// Addresses of the etcd servers in the cluster, including port.
 	// Optional ([]string{"localhost:2379"} by default).
 	Endpoints []string
+	// The timeout for operations.
+	// Optional (200 * time.Millisecond by default).
+	Timeout *time.Duration
 	// (Un-)marshal format.
 	// Optional (JSON by default).
 	MarshalFormat MarshalFormat
 }
 
 // DefaultOptions is an Options object with default values.
-// Endpoints: []string{"localhost:2379"}, MarshalFormat: JSON
+// Endpoints: []string{"localhost:2379"}, Timeout: 200 * time.Millisecond, MarshalFormat: JSON
 var DefaultOptions = Options{
 	Endpoints: []string{"localhost:2379"},
+	Timeout:   &defaultTimeout,
 	// No need to set MarshalFormat to JSON because its zero value is fine.
 }
 
@@ -132,48 +145,37 @@ func NewClient(options Options) (Client, error) {
 	if options.Endpoints == nil || len(options.Endpoints) == 0 {
 		options.Endpoints = DefaultOptions.Endpoints
 	}
+	if options.Timeout == nil {
+		options.Timeout = DefaultOptions.Timeout
+	}
 
-	// The behaviour for New() seems to be inconsistent.
-	// It should block at most for the specified time in DialTimeout.
-	// In our case though New() doesn't block, but instead the following call does.
-	// Maybe it's just the specific version we're using.
-	// See https://github.com/etcd-io/etcd/issues/9829#issuecomment-438434795.
-	// Use own timeout as workaround.
-	// TODO: Remove workaround after etcd behaviour has been fixed or clarified.
+	// clientv3.New() should block when a DialTimeout is set,
+	// according to https://github.com/etcd-io/etcd/issues/9829.
+	// TODO: But it doesn't.
 	//cli, err := clientv3.NewFromURLs(options.Endpoints)
 	config := clientv3.Config{
 		Endpoints:   options.Endpoints,
 		DialTimeout: 2 * time.Second,
 	}
-	errChan := make(chan error, 1)
-	cliChan := make(chan *clientv3.Client, 1)
-	go func() {
-		cli, err := clientv3.New(config)
-		if err != nil {
-			errChan <- err
-			return
-		}
-		statusRes, err := cli.Status(context.Background(), options.Endpoints[0])
-		if err != nil {
-			errChan <- err
-			return
-		}
-		if statusRes == nil {
-			errChan <- errors.New("The status response from etcd was nil")
-			return
-		}
-		cliChan <- cli
-	}()
-	select {
-	case err := <-errChan:
+
+	cli, err := clientv3.New(config)
+	if err != nil {
 		return result, err
-	case cli := <-cliChan:
-		result = Client{
-			c:             cli,
-			marshalFormat: options.MarshalFormat,
-		}
-		return result, nil
-	case <-time.After(3 * time.Second):
-		return result, errors.New("A timeout occurred while trying to connect to the etcd server")
 	}
+
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	statusRes, err := cli.Status(ctxWithTimeout, options.Endpoints[0])
+	if err != nil {
+		return result, err
+	} else if statusRes == nil {
+		return result, errors.New("The status response from etcd was nil")
+	}
+
+	result = Client{
+		c:             cli,
+		timeOut:       *options.Timeout,
+		marshalFormat: options.MarshalFormat,
+	}
+	return result, nil
 }
