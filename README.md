@@ -76,7 +76,6 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
 - Cloud
     - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
         - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
-    - [ ] [Amazon SimpleDB](https://aws.amazon.com/simpledb/)
     - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
     - [ ] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
     - [ ] [Google Cloud Datastore](https://cloud.google.com/datastore/)
