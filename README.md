@@ -28,8 +28,8 @@ Features
 
 ```go
 type Store interface {
-    Set(k string, k interface{}) error
-    Get(k string, k interface{}) (found bool, err error)
+    Set(k string, v interface{}) error
+    Get(k string, v interface{}) (found bool, err error)
     Delete(k string) error
     Close() error
 }
