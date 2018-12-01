@@ -68,7 +68,7 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
         - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
         - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md).
     - [ ] [TiKV](https://github.com/tikv/tikv)
-        - Originally created to complement [TiDB](https://github.com/pingcap/tidb), but recently [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
+        - Originally created as foundation of [TiDB](https://github.com/pingcap/tidb), but acts as a proper key-value store on its own and [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
 - Distributed cache (no presistence *by default*)
     - [X] [Memcached](https://github.com/memcached/memcached)
         - > Note: Memcached is meant to be used as LRU (Least Recently Used) cache, which means items automatically *expire* and are deleted from the server after not being used for a while. See [Memcached Wiki: Forgetting is a feature](https://github.com/memcached/memcached/wiki/Overview#forgetting-is-a-feature).
@@ -82,8 +82,6 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
         - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
-    - [ ] [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server)
-        - Also usable for [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/)
     - [ ] [PostgreSQL](https://github.com/postgres/postgres)
 - NoSQL
     - [X] [MongoDB](https://github.com/mongodb/mongo)
