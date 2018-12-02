@@ -311,6 +311,8 @@ func NewClient(options Options) (Client, error) {
 					describeTableOutput, err := svc.DescribeTable(&describeTableInput)
 					if err != nil || *describeTableOutput.Table.TableStatus == "CREATING" {
 						time.Sleep(1 * time.Second)
+					} else {
+						break
 					}
 				}
 				// Last try (16th) after 15 seconds of waiting.
