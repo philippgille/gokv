@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+v0.4.0 (2018-12-02)
+-------------------
+
 - Added: Method `Close() error` (issue [#36](https://github.com/philippgille/gokv/issues/36))
 - Added: Package `mongodb` - A `gokv.Store` implementation for [MongoDB](https://github.com/mongodb/mongo) (issue [#27](https://github.com/philippgille/gokv/issues/27))
 - Added: Package `dynamodb` - A `gokv.Store` implementation for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) (issue [#28](https://github.com/philippgille/gokv/issues/28))
