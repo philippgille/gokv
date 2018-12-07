@@ -77,7 +77,10 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
     - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
         - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
     - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
-    - [ ] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
+    - [X] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
+        - Not as performant, scalable, flexible as Cosmos DB: [Table Storage vs. Cosmos DB Table Storage API](https://github.com/MicrosoftDocs/azure-docs/blob/58649c6910c182cba2bfc9974baed08a6fadf413/articles/cosmos-db/table-introduction.md#table-offerings)
+        - But much cheaper than Cosmos DB: [Cosmos DB pricing](https://azure.microsoft.com/en-us/pricing/details/cosmos-db/) vs. [Table Storage pricing](https://azure.microsoft.com/en-us/pricing/details/storage/tables/)
+        - > Note: Maximum entity size is 1 MB.
     - [ ] [Google Cloud Datastore](https://cloud.google.com/datastore/)
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
