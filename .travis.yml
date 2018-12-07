@@ -22,6 +22,8 @@ before_install:
   - go env
 
 env:
+  # For encrypted environment variables, use:
+  # travis encrypt 'PASSWORD="SECRET"' -r philippgille/gokv
   global:
     # "DynamoDB local" accepts any credentials
     - AWS_ACCESS_KEY_ID=user
@@ -29,7 +31,7 @@ env:
 
 script:
   # Build
-  - go build -v github.com/philippgille/gokv/...
+  - go build -v ./...
   # Start Consul, etcd, "DynamoDB local" and Azurite so they can be used in the tests
   - docker run -d --rm -p 8500:8500 bitnami/consul
   - docker run -d --rm -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
