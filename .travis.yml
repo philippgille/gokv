@@ -30,16 +30,20 @@ env:
 script:
   # Build
   - go build -v github.com/philippgille/gokv/...
-  # Start Consul, etcd and "DynamoDB local" so they can be used in the tests
+  # Start Consul, etcd, "DynamoDB local" and Azurite so they can be used in the tests
   - docker run -d --rm -p 8500:8500 bitnami/consul
   - docker run -d --rm -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
   - docker run -d --rm -p 8000:8000 amazon/dynamodb-local
-  # Wait for Consul, etcd and "DynamoDB local" to start
+  # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
+  #- docker run -d --rm -e executable=table -p 10002:10002 arafato/azurite
+  # Wait for Consul, etcd, "DynamoDB local" and Azurite to start
   # TODO: Use something like a while-loop with 1s sleep and for
   # Consul: curl request to "http://127.0.0.1:8500/v1/status/leader" and loop until the response is a 200 OK with a proper body
   - sleep 10s
   # Test and generate code coverage report
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic github.com/philippgille/gokv/...
+  # TODO: When Azurite works, change this to testing all packages.
+  #go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./badgerdb ./bbolt ./consul ./dynamodb ./etcd ./gomap ./memcached ./mongodb ./mysql ./redis ./syncmap
 
 after_success:
   # Upload coverage data to codecov.io

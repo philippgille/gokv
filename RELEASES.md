@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added: Package `tablestorage` - A `gokv.Store` implementation for [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/) (issue [#42](https://github.com/philippgille/gokv/issues/42))
+
 v0.4.0 (2018-12-02)
 -------------------
 
