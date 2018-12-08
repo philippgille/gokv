@@ -17,7 +17,7 @@ type Store struct {
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
-func (c Store) Set(k string, v interface{}) error {
+func (s Store) Set(k string, v interface{}) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (c Store) Set(k string, v interface{}) error {
 	// First turn the passed object into something that BadgerDB can handle
 	var data []byte
 	var err error
-	switch c.marshalFormat {
+	switch s.marshalFormat {
 	case JSON:
 		data, err = util.ToJSON(v)
 	case Gob:
@@ -37,7 +37,7 @@ func (c Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	err = c.db.Update(func(txn *badger.Txn) error {
+	err = s.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(k), data)
 	})
 	if err != nil {
@@ -52,13 +52,13 @@ func (c Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (c Store) Get(k string, v interface{}) (found bool, err error) {
+func (s Store) Get(k string, v interface{}) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
 	var data []byte
-	err = c.db.View(func(txn *badger.Txn) error {
+	err = s.db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(k))
 		if err != nil {
 			return err
@@ -80,7 +80,7 @@ func (c Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	switch c.marshalFormat {
+	switch s.marshalFormat {
 	case JSON:
 		return true, util.FromJSON(data, v)
 	case Gob:
@@ -93,20 +93,20 @@ func (c Store) Get(k string, v interface{}) (found bool, err error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 // The key must not be "".
-func (c Store) Delete(k string) error {
+func (s Store) Delete(k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
 	}
 
-	return c.db.Update(func(txn *badger.Txn) error {
+	return s.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(k))
 	})
 }
 
 // Close closes the store.
 // It must be called to make sure that all pending updates make their way to disk.
-func (c Store) Close() error {
-	return c.db.Close()
+func (s Store) Close() error {
+	return s.db.Close()
 }
 
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.

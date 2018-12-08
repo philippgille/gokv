@@ -18,7 +18,7 @@ type Store struct {
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
-func (c Store) Set(k string, v interface{}) error {
+func (s Store) Set(k string, v interface{}) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (c Store) Set(k string, v interface{}) error {
 	// First turn the passed object into something that bbolt can handle
 	var data []byte
 	var err error
-	switch c.marshalFormat {
+	switch s.marshalFormat {
 	case JSON:
 		data, err = util.ToJSON(v)
 	case Gob:
@@ -38,8 +38,8 @@ func (c Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	err = c.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(c.bucketName))
+	err = s.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(s.bucketName))
 		return b.Put([]byte(k), data)
 	})
 	if err != nil {
@@ -54,14 +54,14 @@ func (c Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (c Store) Get(k string, v interface{}) (found bool, err error) {
+func (s Store) Get(k string, v interface{}) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
 	var data []byte
-	err = c.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(c.bucketName))
+	err = s.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(s.bucketName))
 		txData := b.Get([]byte(k))
 		// txData is only valid during the transaction.
 		// Its value must be copied to make it valid outside of the tx.
@@ -83,7 +83,7 @@ func (c Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, nil
 	}
 
-	switch c.marshalFormat {
+	switch s.marshalFormat {
 	case JSON:
 		return true, util.FromJSON(data, v)
 	case Gob:
@@ -96,21 +96,21 @@ func (c Store) Get(k string, v interface{}) (found bool, err error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 // The key must not be "".
-func (c Store) Delete(k string) error {
+func (s Store) Delete(k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
 	}
 
-	return c.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(c.bucketName))
+	return s.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(s.bucketName))
 		return b.Delete([]byte(k))
 	})
 }
 
 // Close closes the store.
 // It must be called to make sure that all open transactions finish and to release all DB resources.
-func (c Store) Close() error {
-	return c.db.Close()
+func (s Store) Close() error {
+	return s.db.Close()
 }
 
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.

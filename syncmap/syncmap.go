@@ -16,14 +16,14 @@ type Store struct {
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
-func (m Store) Set(k string, v interface{}) error {
+func (s Store) Set(k string, v interface{}) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
 
 	var data []byte
 	var err error
-	switch m.marshalFormat {
+	switch s.marshalFormat {
 	case JSON:
 		data, err = util.ToJSON(v)
 	case Gob:
@@ -35,7 +35,7 @@ func (m Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	m.m.Store(k, data)
+	s.m.Store(k, data)
 	return nil
 }
 
@@ -45,17 +45,17 @@ func (m Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (m Store) Get(k string, v interface{}) (found bool, err error) {
+func (s Store) Get(k string, v interface{}) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
-	data, found := m.m.Load(k)
+	data, found := s.m.Load(k)
 	if !found {
 		return false, nil
 	}
 
-	switch m.marshalFormat {
+	switch s.marshalFormat {
 	case JSON:
 		return true, util.FromJSON(data.([]byte), v)
 	case Gob:
@@ -68,20 +68,20 @@ func (m Store) Get(k string, v interface{}) (found bool, err error) {
 // Delete deletes the stored value for the given key.
 // Deleting a non-existing key-value pair does NOT lead to an error.
 // The key must not be "".
-func (m Store) Delete(k string) error {
+func (s Store) Delete(k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
 	}
 
-	m.m.Delete(k)
+	s.m.Delete(k)
 	return nil
 }
 
 // Close closes the store.
 // When called, the store's pointer to the internal Go map is set to nil,
 // leading to the map being free for garbage collection.
-func (m Store) Close() error {
-	m.m = nil
+func (s Store) Close() error {
+	s.m = nil
 	return nil
 }
 
