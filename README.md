@@ -44,9 +44,15 @@ Some of the following databases aren't specifically engineered for storing key-v
 Feel free to suggest more stores by creating an [issue](https://github.com/philippgille/gokv/issues) or even add an actual implementation - [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com).
 
 - Local in-memory
-    - [X] Go map (`sync.Map`)
+    - [X] Go `sync.Map`
         - Faster then a regular map when there are lots of reads and only very few writes
-    - [X] Go map (`map[string]byte[]` with `sync.RWMutex`)
+    - [X] Go `map` (with `sync.RWMutex`)
+    - [X] [FreeCache](https://github.com/coocood/freecache)
+        - Zero GC cache with strictly limited memory usage
+        - > Note: Old entries are evicted from the cache when the cache's size limit is reached
+    - [ ] [BigCache](https://github.com/allegro/bigcache)
+        - Similar to FreeCache in that no GC is required even for gigabytes of data
+        - Difference according to the BigCache creators: [BigCache vs. FreeCache](https://github.com/allegro/bigcache/blob/bff00e20c68d9f136477d62d182a7dc917bae0ca/README.md#bigcache-vs-freecache)
 - Embedded
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
         - bbolt is a fork of Bolt which was maintained by CoreOS, and now by Red Hat (since CoreOS was acquired by them)
