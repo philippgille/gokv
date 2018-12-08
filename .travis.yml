@@ -45,7 +45,7 @@ script:
   # Test and generate code coverage report
   # TODO: When Azurite works, change this to testing all packages.
   #go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./badgerdb ./bbolt ./consul ./dynamodb ./etcd ./gomap ./memcached ./mongodb ./mysql ./redis ./syncmap
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./badgerdb ./bbolt ./consul ./dynamodb ./etcd ./freecache ./gomap ./memcached ./mongodb ./mysql ./redis ./syncmap
 
 after_success:
   # Upload coverage data to codecov.io
