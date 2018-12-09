@@ -9,7 +9,8 @@ vNext
 -----
 
 - Added: Package `tablestorage` - A `gokv.Store` implementation for [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/) (issue [#42](https://github.com/philippgille/gokv/issues/42))
-- Added: Package `freecache` - A `gokv.Store` implementation for [freecache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
+- Added: Package `freecache` - A `gokv.Store` implementation for [FreeCache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
+- Added: Package `bigcache` - A `gokv.Store` implementation for [BigCache](https://github.com/allegro/bigcache) (issue [#45](https://github.com/philippgille/gokv/issues/45))
 
 v0.4.0 (2018-12-02)
 -------------------
