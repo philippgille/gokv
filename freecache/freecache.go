@@ -105,6 +105,8 @@ type Options struct {
 	// 512 KiB is the minimum size
 	// (if you set a lower size, 512 KiB will be used instead).
 	// If you set 0, the default size will be used.
+	// When the size is reached and you store new entries,
+	// old entries are evicted.
 	// Optional (256 MiB by default).
 	Size int
 	// (Un-)marshal format.
