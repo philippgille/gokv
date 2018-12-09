@@ -129,6 +129,8 @@ var DefaultOptions = Options{
 }
 
 // NewClient creates a new Redis client.
+//
+// You must call the Close() method on the client when you're done working with it.
 func NewClient(options Options) (Client, error) {
 	result := Client{}
 

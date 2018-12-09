@@ -110,6 +110,8 @@ var DefaultOptions = Options{
 }
 
 // NewStore creates a new Go sync.Map store.
+//
+// You should call the Close() method on the store when you're done working with it.
 func NewStore(options Options) Store {
 	return Store{
 		m:             &sync.Map{},

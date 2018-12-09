@@ -141,7 +141,7 @@ var DefaultOptions = Options{
 // Note: BadgerDB uses an exclusive write lock on the database directory so it cannot be shared by multiple processes.
 // So when creating multiple clients you should always use a new database directory (by setting a different Path in the options).
 //
-// Don't worry about closing the BadgerDB as long as you don't need to close the DB while the process that opened it runs.
+// You must call the Close() method on the store when you're done working with it.
 func NewStore(options Options) (Store, error) {
 	result := Store{}
 

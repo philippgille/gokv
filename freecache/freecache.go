@@ -86,6 +86,7 @@ func (s Store) Delete(k string) error {
 // When called, the cache is cleared.
 func (s Store) Close() error {
 	s.s.Clear()
+	// TODO: Set s.s to nil to free up resources? "Resources" meaning the for example 256 MiB memory?
 	return nil
 }
 
@@ -123,6 +124,8 @@ var DefaultOptions = Options{
 }
 
 // NewStore creates a FreeCache store.
+//
+// You should call the Close() method on the store when you're done working with it.
 func NewStore(options Options) Store {
 	// Set default values
 	if options.Size == 0 {

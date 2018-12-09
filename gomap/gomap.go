@@ -120,6 +120,8 @@ var DefaultOptions = Options{
 }
 
 // NewStore creates a new Go map store.
+//
+// You should call the Close() method on the store when you're done working with it.
 func NewStore(options Options) Store {
 	return Store{
 		m:             make(map[string][]byte),
