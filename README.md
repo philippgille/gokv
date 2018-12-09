@@ -132,6 +132,15 @@ Differences:
 Usage
 -----
 
+First, download the package. You don't need to download *all* sub packages with `go get -u github.com/philippgille/gokv/...`, but only the sub packages you want to work with. This spares you from downloading many unnecessary dependencies.
+
+- For example when you want to work with the `gokv.Store` interface:
+    - `go get -u github.com/philippgille/gokv`
+- For example when you want to work with the Redis implementation:
+    - `go get -u github.com/philippgille/gokv/redis`
+
+Then you can import and use it.
+
 Every implementation has its own `Options` struct, but all implementations have a `NewStore()` / `NewClient()` function that returns an object of a sctruct that implements the `gokv.Store` interface. Let's take the implementation for Redis as example, which is the most popular distributed key-value store.
 
 ```go
