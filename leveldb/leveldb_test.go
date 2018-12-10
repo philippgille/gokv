@@ -145,6 +145,62 @@ func TestClose(t *testing.T) {
 	}
 }
 
+// TestDefaultPath tests if the store works when the default path is used.
+func TestDefaultPath(t *testing.T) {
+	store, err := leveldb.NewStore(leveldb.DefaultOptions)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	k := "foo"
+	err = store.Set(k, "bar")
+	if err != nil {
+		t.Error(err)
+	}
+	valPtr := new(string)
+	found, err := store.Get(k, valPtr)
+	if err != nil {
+		t.Error(err)
+	}
+	if !found {
+		t.Error("A value should have been found, but wasn't")
+	}
+	err = store.Delete(k)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+// TestSyncWrite tests if file-synchronized writes work.
+func TestSyncWrite(t *testing.T) {
+	options := leveldb.Options{
+		Path:      generateRandomTempDbPath(t),
+		WriteSync: true,
+	}
+	store, err := leveldb.NewStore(options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	k := "foo"
+	err = store.Set(k, "bar")
+	if err != nil {
+		t.Error(err)
+	}
+	valPtr := new(string)
+	found, err := store.Get(k, valPtr)
+	if err != nil {
+		t.Error(err)
+	}
+	if !found {
+		t.Error("A value should have been found, but wasn't")
+	}
+	err = store.Delete(k)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func createStore(t *testing.T, mf leveldb.MarshalFormat) leveldb.Store {
 	options := leveldb.Options{
 		Path:          generateRandomTempDbPath(t),
