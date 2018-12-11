@@ -18,7 +18,7 @@ const kind = "gokv"
 // Cloud Datastore requires a pointer to a struct as value.
 // The key doesn't need to be part of the struct.
 type entity struct {
-	V []byte `datastore: "v,noindex"`
+	V []byte `datastore:"v,noindex"`
 }
 
 // Client is a gokv.Store implementation for Cloud Datastore.
