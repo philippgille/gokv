@@ -169,7 +169,13 @@ func TestNil(t *testing.T) {
 // TestDBcreation tests if the DB gets created successfully when the DSN doesn't contain one.
 // The other tests call createClient, which doesn't use any DSN,
 // which leads to the gokv implementation to use "root@/gokv" by default.
+//
+// Note: This test is only executed if the initial connection to MySQL works.
 func TestDBcreation(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
+	}
+
 	options := mysql.Options{
 		DataSourceName: "root@/",
 	}
@@ -210,7 +216,13 @@ func TestClose(t *testing.T) {
 	}
 }
 
+//
+// Note: This test is only executed if the initial connection to MySQL works.
 func TestDefaultMaxOpenConnections(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to MySQL could be established. Probably not running in a proper test environment.")
+	}
+
 	options := mysql.Options{}
 	client, err := mysql.NewClient(options)
 	if err != nil {
