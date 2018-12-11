@@ -87,7 +87,9 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
         - Not as performant, scalable, flexible as Cosmos DB: [Table Storage vs. Cosmos DB Table Storage API](https://github.com/MicrosoftDocs/azure-docs/blob/58649c6910c182cba2bfc9974baed08a6fadf413/articles/cosmos-db/table-introduction.md#table-offerings)
         - But much cheaper than Cosmos DB: [Cosmos DB pricing](https://azure.microsoft.com/en-us/pricing/details/cosmos-db/) vs. [Table Storage pricing](https://azure.microsoft.com/en-us/pricing/details/storage/tables/)
         - > Note: Maximum entity size is 1 MB.
-    - [ ] [Google Cloud Datastore](https://cloud.google.com/datastore/)
+    - [X] [Google Cloud Datastore](https://cloud.google.com/datastore/)
+    - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
+        - Currently still in beta, but might become the successor to Cloud Datastore
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
         - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
