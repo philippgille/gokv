@@ -62,6 +62,8 @@ Feel free to suggest more stores by creating an [issue](https://github.com/phili
         - It's used for example in [Dgraph](https://github.com/dgraph-io/dgraph), a distributed graph DB
         - It uses an LSM tree, which generally means that it's very fast for write operations
     - [X] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
+    - [X] Local files
+        - One file per key-value pair, with the key being the filename and the value being the file content
 - Distributed store
     - [X] [Redis](https://github.com/antirez/redis)
         - [The most popular distributed key-value store](https://db-engines.com/en/ranking/key-value+store)
