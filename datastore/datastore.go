@@ -140,7 +140,7 @@ type Options struct {
 	// Path to the credentials file. For example:
 	// "/home/user/Downloads/[FILE_NAME].json".
 	// If you don't set a credentials file explicitly,
-	// the GCP SDP will look for the file path in the
+	// the GCP SDK will look for the file path in the
 	// GOOGLE_APPLICATION_CREDENTIALS environment variable.
 	// Optional ("" by default, leading to a lookup via environment variable).
 	CredentialsFile string
