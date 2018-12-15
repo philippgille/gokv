@@ -56,9 +56,16 @@ script:
   # Test Cosmos DB via Azurite
   # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
   #- docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
+  # Test Google Cloud Datastore via "Cloud Datastore Emulator"  
+  # Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
+  # `--host-port` is required because otherwise the server only listens on localhost IN the container.
+  - docker run -d --rm --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage6.txt -covermode=atomic ./datastore
+  - docker stop datastore
 
 after_success:
   # Combine coverage reports
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
