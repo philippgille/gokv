@@ -29,24 +29,36 @@ env:
     - AWS_ACCESS_KEY_ID=user
     - AWS_SECRET_ACCESS_KEY=secret
 
+# Don't start Docker containers all at once. The Travis CI VM doesn't have enough memory for that.
+# TODO: Implement a proper wait (e.g. with container health check) instead of sleeping for 10s
 script:
   # Build
   - go build -v ./...
-  # Start Consul, etcd, "DynamoDB local" and Azurite so they can be used in the tests
-  - docker run -d --rm -p 8500:8500 bitnami/consul
-  - docker run -d --rm -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
-  - docker run -d --rm -p 8000:8000 amazon/dynamodb-local
-  # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
-  #- docker run -d --rm -e executable=table -p 10002:10002 arafato/azurite
-  # Wait for Consul, etcd, "DynamoDB local" and Azurite to start
-  # TODO: Use something like a while-loop with 1s sleep and for
-  # Consul: curl request to "http://127.0.0.1:8500/v1/status/leader" and loop until the response is a 200 OK with a proper body
+  # Test all packages that don't require a service
+  - go test -v -race -coverprofile=coverage1.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./freecache ./gomap ./leveldb ./syncmap
+  # Test all packages that don't require a Docker container
+  - go test -v -race -coverprofile=coverage2.txt -covermode=atomic ./memcached ./mongodb ./mysql ./redis
+  # Test Consul
+  - docker run -d --rm --name consul -p 8500:8500 bitnami/consul
   - sleep 10s
-  # Test and generate code coverage report
-  # TODO: When Azurite works, change this to testing all packages.
-  #go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./consul ./dynamodb ./etcd ./freecache ./gomap ./leveldb ./memcached ./mongodb ./mysql ./redis ./syncmap
+  - go test -v -race -coverprofile=coverage3.txt -covermode=atomic ./consul
+  - docker stop consul
+  # Test etcd
+  - docker run -d --rm --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage4.txt -covermode=atomic ./etcd
+  - docker stop etcd
+  # Test DynamoDB via "DynamoDB local"
+  - docker run -d --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage5.txt -covermode=atomic ./dynamodb
+  - docker stop dynamodb-local
+  # Test Cosmos DB via Azurite
+  # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
+  #- docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
 
 after_success:
+  # Combine coverage reports
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
