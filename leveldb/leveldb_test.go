@@ -147,6 +147,12 @@ func TestClose(t *testing.T) {
 
 // TestDefaultPath tests if the store works when the default path is used.
 func TestDefaultPath(t *testing.T) {
+	defaultPath := leveldb.DefaultOptions.Path
+	err := os.RemoveAll(defaultPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	store, err := leveldb.NewStore(leveldb.DefaultOptions)
 	if err != nil {
 		t.Fatal(err)

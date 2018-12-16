@@ -1,10 +1,12 @@
 package bbolt_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/philippgille/gokv/badgerdb"
 	"github.com/philippgille/gokv/bbolt"
 	"github.com/philippgille/gokv/test"
 )
@@ -142,6 +144,35 @@ func TestClose(t *testing.T) {
 	err := store.Close()
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+// TestNonExistingDir tests whether the implementation can create the given directory on its own.
+func TestNonExistingDir(t *testing.T) {
+	tmpDir := os.TempDir() + "/bbolt"
+	err := os.RemoveAll(tmpDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	options := badgerdb.Options{
+		Dir: tmpDir,
+	}
+	store, err := badgerdb.NewStore(options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = store.Set("foo", "bar")
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Clean up
+	store.Close()
+	err = os.RemoveAll(tmpDir)
+	if err != nil {
+		fmt.Println("Couldn't delete DB directory")
 	}
 }
 
