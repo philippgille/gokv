@@ -56,7 +56,7 @@ func (s Store) Set(k string, v interface{}) error {
 	// File lock and file handling.
 	lock.Lock()
 	defer lock.Unlock()
-	return ioutil.WriteFile(filePath, data, 666)
+	return ioutil.WriteFile(filePath, data, 0600)
 }
 
 // Get retrieves the stored value for the given key.
@@ -185,7 +185,7 @@ func NewStore(options Options) (Store, error) {
 		options.Directory = DefaultOptions.Directory
 	}
 
-	err := os.MkdirAll(options.Directory, 666)
+	err := os.MkdirAll(options.Directory, 0700)
 	if err != nil {
 		return result, err
 	}
