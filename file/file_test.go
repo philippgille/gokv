@@ -1,6 +1,7 @@
 package file_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/philippgille/gokv/file"
@@ -143,7 +144,14 @@ func TestClose(t *testing.T) {
 }
 
 func createStore(t *testing.T, mf file.MarshalFormat) file.Store {
+	tmpDir := os.TempDir() + "/gokv"
+	err := os.RemoveAll(tmpDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	options := file.Options{
+		Directory:     tmpDir,
 		MarshalFormat: mf,
 	}
 	store, err := file.NewStore(options)
