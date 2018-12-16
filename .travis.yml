@@ -35,7 +35,7 @@ script:
   # Build
   - go build -v ./...
   # Test all packages that don't require a service
-  - go test -v -race -coverprofile=coverage1.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./freecache ./gomap ./leveldb ./syncmap
+  - go test -v -race -coverprofile=coverage1.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./file ./freecache ./gomap ./leveldb ./syncmap
   # Test all packages that don't require a Docker container
   - go test -v -race -coverprofile=coverage2.txt -covermode=atomic ./memcached ./mongodb ./mysql ./redis
   # Test Consul
