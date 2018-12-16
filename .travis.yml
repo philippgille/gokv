@@ -21,14 +21,6 @@ before_install:
   - go version
   - go env
 
-env:
-  # For encrypted environment variables, use:
-  # travis encrypt 'PASSWORD="SECRET"' -r philippgille/gokv
-  global:
-    # "DynamoDB local" accepts any credentials
-    - AWS_ACCESS_KEY_ID=user
-    - AWS_SECRET_ACCESS_KEY=secret
-
 # Don't start Docker containers all at once. The Travis CI VM doesn't have enough memory for that.
 # TODO: Implement a proper wait (e.g. with container health check) instead of sleeping for 10s
 script:
@@ -36,36 +28,3 @@ script:
   - go build -v ./...
   # Test all packages that don't require a service
   - go test -v -race -coverprofile=coverage1.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./freecache ./gomap ./leveldb ./syncmap
-  # Test all packages that don't require a Docker container
-  - go test -v -race -coverprofile=coverage2.txt -covermode=atomic ./memcached ./mongodb ./mysql ./redis
-  # Test Consul
-  - docker run -d --rm --name consul -p 8500:8500 bitnami/consul
-  - sleep 10s
-  - go test -v -race -coverprofile=coverage3.txt -covermode=atomic ./consul
-  - docker stop consul
-  # Test etcd
-  - docker run -d --rm --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
-  - sleep 10s
-  - go test -v -race -coverprofile=coverage4.txt -covermode=atomic ./etcd
-  - docker stop etcd
-  # Test DynamoDB via "DynamoDB local"
-  - docker run -d --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local
-  - sleep 10s
-  - go test -v -race -coverprofile=coverage5.txt -covermode=atomic ./dynamodb
-  - docker stop dynamodb-local
-  # Test Cosmos DB via Azurite
-  # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
-  #- docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
-  # Test Google Cloud Datastore via "Cloud Datastore Emulator"  
-  # Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
-  # `--host-port` is required because otherwise the server only listens on localhost IN the container.
-  - docker run -d --rm --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081
-  - sleep 10s
-  - go test -v -race -coverprofile=coverage6.txt -covermode=atomic ./datastore
-  - docker stop datastore
-
-after_success:
-  # Combine coverage reports
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt
-  # Upload coverage data to codecov.io
-  - bash <(curl -s https://codecov.io/bash)
