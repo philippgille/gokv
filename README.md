@@ -43,68 +43,44 @@ Some of the following databases aren't specifically engineered for storing key-v
 
 Feel free to suggest more stores by creating an [issue](https://github.com/philippgille/gokv/issues) or even add an actual implementation - [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com).
 
+For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).
+
 - Local in-memory
     - [X] Go `sync.Map`
-        - Faster then a regular map when there are lots of reads and only very few writes
     - [X] Go `map` (with `sync.RWMutex`)
     - [X] [FreeCache](https://github.com/coocood/freecache)
-        - Zero GC cache with strictly limited memory usage
-        - > Note: Old entries are evicted from the cache when the cache's size limit is reached
     - [X] [BigCache](https://github.com/allegro/bigcache)
-        - Similar to FreeCache in that no GC is required even for gigabytes of data, but the memory limit is optional
-        - Difference according to the BigCache creators: [BigCache vs. FreeCache](https://github.com/allegro/bigcache/blob/bff00e20c68d9f136477d62d182a7dc917bae0ca/README.md#bigcache-vs-freecache)
 - Embedded
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
-        - bbolt is a fork of Bolt which was maintained by CoreOS, and now by Red Hat (since CoreOS was acquired by them)
-        - It's used for example in [etcd](https://github.com/etcd-io/etcd) as underlying persistent store
-        - It uses a B+ tree, which generally means that it's very fast for read operations
     - [X] [BadgerDB](https://github.com/dgraph-io/badger)
-        - It's used for example in [Dgraph](https://github.com/dgraph-io/dgraph), a distributed graph DB
-        - It uses an LSM tree, which generally means that it's very fast for write operations
     - [X] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
-    - [X] Local files
-        - One file per key-value pair, with the key being the filename and the value being the file content
+    - [X] Local files (one file per key-value pair, with the key being the filename and the value being the file content)
 - Distributed store
     - [X] [Redis](https://github.com/antirez/redis)
-        - [The most popular distributed key-value store](https://db-engines.com/en/ranking/key-value+store)
     - [X] [Consul](https://github.com/hashicorp/consul)
-        - Probably the most popular service registry. Has a key-value store as additional feature.
-        - [Official comparison with ZooKeeper, doozerd and etcd](https://github.com/hashicorp/consul/blob/df91388b7b69e1dc5bfda76f2e67b658a99324ad/website/source/intro/vs/zookeeper.html.md)
-        - > Note: Consul doesn't allow values larger than 512 KB
     - [X] [etcd](https://github.com/etcd-io/etcd)
-        - It's used for example in [Kubernetes](https://github.com/kubernetes/kubernetes)
-        - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
-        - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md).
     - [ ] [TiKV](https://github.com/tikv/tikv)
-        - Originally created as foundation of [TiDB](https://github.com/pingcap/tidb), but acts as a proper key-value store on its own and [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
 - Distributed cache (no presistence *by default*)
     - [X] [Memcached](https://github.com/memcached/memcached)
-        - > Note: Memcached is meant to be used as LRU (Least Recently Used) cache, which means items automatically *expire* and are deleted from the server after not being used for a while. See [Memcached Wiki: Forgetting is a feature](https://github.com/memcached/memcached/wiki/Overview#forgetting-is-a-feature).
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
     - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
-        - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
     - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
     - [X] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
-        - Not as performant, scalable, flexible as Cosmos DB: [Table Storage vs. Cosmos DB Table Storage API](https://github.com/MicrosoftDocs/azure-docs/blob/58649c6910c182cba2bfc9974baed08a6fadf413/articles/cosmos-db/table-introduction.md#table-offerings)
-        - But much cheaper than Cosmos DB: [Cosmos DB pricing](https://azure.microsoft.com/en-us/pricing/details/cosmos-db/) vs. [Table Storage pricing](https://azure.microsoft.com/en-us/pricing/details/storage/tables/)
-        - > Note: Maximum entity size is 1 MB.
     - [X] [Google Cloud Datastore](https://cloud.google.com/datastore/)
     - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
-        - Currently still in beta, but might become the successor to Cloud Datastore
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
-        - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
     - [ ] [PostgreSQL](https://github.com/postgres/postgres)
 - NoSQL
     - [X] [MongoDB](https://github.com/mongodb/mongo)
-        - [The most popular non-relational database](https://db-engines.com/en/ranking)
     - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
 - NewSQL
     - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
-        - [Official comparison with MongoDB and PostgreSQL](https://www.cockroachlabs.com/docs/stable/cockroachdb-in-comparison.html)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
     - [ ] [Apache Ignite](https://github.com/apache/ignite)
+
+Again: For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).
 
 ### Value types
 
