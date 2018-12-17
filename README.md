@@ -43,7 +43,8 @@ Some of the following databases aren't specifically engineered for storing key-v
 
 Feel free to suggest more stores by creating an [issue](https://github.com/philippgille/gokv/issues) or even add an actual implementation - [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com).
 
-For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).
+For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  
+For the GoDoc of specific implementations, see [https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories](https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories).
 
 - Local in-memory
     - [X] Go `sync.Map`
@@ -80,7 +81,9 @@ For differences between the implementations, see [Choosing an implementation](do
     - [ ] [TiDB](https://github.com/pingcap/tidb)
     - [ ] [Apache Ignite](https://github.com/apache/ignite)
 
-Again: For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).
+Again:  
+For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  
+For the GoDoc of specific implementations, see [https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories](https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories).
 
 ### Value types
 
