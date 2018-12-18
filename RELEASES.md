@@ -10,6 +10,8 @@ vNext
 
 - Added: Package `tablestorage` - A `gokv.Store` implementation for [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/) (issue [#42](https://github.com/philippgille/gokv/issues/42))
 - Added: Package `datastore` - A `gokv.Store` implementation for [Google Cloud Datastore](https://cloud.google.com/datastore/) (issue [#51](https://github.com/philippgille/gokv/issues/51))
+- Added: Package `s3` - A `gokv.Store` implementation for [Amazon S3](https://aws.amazon.com/s3/) (issue [#37](https://github.com/philippgille/gokv/issues/37))
+    - Also works for other S3-compatible cloud services like [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) and [Scaleway Object Storage](https://www.scaleway.com/object-storage/), as well as for self-hosted solutions like [OpenStack Swift](https://github.com/openstack/swift), [Ceph](https://github.com/ceph/ceph) and [Minio](https://github.com/minio/minio)
 - Added: Package `leveldb` - A `gokv.Store` implementation for [LevelDB](https://github.com/syndtr/goleveldb) (issue [#48](https://github.com/philippgille/gokv/issues/48))
 - Added: Package `file` - A `gokv.Store` implementation for storing key-value pairs as files (issue [#52](https://github.com/philippgille/gokv/issues/52))
 - Added: Package `freecache` - A `gokv.Store` implementation for [FreeCache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
