@@ -2,6 +2,7 @@ package s3_test
 
 import (
 	"log"
+	"os"
 	"strings"
 	"testing"
 
@@ -13,6 +14,10 @@ import (
 	"github.com/philippgille/gokv/s3"
 	"github.com/philippgille/gokv/test"
 )
+
+// For Minio Docker container.
+// See https://docs.minio.io/docs/minio-docker-quickstart-guide.html.
+var customEndpoint = "http://localhost:9000"
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
@@ -110,6 +115,7 @@ func TestErrors(t *testing.T) {
 
 	// Test client creation with bad options
 	options := s3.Options{
+		BucketName:     "gokv",
 		AWSaccessKeyID: "foo",
 	}
 	client, err = s3.NewClient(options)
@@ -117,6 +123,7 @@ func TestErrors(t *testing.T) {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	options = s3.Options{
+		BucketName:         "gokv",
 		AWSsecretAccessKey: "foo",
 	}
 	client, err = s3.NewClient(options)
@@ -213,7 +220,9 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID))
+	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
+	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID).WithEndpoint(customEndpoint))
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
@@ -230,10 +239,13 @@ func checkConnection() bool {
 }
 
 func createClient(t *testing.T, mf s3.MarshalFormat) s3.Client {
+	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
+	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
 	options := s3.Options{
-		BucketName:    "gokv",
-		Region:        endpoints.EuCentral1RegionID,
-		MarshalFormat: mf,
+		BucketName:     "gokv",
+		Region:         endpoints.EuCentral1RegionID,
+		CustomEndpoint: customEndpoint,
+		MarshalFormat:  mf,
 	}
 	client, err := s3.NewClient(options)
 	if err != nil {

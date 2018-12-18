@@ -151,9 +151,8 @@ type Options struct {
 	// Environment variable: "AWS_SECRET_ACCESS_KEY".
 	AWSsecretAccessKey string
 	// CustomEndpoint allows you to set a custom S3 service endpoint.
-	// This is especially useful if you're running a "S3 local" Docker container for local testing.
-	// Typical value for the Docker container: "http://localhost:8000".
-	// See https://hub.docker.com/r/amazon/s3-local/.
+	// This must be set if you want to use a different S3-compatible cloud service or self-hosted solution.
+	// For Minio for example this could be "http://localhost:9000".
 	// Optional ("" by default)
 	CustomEndpoint string
 	// (Un-)marshal format.
@@ -204,7 +203,17 @@ func NewClient(options Options) (Client, error) {
 		config = config.WithCredentials(creds)
 	}
 	if options.CustomEndpoint != "" {
-		config = config.WithEndpoint(options.CustomEndpoint)
+		// Not only the endpoint must be set, but also the path style must be forced.
+		// By default, S3 uses "virtual hosting", e.g. an object is available with http://BUCKET.s3.amazonaws.com/KEY.
+		// But for example self-hosted solutions like Minio don't support this.
+		// They require http://s3.amazonaws.com/BUCKET/KEY.
+		// Note that when using the path style with the original Amazon S3 service though,
+		// the region must be used as subdomain.
+		// E.g.: http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg.
+		//
+		// See https://github.com/aws/aws-sdk-go/blob/eede7b5ad63d23f46805d59ed100c33a3635931a/aws/config.go#L118
+		// and http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html.
+		config = config.WithEndpoint(options.CustomEndpoint).WithS3ForcePathStyle(true)
 	}
 	// Use shared config file...
 	sessionOpts := session.Options{
