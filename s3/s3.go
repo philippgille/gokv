@@ -135,12 +135,17 @@ const (
 // Options are the options for the S3 client.
 type Options struct {
 	// Name of the S3 bucket.
+	// The bucket is automatically created if it doesn't exist yet.
 	BucketName string
 	// Region of the S3 service you want to use.
 	// Valid values: https://docs.aws.amazon.com/general/latest/gr/rande.html#ddb_region.
 	// E.g. "us-west-2".
 	// Optional (read from shared config file or environment variable if not set).
 	// Environment variable: "AWS_REGION".
+	//
+	// Note: A region is required even when using an S3-compatible cloud service or self-hosted solution.
+	// When running Minio locally for example, you can set any value.
+	// When using Scaleway Object Storage for example, you can set "nl-ams".
 	Region string
 	// AWS access key ID (part of the credentials).
 	// Optional (read from shared credentials file or environment variable if not set).
@@ -153,6 +158,8 @@ type Options struct {
 	// CustomEndpoint allows you to set a custom S3 service endpoint.
 	// This must be set if you want to use a different S3-compatible cloud service or self-hosted solution.
 	// For Minio for example this could be "http://localhost:9000".
+	// For Scaleway Object Storage this could be "s3.nl-ams.scw.cloud".
+	// If you don't include "http://", then HTTPS (with TLS) will be used.
 	// Optional ("" by default)
 	CustomEndpoint string
 	// (Un-)marshal format.
@@ -227,15 +234,45 @@ func NewClient(options Options) (Client, error) {
 	}
 	svc := awss3.New(session)
 
-	// Try to create bucket, even if it exists (in which case this serves as connection test).
+	// Create the bucket if it doesn't exist yet.
+	//
+	// When using actual Amazon S3, and trying to create a bucket you already own,
+	// the API returns a proper ErrCodeBucketAlreadyOwnedByYou.
+	// So we can just try to create it immediately and ignore the ErrCodeBucketAlreadyOwnedByYou error.
+	//
+	// But Scaleway Object Storage for example just returns BucketAlreadyExists,
+	// which could also mean that someone else owns it, which would be an error.
+	// So in this case we must do it differently.
 	createBucketInput := awss3.CreateBucketInput{
 		Bucket: aws.String(options.BucketName),
 	}
-	_, err = svc.CreateBucket(&createBucketInput)
-	if err != nil {
-		aerr, ok := err.(awserr.Error)
-		if !ok || aerr.Code() != awss3.ErrCodeBucketAlreadyOwnedByYou {
+	if options.CustomEndpoint == "" {
+		_, err = svc.CreateBucket(&createBucketInput)
+		if err != nil {
+			aerr, ok := err.(awserr.Error)
+			if !ok || aerr.Code() != awss3.ErrCodeBucketAlreadyOwnedByYou {
+				return result, err
+			}
+		}
+	} else {
+		listBucketsOutput, err := svc.ListBuckets(&awss3.ListBucketsInput{})
+		if err != nil {
 			return result, err
+		}
+		ownsBucket := false
+		if listBucketsOutput.Buckets != nil {
+			for _, bucket := range listBucketsOutput.Buckets {
+				if *bucket.Name == options.BucketName {
+					ownsBucket = true
+					break
+				}
+			}
+		}
+		if !ownsBucket {
+			_, err = svc.CreateBucket(&createBucketInput)
+			if err != nil {
+				return result, err
+			}
 		}
 	}
 
