@@ -115,6 +115,14 @@ func TestErrors(t *testing.T) {
 
 	// Test client creation with bad options
 	options := s3.Options{
+		AWSaccessKeyID:     "foo",
+		AWSsecretAccessKey: "bar",
+	}
+	client, err = s3.NewClient(options)
+	if err.Error() != "The BucketName in the options must not be empty" {
+		t.Error("An error was expected, but didn't occur.")
+	}
+	options = s3.Options{
 		BucketName:     "gokv",
 		AWSaccessKeyID: "foo",
 	}
