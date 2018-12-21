@@ -183,7 +183,7 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	db, err := sql.Open("postgres", "postgres://postgres:secret@/?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:secret@localhost:5433/?sslmode=disable")
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
@@ -200,7 +200,7 @@ func checkConnection() bool {
 
 func createClient(t *testing.T, mf postgresql.MarshalFormat) postgresql.Client {
 	options := postgresql.Options{
-		ConnectionURL: "postgres://postgres:secret@/gokv?sslmode=disable",
+		ConnectionURL: "postgres://postgres:secret@localhost:5433/gokv?sslmode=disable",
 		MarshalFormat: mf,
 		// Higher values seem to lead to issues on Travis CI when using MySQL,
 		// so let's just use the same value here.
