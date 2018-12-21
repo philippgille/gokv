@@ -16,6 +16,8 @@ vNext
 - Added: Package `file` - A `gokv.Store` implementation for storing key-value pairs as files (issue [#52](https://github.com/philippgille/gokv/issues/52))
 - Added: Package `freecache` - A `gokv.Store` implementation for [FreeCache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
 - Added: Package `bigcache` - A `gokv.Store` implementation for [BigCache](https://github.com/allegro/bigcache) (issue [#45](https://github.com/philippgille/gokv/issues/45))
+- Added: Package `postgresql` - A `gokv.Store` implementation for [PostgreSQL](https://github.com/postgres/postgres) (issue [#57](https://github.com/philippgille/gokv/issues/57))
+- Added: Package `sql` - It contains shared code for SQL implementations. `mysql` and `postgres` already use it and if you want to create your own SQL implementation you can use it as well. (Useful for issue [#57](https://github.com/philippgille/gokv/issues/57).)
 
 v0.4.0 (2018-12-02)
 -------------------

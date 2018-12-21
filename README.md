@@ -73,7 +73,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
-    - [ ] [PostgreSQL](https://github.com/postgres/postgres)
+    - [X] [PostgreSQL](https://github.com/postgres/postgres)
 - NoSQL
     - [X] [MongoDB](https://github.com/mongodb/mongo)
     - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
