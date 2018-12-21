@@ -1,15 +1,13 @@
 package mysql
 
 import (
-	"errors"
-
-	"database/sql"
+	gosql "database/sql"
 
 	// Usually a blank import is enough as it calls the package's init() function and loads the driver,
 	// but we'll use the package's ParseDNS() function so we make this an actual import.
 	gosqldriver "github.com/go-sql-driver/mysql"
 
-	"github.com/philippgille/gokv/util"
+	"github.com/philippgille/gokv/sql"
 )
 
 const defaultDBname = "gokv"
@@ -22,98 +20,7 @@ const errDBnotFound = 1049
 
 // Client is a gokv.Store implementation for MySQL.
 type Client struct {
-	c             *sql.DB
-	insertStmt    *sql.Stmt
-	getStmt       *sql.Stmt
-	deleteStmt    *sql.Stmt
-	marshalFormat MarshalFormat
-}
-
-// Set stores the given value for the given key.
-// Values are automatically marshalled to JSON or gob (depending on the configuration).
-// The length of the key must not exceed 255 characters.
-// The key must not be "" and the value must not be nil.
-func (c Client) Set(k string, v interface{}) error {
-	if err := util.CheckKeyAndValue(k, v); err != nil {
-		return err
-	}
-
-	// First turn the passed object into something that MySQL can handle
-	var data []byte
-	var err error
-	switch c.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
-	if err != nil {
-		return err
-	}
-
-	if err != nil {
-		return err
-	}
-	_, err = c.insertStmt.Exec(k, data)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Get retrieves the stored value for the given key.
-// You need to pass a pointer to the value, so in case of a struct
-// the automatic unmarshalling can populate the fields of the object
-// that v points to with the values of the retrieved object's values.
-// The length of the key must not exceed 255 characters.
-// If no value is found it returns (false, nil).
-// The key must not be "" and the pointer must not be nil.
-func (c Client) Get(k string, v interface{}) (found bool, err error) {
-	if err := util.CheckKeyAndValue(k, v); err != nil {
-		return false, err
-	}
-
-	// TODO: Consider using RawBytes.
-	dataPtr := new([]byte)
-	err = c.getStmt.QueryRow(k).Scan(dataPtr)
-	// If no value was found return false
-	if err == sql.ErrNoRows {
-		return false, nil
-	} else if err != nil {
-		return false, err
-	}
-	data := *dataPtr
-
-	switch c.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
-}
-
-// Delete deletes the stored value for the given key.
-// Deleting a non-existing key-value pair does NOT lead to an error.
-// The length of the key must not exceed 255 characters.
-// The key must not be "".
-func (c Client) Delete(k string) error {
-	if err := util.CheckKey(k); err != nil {
-		return err
-	}
-
-	_, err := c.deleteStmt.Exec(k)
-	return err
-}
-
-// Close closes the client.
-// It must be called to return all open connections to the connection pool and to release any open resources.
-func (c Client) Close() error {
-	return c.c.Close()
+	*sql.Client
 }
 
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
@@ -181,7 +88,7 @@ func NewClient(options Options) (Client, error) {
 		options.MaxOpenConnections = 0 // 0 actually leads to the MySQL driver using no connection limit.
 	}
 
-	db, err := sql.Open("mysql", options.DataSourceName)
+	db, err := gosql.Open("mysql", options.DataSourceName)
 	if err != nil {
 		return result, err
 	}
@@ -203,7 +110,7 @@ func NewClient(options Options) (Client, error) {
 				userProvidedDBname := cfg.DBName
 				cfg.DBName = ""
 				dsnWithoutDBname := cfg.FormatDSN()
-				tempDB, err := sql.Open("mysql", dsnWithoutDBname)
+				tempDB, err := gosql.Open("mysql", dsnWithoutDBname)
 				// This temporary DB must be closed.
 				defer tempDB.Close()
 				if err != nil {
@@ -215,7 +122,7 @@ func NewClient(options Options) (Client, error) {
 				}
 				// No need to check if userProvidedDBname == "", because in that case the error wouldn't be 1049 (unknown database).
 				// In case the user doesn't have the permission to create a database, an error is returned.
-				err = createDB(tempDB, userProvidedDBname)
+				err = sql.CreateDB(tempDB, userProvidedDBname)
 				if err != nil {
 					return result, err
 				}
@@ -233,7 +140,7 @@ func NewClient(options Options) (Client, error) {
 	} else if cfg.DBName == "" {
 		// Ping() was successful, but in case the package user didn't include a database name
 		// in the DataSourceName, we must now attempt to create the database.
-		err = createDB(db, defaultDBname)
+		err = sql.CreateDB(db, defaultDBname)
 		if err != nil {
 			return result, err
 		}
@@ -243,7 +150,7 @@ func NewClient(options Options) (Client, error) {
 		db.Close()
 		cfg.DBName = defaultDBname
 		dsnWithDBname := cfg.FormatDSN()
-		db, err = sql.Open("mysql", dsnWithDBname)
+		db, err = gosql.Open("mysql", dsnWithDBname)
 		if err != nil {
 			return result, err
 		}
@@ -254,7 +161,7 @@ func NewClient(options Options) (Client, error) {
 	}
 
 	// Limit number of concurrent connections. Typical max connections on a MySQL server is 100.
-	// This prevents "Error 1040: Too many connections", which otherwise occurs for examaple with 500 concurrent goroutines.
+	// This prevents "Error 1040: Too many connections", which otherwise occurs for example with 500 concurrent goroutines.
 	db.SetMaxOpenConns(options.MaxOpenConnections)
 
 	// Create table if it doesn't exist yet.
@@ -288,26 +195,16 @@ func NewClient(options Options) (Client, error) {
 		return result, err
 	}
 
-	result.c = db
-	result.insertStmt = insertStmt
-	result.getStmt = getStmt
-	result.deleteStmt = deleteStmt
-	result.marshalFormat = options.MarshalFormat
+	c := sql.Client{
+		C:          db,
+		InsertStmt: insertStmt,
+		GetStmt:    getStmt,
+		DeleteStmt: deleteStmt,
+		// TODO: This cast requires the order of the enum values to be the same. Fix with #47.
+		MarshalFormat: sql.MarshalFormat(options.MarshalFormat),
+	}
+
+	result.Client = &c
 
 	return result, nil
-}
-
-// createDB creates a database with the given name.
-// Note 1: When the DataSourceName already contained a database name
-// but it doesn't exist yet (error 1049 occurred during Ping()),
-// the same error will occur when trying to create the database.
-// So this method is only useful when the DataSourceName did NOT contain a database name.
-// Note 2: Prepared statements cannot be used for creating and using databases,
-// so you must make sure that dbName doesn't contain SQL injections.
-func createDB(db *sql.DB, dbName string) error {
-	_, err := db.Exec("CREATE DATABASE IF NOT EXISTS " + dbName)
-	if err != nil {
-		return err
-	}
-	return nil
 }

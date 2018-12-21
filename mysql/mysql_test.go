@@ -265,9 +265,10 @@ func checkConnection() bool {
 
 func createClient(t *testing.T, mf mysql.MarshalFormat) mysql.Client {
 	options := mysql.Options{
-		MaxOpenConnections: 25, // Higher values seem to lead to issues on Travis CI
+		MarshalFormat: mf,
+		// Higher values seem to lead to issues on Travis CI
+		MaxOpenConnections: 25,
 	}
-	options.MarshalFormat = mf
 	client, err := mysql.NewClient(options)
 	if err != nil {
 		t.Fatal(err)
