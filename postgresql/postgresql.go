@@ -40,7 +40,7 @@ type Options struct {
 	// to not require a password when connecting from the same host.
 	// When running the official PostgreSQL Docker container
 	// and accessing it from outside the container,
-	// this doesn't count as "same host").
+	// this is NOT the "same host" (except when running with `--network host`)).
 	ConnectionURL string
 	// Name of the table in which the key-value pairs are stored.
 	// Optional ("Item" by default).
@@ -55,9 +55,9 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// ConnectionURL: "postgres://postgres@/gokv", TableName: "Item", MaxOpenConnections: 100, MarshalFormat: JSON
+// ConnectionURL: "postgres://postgres@/gokv?sslmode=disable", TableName: "Item", MaxOpenConnections: 100, MarshalFormat: JSON
 var DefaultOptions = Options{
-	ConnectionURL:      "postgres://postgres@/" + defaultDBname,
+	ConnectionURL:      "postgres://postgres@/" + defaultDBname + "?sslmode=disable",
 	TableName:          "Item",
 	MaxOpenConnections: 100,
 	// No need to set MarshalFormat to JSON because its zero value is fine.
