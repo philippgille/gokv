@@ -20,7 +20,52 @@ const errDBnotFound = 1049
 
 // Client is a gokv.Store implementation for MySQL.
 type Client struct {
-	*sql.Client
+	c *sql.Client
+}
+
+// Set stores the given value for the given key.
+// Values are automatically marshalled to JSON or gob (depending on the configuration).
+// The length of the key must not exceed 255 characters.
+// The key must not be "" and the value must not be nil.
+func (c Client) Set(k string, v interface{}) error {
+	// It's tempting to remove this "wrapper" method
+	// and just use *sql.Client as embedded field,
+	// But we need this explicit method for a different GoDoc
+	// (255 character limit).
+	return c.c.Set(k, v)
+}
+
+// Get retrieves the stored value for the given key.
+// You need to pass a pointer to the value, so in case of a struct
+// the automatic unmarshalling can populate the fields of the object
+// that v points to with the values of the retrieved object's values.
+// If no value is found it returns (false, nil).
+// The length of the key must not exceed 255 characters.
+// The key must not be "" and the pointer must not be nil.
+func (c Client) Get(k string, v interface{}) (found bool, err error) {
+	// It's tempting to remove this "wrapper" method
+	// and just use *sql.Client as embedded field,
+	// But we need this explicit method for a different GoDoc
+	// (255 character limit).
+	return c.c.Get(k, v)
+}
+
+// Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
+// The length of the key must not exceed 255 characters.
+// The key must not be "".
+func (c Client) Delete(k string) error {
+	// It's tempting to remove this "wrapper" method
+	// and just use *sql.Client as embedded field,
+	// But we need this explicit method for a different GoDoc
+	// (255 character limit).
+	return c.c.Delete(k)
+}
+
+// Close closes the client.
+// It must be called to return all open connections to the connection pool and to release any open resources.
+func (c Client) Close() error {
+	return c.c.Close()
 }
 
 // MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
@@ -204,7 +249,7 @@ func NewClient(options Options) (Client, error) {
 		MarshalFormat: sql.MarshalFormat(options.MarshalFormat),
 	}
 
-	result.Client = &c
+	result.c = &c
 
 	return result, nil
 }

@@ -11,7 +11,6 @@ import (
 )
 
 const defaultDBname = "gokv"
-const keyLength = "255"
 
 // Client is a gokv.Store implementation for PostgreSQL.
 type Client struct {
