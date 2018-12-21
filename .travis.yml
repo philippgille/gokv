@@ -68,9 +68,17 @@ script:
   - sleep 10s
   - go test -v -race -coverprofile=coverage7.txt -covermode=atomic ./s3
   - docker stop s3
+  # Test PostgreSQL
+  # It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
+  # starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
+  - docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage8.txt -covermode=atomic ./postgresql
+  - docker stop postgres
 
 after_success:
-  # Combine coverage reports
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt
+  # Combine coverage reports.
+  # (Using grep to skip the first line of each coverage report (there's probably a more elegant way to do this).)
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
