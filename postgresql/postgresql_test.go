@@ -5,8 +5,6 @@ import (
 	"log"
 	"testing"
 
-	_ "github.com/lib/pq"
-
 	"github.com/philippgille/gokv/postgresql"
 	"github.com/philippgille/gokv/test"
 )
@@ -104,6 +102,23 @@ func TestErrors(t *testing.T) {
 	if err == nil {
 		t.Error("Expected an error")
 	}
+
+	// Test default options.
+	// Will lead to an error because our Docker container requires a password.
+	//
+	// TODO: Currently doesn't work because our PostgreSQL server runs in Docker in port 5433,
+	// while Travis CI has a PostgreSQL server running on 5432, where the gokv DB doesn't exist.
+	// We could create that DB in the Travis CI configuration, but then this test would still not work
+	// because it expects an invalid password, but the Travis CI default configuration is configured
+	// with an empty password.
+	// client, err = postgresql.NewClient(postgresql.DefaultOptions)
+	// pqErr, ok := err.(*pq.Error)
+	// expectedErrorCode := "28P01" // invalid_password, see https://www.postgresql.org/docs/11/errcodes-appendix.html
+	// if !ok {
+	// 	t.Errorf("Expected a pq error, but wasn't. Type: %T, error: %v", err, err)
+	// } else if string(pqErr.Code) != expectedErrorCode {
+	// 	t.Errorf("Expected error code %v, but was %v. Error: %v", expectedErrorCode, pqErr.Code, pqErr)
+	// }
 }
 
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
@@ -183,6 +198,7 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
+	// Need to use port 5433 because 5432 is already used by another service on Travis CI
 	db, err := sql.Open("postgres", "postgres://postgres:secret@localhost:5433/?sslmode=disable")
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
@@ -200,6 +216,7 @@ func checkConnection() bool {
 
 func createClient(t *testing.T, mf postgresql.MarshalFormat) postgresql.Client {
 	options := postgresql.Options{
+		// Need to use port 5433 because 5432 is already used by another service on Travis CI
 		ConnectionURL: "postgres://postgres:secret@localhost:5433/gokv?sslmode=disable",
 		MarshalFormat: mf,
 		// Higher values seem to lead to issues on Travis CI when using MySQL,
