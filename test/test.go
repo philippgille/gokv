@@ -51,6 +51,12 @@ func TestStore(store gokv.Store, t *testing.T) {
 		t.Error(err)
 	}
 
+	// Storing it again should not lead to an error but just overwrite it
+	err = store.Set(key, val)
+	if err != nil {
+		t.Error(err)
+	}
+
 	// Retrieve the object
 	expected := val
 	actualPtr := new(Foo)
