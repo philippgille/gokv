@@ -106,6 +106,7 @@ Implementations
     - [MySQL](https://github.com/mysql/mysql-server)
         - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
     - [PostgreSQL](https://github.com/postgres/postgres)
+        - Seems to be seen as more advanced, robust and performant than MySQL, especially in the Go community.
 - NoSQL
     - [MongoDB](https://github.com/mongodb/mongo)
         - [The most popular non-relational database](https://db-engines.com/en/ranking)

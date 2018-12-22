@@ -56,7 +56,8 @@ script:
   # Test Cosmos DB via Azurite
   # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
   #- docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
-  # Test Google Cloud Datastore via "Cloud Datastore Emulator"  
+  # Test Google Cloud Datastore via "Cloud Datastore Emulator"
+  # Using the ":slim" or ":alpine" tag would require the emulator to be installed manually.
   # Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
   # `--host-port` is required because otherwise the server only listens on localhost IN the container.
   - docker run -d --rm --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081
@@ -68,9 +69,18 @@ script:
   - sleep 10s
   - go test -v -race -coverprofile=coverage7.txt -covermode=atomic ./s3
   - docker stop s3
+  # Test PostgreSQL
+  # It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
+  # starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
+  # Expose port 5433 instead of 5432 because Travis CI already has a service running on 5432.
+  - docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5433:5432 postgres:alpine
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage8.txt -covermode=atomic ./postgresql
+  - docker stop postgres
 
 after_success:
-  # Combine coverage reports
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt
+  # Combine coverage reports.
+  # (Using grep to skip the first line of each coverage report (there's probably a more elegant way to do this).)
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
