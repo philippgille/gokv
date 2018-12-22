@@ -80,12 +80,12 @@ Implementations
         - It's used for example in [Kubernetes](https://github.com/kubernetes/kubernetes)
         - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
         - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md).
-    - [TiKV](https://github.com/tikv/tikv)
+    - [TiKV](https://github.com/tikv/tikv) (⚠️Not implemented yet!)
         - Originally created as foundation of [TiDB](https://github.com/pingcap/tidb), but acts as a proper key-value store on its own and [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
 - Distributed cache
     - [Memcached](https://github.com/memcached/memcached)
         - > Note: Memcached is meant to be used as LRU (Least Recently Used) cache, which means items automatically *expire* and are deleted from the server after not being used for a while. See [Memcached Wiki: Forgetting is a feature](https://github.com/memcached/memcached/wiki/Overview#forgetting-is-a-feature).
-    - [Hazelcast](https://github.com/hazelcast/hazelcast)
+    - [Hazelcast](https://github.com/hazelcast/hazelcast) (⚠️Not implemented yet!)
 - Cloud
     - [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
         - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
@@ -110,9 +110,9 @@ Implementations
 - NoSQL
     - [MongoDB](https://github.com/mongodb/mongo)
         - [The most popular non-relational database](https://db-engines.com/en/ranking)
-    - [Apache Cassandra](https://github.com/apache/cassandra)
+    - [Apache Cassandra](https://github.com/apache/cassandra) (⚠️Not implemented yet!)
 - NewSQL
-    - [CockroachDB](https://github.com/cockroachdb/cockroach)
+    - [CockroachDB](https://github.com/cockroachdb/cockroach) (⚠️Not implemented yet!)
         - [Official comparison with MongoDB and PostgreSQL](https://www.cockroachlabs.com/docs/stable/cockroachdb-in-comparison.html)
-    - [TiDB](https://github.com/pingcap/tidb)
-    - [Apache Ignite](https://github.com/apache/ignite)
+    - [TiDB](https://github.com/pingcap/tidb) (⚠️Not implemented yet!)
+    - [Apache Ignite](https://github.com/apache/ignite) (⚠️Not implemented yet!)
