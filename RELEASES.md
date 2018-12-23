@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added: Package `encoding` - An abstraction and wrapper for the core functionality of packages like `encoding/json` and `encoding/gob` (issue [#47](https://github.com/philippgille/gokv/issues/47))
+- Added: Package `sql` - It contains shared code for SQL implementations. `mysql` and `postgres` already use it and if you want to create your own SQL implementation you can use it as well. (Useful for issue [#57](https://github.com/philippgille/gokv/issues/57).)
 - Added: Package `tablestorage` - A `gokv.Store` implementation for [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/) (issue [#42](https://github.com/philippgille/gokv/issues/42))
 - Added: Package `datastore` - A `gokv.Store` implementation for [Google Cloud Datastore](https://cloud.google.com/datastore/) (issue [#51](https://github.com/philippgille/gokv/issues/51))
 - Added: Package `s3` - A `gokv.Store` implementation for [Amazon S3](https://aws.amazon.com/s3/) (issue [#37](https://github.com/philippgille/gokv/issues/37))
@@ -17,7 +19,11 @@ vNext
 - Added: Package `freecache` - A `gokv.Store` implementation for [FreeCache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
 - Added: Package `bigcache` - A `gokv.Store` implementation for [BigCache](https://github.com/allegro/bigcache) (issue [#45](https://github.com/philippgille/gokv/issues/45))
 - Added: Package `postgresql` - A `gokv.Store` implementation for [PostgreSQL](https://github.com/postgres/postgres) (issue [#57](https://github.com/philippgille/gokv/issues/57))
-- Added: Package `sql` - It contains shared code for SQL implementations. `mysql` and `postgres` already use it and if you want to create your own SQL implementation you can use it as well. (Useful for issue [#57](https://github.com/philippgille/gokv/issues/57).)
+
+Breaking changes
+----------------
+
+- The `MarshalFormat` enums were removed from all packages that contained `gokv.Store` implementations. Instead the shared package `encoding` was introduced (required for issue [#47](https://github.com/philippgille/gokv/issues/47))
 
 v0.4.0 (2018-12-02)
 -------------------

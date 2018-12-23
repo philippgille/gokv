@@ -90,7 +90,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
 
 Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `interface{}` as parameter), including structs, and automatically (un-)marshals the value.
 
-The kind of (un-)marshalling is left to the implementation. All implementations in this repository currently support JSON and [gob](https://blog.golang.org/gobs-of-data) by using `encoding/json` and `encoding/gob`. See [Marshal formats](#marshal-formats) for details.
+The kind of (un-)marshalling is left to the implementation. All implementations in this repository currently support JSON and [gob](https://blog.golang.org/gobs-of-data) by using the `encoding` subpackage in this repository, which wraps the core functionality of the standard library's `encoding/json` and `encoding/gob` packages. See [Marshal formats](#marshal-formats) for details.
 
 For unexported struct fields to be (un-)marshalled to/from JSON/gob, the respective custom (un-)marshalling methods need to be implemented as methods of the struct (e.g. `MarshalJSON() ([]byte, error)` for custom marshalling into JSON). See [Marshaler](https://godoc.org/encoding/json#Marshaler) and [Unmarshaler](https://godoc.org/encoding/json#Unmarshaler) for JSON, and [GobEncoder](https://godoc.org/encoding/gob#GobEncoder) and [GobDecoder](https://godoc.org/encoding/gob#GobDecoder) for gob.
 
@@ -98,14 +98,18 @@ To improve performance you can also implement the custom (un-)marshalling method
 
 ### Marshal formats
 
+This repository contains the subpackage `encoding`, which is an abstraction and wrapper for the core functionality of packages like `encoding/json` and `encoding/gob`. The currently supported marshal formats are:
+
 - [X] JSON
 - [X] [gob](https://blog.golang.org/gobs-of-data)
 
-The stores marshal and unmarshal the values when storing / retrieving them. The default format is JSON, but all `gokv.Store` implementations in this repository also support [gob](https://blog.golang.org/gobs-of-data) as alternative, configurable via their `Options`.
+More formats will be supported in the future (e.g. XML).
+
+The stores use this `encoding` package to marshal and unmarshal the values when storing / retrieving them. The default format is JSON, but all `gokv.Store` implementations in this repository also support [gob](https://blog.golang.org/gobs-of-data) as alternative, configurable via their `Options`.
 
 The marshal format is up to the implementations though, so package creators using the `gokv.Store` interface as parameter of a function should not make any assumptions about this. If they require any specific format they should inform the package user about this in the GoDoc of the function taking the store interface as parameter.
 
-Differences:
+Differences between the formats:
 
 - Depending on the struct, one of the formats might be faster
 - Depending on the struct, one of the formats might lead to a lower storage size
@@ -277,6 +281,7 @@ Others:
 
 - [gladkikhartem/gokv](https://github.com/gladkikhartem/gokv): No `Delete()` method, no Redis, embedded DBs etc., no Git tags / releases, no stars (as of 2018-11-28)
 - [bradberger/gokv](https://github.com/bradberger/gokv): Not maintained (no commits in the last 22 months), no Redis, Consul etc., no Git tags / releases, 1 star (as of 2018-11-28)
+    - This package inspired me to implement something similar to its `Codec`.
 - [ppacher/gokv](https://github.com/ppacher/gokv): Not maintained (no commits in the last 22 months), no Redis, embedded DBs etc., no automatic (un-)marshalling, 1 star (as of 2018-11-28)
-    - Nice CLI though!
+    - Nice CLI!
 - [kapitan-k/gokvstore](https://github.com/kapitan-k/gokvstore): Not actively maintained (no commits in the last 10+ months), RocksDB only, requires cgo, no automatic (un-)marshalling, no Git tags/ releases, 1 star (as of 2018-11-28)
