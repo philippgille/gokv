@@ -1,18 +1,17 @@
 package consul
 
 import (
-	"errors"
-
 	"github.com/hashicorp/consul/api"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
 // Client is a gokv.Store implementation for Consul.
 type Client struct {
-	c             *api.KV
-	folder        string
-	marshalFormat MarshalFormat
+	c      *api.KV
+	folder string
+	codec  encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -24,16 +23,7 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that Consul can handle
-	var data []byte
-	var err error
-	switch c.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := c.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -77,14 +67,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	data := kvPair.Value
 
-	switch c.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, c.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -108,16 +91,6 @@ func (c Client) Close() error {
 	return nil
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the Consul client.
 type Options struct {
 	// URI scheme for the Consul server.
@@ -130,18 +103,18 @@ type Options struct {
 	// The Consul UI calls this "folder".
 	// Optional (none by default).
 	Folder string
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// Scheme: "http", Address: "127.0.0.1:8500", Folder: none, MarshalFormat: JSON
+// Scheme: "http", Address: "127.0.0.1:8500", Folder: none, Codec: encoding.JSON
 var DefaultOptions = Options{
 	Scheme:  "http",
 	Address: "127.0.0.1:8500",
+	Codec:   encoding.JSON,
 	// No need to define Folder because its zero value is fine
-	// No need to set MarshalFormat to JSON because its zero value is fine.
 }
 
 // NewClient creates a new Consul client.
@@ -155,6 +128,9 @@ func NewClient(options Options) (Client, error) {
 	if options.Address == "" {
 		options.Address = DefaultOptions.Address
 	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
 
 	config := api.DefaultConfig()
 	config.Scheme = options.Scheme
@@ -164,11 +140,9 @@ func NewClient(options Options) (Client, error) {
 		return result, err
 	}
 
-	result = Client{
-		c:             client.KV(),
-		folder:        options.Folder,
-		marshalFormat: options.MarshalFormat,
-	}
+	result.c = client.KV()
+	result.folder = options.Folder
+	result.codec = options.Codec
 
 	return result, nil
 }

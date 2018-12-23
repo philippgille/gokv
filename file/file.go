@@ -1,13 +1,13 @@
 package file
 
 import (
-	"errors"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
 	"sync"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -17,10 +17,10 @@ type Store struct {
 	// (no two goroutines may create a lock for a filename that doesn't have a lock yet).
 	locksLock *sync.Mutex
 	// For locking file access.
-	fileLocks     map[string]*sync.RWMutex
-	fileSuffix    string
-	directory     string
-	marshalFormat MarshalFormat
+	fileLocks  map[string]*sync.RWMutex
+	fileSuffix string
+	directory  string
+	codec      encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -31,16 +31,7 @@ func (s Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	var data []byte
-	var err error
-	switch s.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := s.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -90,14 +81,7 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	switch s.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, s.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -145,33 +129,22 @@ func (s Store) prepFileLock(escapedKey string) *sync.RWMutex {
 	return lock
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the Go map store.
 type Options struct {
 	// The directory in which to store files.
 	// Can be absolute or relative.
 	// Optional ("gokv" by default).
 	Directory string
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// Directory: "gokv", MarshalFormat: JSON
+// Directory: "gokv", Codec: encoding.JSON
 var DefaultOptions = Options{
 	Directory: "gokv",
-	// No need to set MarshalFormat to JSON
-	// because its zero value is fine.
+	Codec:     encoding.JSON,
 }
 
 // NewStore creates a new Go map store.
@@ -184,6 +157,9 @@ func NewStore(options Options) (Store, error) {
 	if options.Directory == "" {
 		options.Directory = DefaultOptions.Directory
 	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
 
 	err := os.MkdirAll(options.Directory, 0700)
 	if err != nil {
@@ -191,10 +167,9 @@ func NewStore(options Options) (Store, error) {
 	}
 
 	var fileSuffix string
-	switch options.MarshalFormat {
-	case JSON:
+	if _, ok := options.Codec.(encoding.JSONcodec); ok {
 		fileSuffix = ".json"
-	case Gob:
+	} else if _, ok := options.Codec.(encoding.GobCodec); ok {
 		fileSuffix = ".gob"
 	}
 
@@ -202,7 +177,7 @@ func NewStore(options Options) (Store, error) {
 	result.locksLock = new(sync.Mutex)
 	result.fileLocks = make(map[string]*sync.RWMutex)
 	result.fileSuffix = fileSuffix
-	result.marshalFormat = options.MarshalFormat
+	result.codec = options.Codec
 
 	return result, nil
 }

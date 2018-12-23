@@ -1,11 +1,11 @@
 package memcached
 
 import (
-	"errors"
 	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -13,8 +13,8 @@ var defaultTimeout = 200 * time.Millisecond
 
 // Client is a gokv.Store implementation for Memcached.
 type Client struct {
-	c             *memcache.Client
-	marshalFormat MarshalFormat
+	c     *memcache.Client
+	codec encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -27,16 +27,7 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that Memcached can handle
-	var data []byte
-	var err error
-	switch c.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := c.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -74,14 +65,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	data := item.Value
 
-	switch c.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, c.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -106,16 +90,6 @@ func (c Client) Close() error {
 	return nil
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the Memcached client.
 type Options struct {
 	// Addresses of all Memcached servers, including their port.
@@ -134,18 +108,18 @@ type Options struct {
 	// 0 will lead to the default value being used.
 	// Optional (100 by default).
 	MaxIdleConns int
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// Addresses: "localhost:11211", Timeout: 200 milliseconds, MaxIdleConns: 100, MarshalFormat: JSON
+// Addresses: "localhost:11211", Timeout: 200 milliseconds, MaxIdleConns: 100, Codec: encoding.JSON
 var DefaultOptions = Options{
 	Addresses:    []string{"localhost:11211"},
 	Timeout:      &defaultTimeout,
 	MaxIdleConns: 100,
-	// No need to set MarshalFormat to JSON because its zero value is fine.
+	Codec:        encoding.JSON,
 }
 
 // NewClient creates a new Memcached client.
@@ -162,13 +136,16 @@ func NewClient(options Options) (Client, error) {
 	if options.MaxIdleConns == 0 {
 		options.MaxIdleConns = DefaultOptions.MaxIdleConns
 	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
 
 	mc := memcache.New(options.Addresses...)
 	mc.Timeout = *options.Timeout
 	mc.MaxIdleConns = options.MaxIdleConns
 
 	result.c = mc
-	result.marshalFormat = options.MarshalFormat
+	result.codec = options.Codec
 
 	return result, nil
 }

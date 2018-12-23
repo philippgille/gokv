@@ -7,6 +7,7 @@ import (
 	// but we'll use the package's ParseDNS() function so we make this an actual import.
 	_ "github.com/lib/pq"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/sql"
 )
 
@@ -16,16 +17,6 @@ const defaultDBname = "gokv"
 type Client struct {
 	*sql.Client
 }
-
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
 
 // Options are the options for the PostgreSQL client.
 type Options struct {
@@ -49,18 +40,18 @@ type Options struct {
 	// -1 for no limit. 0 will lead to the default value (100) being set.
 	// Optional (100 by default).
 	MaxOpenConnections int
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// ConnectionURL: "postgres://postgres@/gokv?sslmode=disable", TableName: "Item", MaxOpenConnections: 100, MarshalFormat: JSON
+// ConnectionURL: "postgres://postgres@/gokv?sslmode=disable", TableName: "Item", MaxOpenConnections: 100, Codec: encoding.JSON
 var DefaultOptions = Options{
 	ConnectionURL:      "postgres://postgres@/" + defaultDBname + "?sslmode=disable",
 	TableName:          "Item",
 	MaxOpenConnections: 100,
-	// No need to set MarshalFormat to JSON because its zero value is fine.
+	Codec:              encoding.JSON,
 }
 
 // NewClient creates a new PostgreSQL client.
@@ -80,6 +71,9 @@ func NewClient(options Options) (Client, error) {
 		options.MaxOpenConnections = DefaultOptions.MaxOpenConnections
 	} else if options.MaxOpenConnections == -1 {
 		options.MaxOpenConnections = 0 // 0 actually leads to the PostgreSQL driver using no connection limit.
+	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
 	}
 
 	db, err := gosql.Open("postgres", options.ConnectionURL)
@@ -124,8 +118,7 @@ func NewClient(options Options) (Client, error) {
 		InsertStmt: insertStmt,
 		GetStmt:    getStmt,
 		DeleteStmt: deleteStmt,
-		// TODO: This cast requires the order of the enum values to be the same. Fix with #47.
-		MarshalFormat: sql.MarshalFormat(options.MarshalFormat),
+		Codec:      options.Codec,
 	}
 
 	result.Client = &c

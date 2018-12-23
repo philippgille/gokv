@@ -1,10 +1,9 @@
 package freecache
 
 import (
-	"errors"
-
 	"github.com/coocood/freecache"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -12,8 +11,8 @@ const minSize = 512 * 1024
 
 // Store is a gokv.Store implementation for FreeCache.
 type Store struct {
-	s             *freecache.Cache
-	marshalFormat MarshalFormat
+	s     *freecache.Cache
+	codec encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -24,16 +23,7 @@ func (s Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	var data []byte
-	var err error
-	switch s.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := s.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -60,14 +50,7 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	switch s.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, s.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -90,16 +73,6 @@ func (s Store) Close() error {
 	return nil
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the FreeCache store.
 type Options struct {
 	// The size of the cache in bytes.
@@ -110,17 +83,16 @@ type Options struct {
 	// old entries are evicted.
 	// Optional (256 MiB by default).
 	Size int
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// Size: 256 MiB, MarshalFormat: JSON
+// Size: 256 MiB, Codec: encoding.JSON
 var DefaultOptions = Options{
-	Size: 256 * 1024 * 1024,
-	// No need to set MarshalFormat to JSON
-	// because its zero value is fine.
+	Size:  256 * 1024 * 1024,
+	Codec: encoding.JSON,
 }
 
 // NewStore creates a FreeCache store.
@@ -133,11 +105,14 @@ func NewStore(options Options) Store {
 	} else if options.Size < minSize {
 		options.Size = minSize
 	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
 
 	cache := freecache.NewCache(options.Size)
 
 	return Store{
-		s:             cache,
-		marshalFormat: options.MarshalFormat,
+		s:     cache,
+		codec: options.Codec,
 	}
 }

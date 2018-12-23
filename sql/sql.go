@@ -1,20 +1,19 @@
 package sql
 
 import (
-	"errors"
-
 	"database/sql"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
 // Client is a gokv.Store implementation for SQL databases.
 type Client struct {
-	C             *sql.DB
-	InsertStmt    *sql.Stmt
-	GetStmt       *sql.Stmt
-	DeleteStmt    *sql.Stmt
-	MarshalFormat MarshalFormat
+	C          *sql.DB
+	InsertStmt *sql.Stmt
+	GetStmt    *sql.Stmt
+	DeleteStmt *sql.Stmt
+	Codec      encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -26,23 +25,11 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that the SQL database can handle
-	var data []byte
-	var err error
-	switch c.MarshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := c.Codec.Marshal(v)
 	if err != nil {
 		return err
 	}
 
-	if err != nil {
-		return err
-	}
 	_, err = c.InsertStmt.Exec(k, data)
 	if err != nil {
 		return err
@@ -73,14 +60,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	data := *dataPtr
 
-	switch c.MarshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, c.Codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -100,16 +80,6 @@ func (c Client) Delete(k string) error {
 func (c Client) Close() error {
 	return c.C.Close()
 }
-
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
 
 // CreateDB creates a database with the given name.
 // Note 1: When the DataSourceName already contained a database name

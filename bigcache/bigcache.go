@@ -1,11 +1,11 @@
 package bigcache
 
 import (
-	"errors"
 	"time"
 
 	"github.com/allegro/bigcache"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -13,8 +13,8 @@ const minSize = 512 * 1024
 
 // Store is a gokv.Store implementation for BigCache.
 type Store struct {
-	s             *bigcache.BigCache
-	marshalFormat MarshalFormat
+	s     *bigcache.BigCache
+	codec encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -25,16 +25,7 @@ func (s Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	var data []byte
-	var err error
-	switch s.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := s.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -61,14 +52,7 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	switch s.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, s.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -95,16 +79,6 @@ func (s Store) Close() error {
 	return s.s.Close()
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the BigCache store.
 type Options struct {
 	// The maximum size of the cache in MiB.
@@ -118,16 +92,16 @@ type Options struct {
 	// the oldest entries will be evicted nonetheless when new ones are stored.
 	// Optional (0 by default, meaning no eviction).
 	Eviction time.Duration
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// HardMaxCacheSize: 0 (no limit), Eviction: 0 (no limit), MarshalFormat: JSON
+// HardMaxCacheSize: 0 (no limit), Eviction: 0 (no limit), Codec: encoding.JSON
 var DefaultOptions = Options{
-	// No need to set Eviction, HardMaxCacheSize or MarshalFormat
-	// because their zero values are fine.
+	Codec: encoding.JSON,
+	// No need to set Eviction or HardMaxCacheSize because their zero values are fine.
 }
 
 // NewStore creates a BigCache store.
@@ -135,6 +109,11 @@ var DefaultOptions = Options{
 // You should call the Close() method on the store when you're done working with it.
 func NewStore(options Options) (Store, error) {
 	result := Store{}
+
+	// Set default options
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
 
 	config := bigcache.DefaultConfig(options.Eviction)
 	config.HardMaxCacheSize = options.HardMaxCacheSize
@@ -144,7 +123,7 @@ func NewStore(options Options) (Store, error) {
 	}
 
 	result.s = cache
-	result.marshalFormat = options.MarshalFormat
+	result.codec = options.Codec
 
 	return result, nil
 }

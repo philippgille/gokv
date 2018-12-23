@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	awsdynamodb "github.com/aws/aws-sdk-go/service/dynamodb"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -22,9 +23,9 @@ var valAttrName = "v"
 
 // Client is a gokv.Store implementation for DynamoDB.
 type Client struct {
-	c             *awsdynamodb.DynamoDB
-	tableName     string
-	marshalFormat MarshalFormat
+	c         *awsdynamodb.DynamoDB
+	tableName string
+	codec     encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -36,16 +37,7 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that DynamoDB can handle.
-	var data []byte
-	var err error
-	switch c.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := c.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -102,14 +94,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	data := attributeVal.B
 
-	switch c.marshalFormat {
-	case JSON:
-		return true, util.FromJSON([]byte(data), v)
-	case Gob:
-		return true, util.FromGob([]byte(data), v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, c.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -137,16 +122,6 @@ func (c Client) Delete(k string) error {
 func (c Client) Close() error {
 	return nil
 }
-
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
 
 // Options are the options for the DynamoDB client.
 type Options struct {
@@ -195,23 +170,24 @@ type Options struct {
 	// See https://hub.docker.com/r/amazon/dynamodb-local/.
 	// Optional ("" by default)
 	CustomEndpoint string
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
 // Region: "" (use shared config file or environment variable), TableName: "gokv",
 // AWSaccessKeyID: "" (use shared credentials file or environment variable),
 // AWSsecretAccessKey: "" (use shared credentials file or environment variable),
-// CustomEndpoint: "", MarshalFormat: JSON
+// CustomEndpoint: "", Codec: encoding.JSON
 var DefaultOptions = Options{
 	TableName:            "gokv",
 	ReadCapacityUnits:    5,
 	WriteCapacityUnits:   5,
 	WaitForTableCreation: aws.Bool(true),
+	Codec:                encoding.JSON,
 	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
-	// MarshalFormat or CustomEndpoint because their Go zero values are fine.
+	// or CustomEndpoint because their Go zero values are fine.
 }
 
 // NewClient creates a new DynamoDB client.
@@ -235,6 +211,9 @@ func NewClient(options Options) (Client, error) {
 	}
 	if options.WaitForTableCreation == nil {
 		options.WaitForTableCreation = DefaultOptions.WaitForTableCreation
+	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
 	}
 	// Set credentials only if set in the options.
 	// If not set, the SDK uses the shared credentials file or environment variables, which is the preferred way.
@@ -332,7 +311,7 @@ func NewClient(options Options) (Client, error) {
 
 	result.c = svc
 	result.tableName = options.TableName
-	result.marshalFormat = options.MarshalFormat
+	result.codec = options.Codec
 
 	return result, nil
 }
