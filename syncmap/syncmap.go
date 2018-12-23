@@ -1,16 +1,16 @@
 package syncmap
 
 import (
-	"errors"
 	"sync"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
 // Store is a gokv.Store implementation for a Go sync.Map.
 type Store struct {
-	m             *sync.Map
-	marshalFormat MarshalFormat
+	m     *sync.Map
+	codec encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -21,16 +21,7 @@ func (s Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	var data []byte
-	var err error
-	switch s.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := s.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -50,19 +41,15 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	data, found := s.m.Load(k)
+	dataInterface, found := s.m.Load(k)
 	if !found {
 		return false, nil
 	}
+	// No need to check "ok" return value in type assertion,
+	// because we control the map and we only put slices of bytes in the map.
+	data := dataInterface.([]byte)
 
-	switch s.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data.([]byte), v)
-	case Gob:
-		return true, util.FromGob(data.([]byte), v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, s.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -85,36 +72,30 @@ func (s Store) Close() error {
 	return nil
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the Go sync.Map store.
 type Options struct {
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// MarshalFormat: JSON
+// Codec: encoding.JSON
 var DefaultOptions = Options{
-	// No need to set MarshalFormat to JSON
-	// because its zero value is fine.
+	Codec: encoding.JSON,
 }
 
 // NewStore creates a new Go sync.Map store.
 //
 // You should call the Close() method on the store when you're done working with it.
 func NewStore(options Options) Store {
+	// Set default values
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
+
 	return Store{
-		m:             &sync.Map{},
-		marshalFormat: options.MarshalFormat,
+		m:     &sync.Map{},
+		codec: options.Codec,
 	}
 }

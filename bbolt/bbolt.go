@@ -1,18 +1,17 @@
 package bbolt
 
 import (
-	"errors"
-
 	bolt "github.com/etcd-io/bbolt"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
 // Store is a gokv.Store implementation for bbolt (formerly known as Bolt / Bolt DB).
 type Store struct {
-	db            *bolt.DB
-	bucketName    string
-	marshalFormat MarshalFormat
+	db         *bolt.DB
+	bucketName string
+	codec      encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -24,16 +23,7 @@ func (s Store) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that bbolt can handle
-	var data []byte
-	var err error
-	switch s.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := s.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -83,14 +73,7 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, nil
 	}
 
-	switch s.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, s.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -113,16 +96,6 @@ func (s Store) Close() error {
 	return s.db.Close()
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the bbolt store.
 type Options struct {
 	// Bucket name for storing the key-value pairs.
@@ -131,18 +104,17 @@ type Options struct {
 	// Path of the DB file.
 	// Optional ("bbolt.db" by default).
 	Path string
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// BucketName: "default", Path: "bbolt.db", MarshalFormat: JSON
+// BucketName: "default", Path: "bbolt.db", Codec: encoding.JSON
 var DefaultOptions = Options{
 	BucketName: "default",
 	Path:       "bbolt.db",
-	// No need to set MarshalFormat to JSON
-	// because its zero value is fine.
+	Codec:      encoding.JSON,
 }
 
 // NewStore creates a new bbolt store.
@@ -159,6 +131,9 @@ func NewStore(options Options) (Store, error) {
 	}
 	if options.Path == "" {
 		options.Path = DefaultOptions.Path
+	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
 	}
 
 	// Open DB
@@ -180,11 +155,9 @@ func NewStore(options Options) (Store, error) {
 		return result, err
 	}
 
-	result = Store{
-		db:            db,
-		bucketName:    options.BucketName,
-		marshalFormat: options.MarshalFormat,
-	}
+	result.db = db
+	result.bucketName = options.BucketName
+	result.codec = options.Codec
 
 	return result, nil
 }

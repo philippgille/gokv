@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/file"
 	"github.com/philippgille/gokv/test"
 )
@@ -13,13 +14,13 @@ import (
 func TestStore(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
-		store := createStore(t, file.JSON)
+		store := createStore(t, encoding.JSON)
 		test.TestStore(store, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
-		store := createStore(t, file.Gob)
+		store := createStore(t, encoding.Gob)
 		test.TestStore(store, t)
 	})
 }
@@ -28,13 +29,13 @@ func TestStore(t *testing.T) {
 func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
-		store := createStore(t, file.JSON)
+		store := createStore(t, encoding.JSON)
 		test.TestTypes(store, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
-		store := createStore(t, file.Gob)
+		store := createStore(t, encoding.Gob)
 		test.TestTypes(store, t)
 	})
 }
@@ -42,7 +43,7 @@ func TestTypes(t *testing.T) {
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 // The store is Go map with manual locking via sync.RWMutex, so testing this is important.
 func TestStoreConcurrent(t *testing.T) {
-	store := createStore(t, file.JSON)
+	store := createStore(t, encoding.JSON)
 
 	goroutineCount := 1000
 
@@ -51,22 +52,9 @@ func TestStoreConcurrent(t *testing.T) {
 
 // TestErrors tests some error cases.
 func TestErrors(t *testing.T) {
-	// Test with a bad MarshalFormat enum value
-
-	store := createStore(t, file.MarshalFormat(19))
-	err := store.Set("foo", "bar")
-	if err == nil {
-		t.Error("An error should have occurred, but didn't")
-	}
-	// TODO: store some value for "foo", so retrieving the value works.
-	// Just the unmarshalling should fail.
-	// _, err = store.Get("foo", new(string))
-	// if err == nil {
-	// 	t.Error("An error should have occurred, but didn't")
-	// }
-
 	// Test empty key
-	err = store.Set("", "bar")
+	store := createStore(t, encoding.JSON)
+	err := store.Set("", "bar")
 	if err == nil {
 		t.Error("Expected an error")
 	}
@@ -85,7 +73,7 @@ func TestNil(t *testing.T) {
 	// Test setting nil
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
-		store := createStore(t, file.JSON)
+		store := createStore(t, encoding.JSON)
 		err := store.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -93,7 +81,7 @@ func TestNil(t *testing.T) {
 	})
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
-		store := createStore(t, file.Gob)
+		store := createStore(t, encoding.Gob)
 		err := store.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -102,9 +90,9 @@ func TestNil(t *testing.T) {
 
 	// Test passing nil or pointer to nil value for retrieval
 
-	createTest := func(mf file.MarshalFormat) func(t *testing.T) {
+	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
-			store := createStore(t, mf)
+			store := createStore(t, codec)
 
 			// Prep
 			err := store.Set("foo", test.Foo{Bar: "baz"})
@@ -130,20 +118,20 @@ func TestNil(t *testing.T) {
 			}
 		}
 	}
-	t.Run("get with nil / nil value parameter", createTest(file.JSON))
-	t.Run("get with nil / nil value parameter", createTest(file.Gob))
+	t.Run("get with nil / nil value parameter", createTest(encoding.JSON))
+	t.Run("get with nil / nil value parameter", createTest(encoding.Gob))
 }
 
 // TestClose tests if the close method returns any errors.
 func TestClose(t *testing.T) {
-	store := createStore(t, file.JSON)
+	store := createStore(t, encoding.JSON)
 	err := store.Close()
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func createStore(t *testing.T, mf file.MarshalFormat) file.Store {
+func createStore(t *testing.T, codec encoding.Codec) file.Store {
 	tmpDir := os.TempDir() + "/gokv"
 	err := os.RemoveAll(tmpDir)
 	if err != nil {
@@ -151,8 +139,8 @@ func createStore(t *testing.T, mf file.MarshalFormat) file.Store {
 	}
 
 	options := file.Options{
-		Directory:     tmpDir,
-		MarshalFormat: mf,
+		Directory: tmpDir,
+		Codec:     codec,
 	}
 	store, err := file.NewStore(options)
 	if err != nil {

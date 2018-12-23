@@ -7,6 +7,7 @@ import (
 
 	"go.etcd.io/etcd/clientv3"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -14,9 +15,9 @@ var defaultTimeout = 200 * time.Millisecond
 
 // Client is a gokv.Store implementation for etcd.
 type Client struct {
-	c             *clientv3.Client
-	timeOut       time.Duration
-	marshalFormat MarshalFormat
+	c       *clientv3.Client
+	timeOut time.Duration
+	codec   encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -28,16 +29,7 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that etcd can handle
-	var data []byte
-	var err error
-	switch c.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := c.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -76,14 +68,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	data := kvs[0].Value
 
-	switch c.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, c.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -106,16 +91,6 @@ func (c Client) Close() error {
 	return c.c.Close()
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the etcd client.
 type Options struct {
 	// Addresses of the etcd servers in the cluster, including port.
@@ -124,17 +99,17 @@ type Options struct {
 	// The timeout for operations.
 	// Optional (200 * time.Millisecond by default).
 	Timeout *time.Duration
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// Endpoints: []string{"localhost:2379"}, Timeout: 200 * time.Millisecond, MarshalFormat: JSON
+// Endpoints: []string{"localhost:2379"}, Timeout: 200 * time.Millisecond, Codec: encoding.JSON
 var DefaultOptions = Options{
 	Endpoints: []string{"localhost:2379"},
 	Timeout:   &defaultTimeout,
-	// No need to set MarshalFormat to JSON because its zero value is fine.
+	Codec:     encoding.JSON,
 }
 
 // NewClient creates a new etcd client.
@@ -149,6 +124,9 @@ func NewClient(options Options) (Client, error) {
 	}
 	if options.Timeout == nil {
 		options.Timeout = DefaultOptions.Timeout
+	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
 	}
 
 	// clientv3.New() should block when a DialTimeout is set,
@@ -174,10 +152,9 @@ func NewClient(options Options) (Client, error) {
 		return result, errors.New("The status response from etcd was nil")
 	}
 
-	result = Client{
-		c:             cli,
-		timeOut:       *options.Timeout,
-		marshalFormat: options.MarshalFormat,
-	}
+	result.c = cli
+	result.timeOut = *options.Timeout
+	result.codec = options.Codec
+
 	return result, nil
 }

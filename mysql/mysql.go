@@ -7,6 +7,7 @@ import (
 	// but we'll use the package's ParseDNS() function so we make this an actual import.
 	gosqldriver "github.com/go-sql-driver/mysql"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/sql"
 )
 
@@ -68,16 +69,6 @@ func (c Client) Close() error {
 	return c.c.Close()
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the MySQL client.
 type Options struct {
 	// Connection string.
@@ -100,18 +91,18 @@ type Options struct {
 	// -1 for no limit. 0 will lead to the default value (100) being set.
 	// Optional (100 by default).
 	MaxOpenConnections int
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// DataSourceName: "root@/gokv", TableName: "Item", MaxOpenConnections: 100, MarshalFormat: JSON
+// DataSourceName: "root@/gokv", TableName: "Item", MaxOpenConnections: 100, Codec: encoding.JSON
 var DefaultOptions = Options{
 	DataSourceName:     "root@/" + defaultDBname,
 	TableName:          "Item",
 	MaxOpenConnections: 100,
-	// No need to set MarshalFormat to JSON because its zero value is fine.
+	Codec:              encoding.JSON,
 }
 
 // NewClient creates a new MySQL client.
@@ -131,6 +122,9 @@ func NewClient(options Options) (Client, error) {
 		options.MaxOpenConnections = DefaultOptions.MaxOpenConnections
 	} else if options.MaxOpenConnections == -1 {
 		options.MaxOpenConnections = 0 // 0 actually leads to the MySQL driver using no connection limit.
+	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
 	}
 
 	db, err := gosql.Open("mysql", options.DataSourceName)
@@ -245,8 +239,7 @@ func NewClient(options Options) (Client, error) {
 		InsertStmt: insertStmt,
 		GetStmt:    getStmt,
 		DeleteStmt: deleteStmt,
-		// TODO: This cast requires the order of the enum values to be the same. Fix with #47.
-		MarshalFormat: sql.MarshalFormat(options.MarshalFormat),
+		Codec:      options.Codec,
 	}
 
 	result.c = &c

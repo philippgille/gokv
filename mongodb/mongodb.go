@@ -1,11 +1,11 @@
 package mongodb
 
 import (
-	"errors"
 	"time"
 
 	"github.com/globalsign/mgo"
 
+	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
@@ -40,8 +40,8 @@ type item struct {
 type Client struct {
 	c *mgo.Collection
 	// Only needed for closing.
-	session       *mgo.Session
-	marshalFormat MarshalFormat
+	session *mgo.Session
+	codec   encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -53,16 +53,7 @@ func (c Client) Set(k string, v interface{}) error {
 	}
 
 	// First turn the passed object into something that MongoDB can handle
-	var data []byte
-	var err error
-	switch c.marshalFormat {
-	case JSON:
-		data, err = util.ToJSON(v)
-	case Gob:
-		data, err = util.ToGob(v)
-	default:
-		err = errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	data, err := c.codec.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -102,14 +93,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	data := item.V
 
-	switch c.marshalFormat {
-	case JSON:
-		return true, util.FromJSON(data, v)
-	case Gob:
-		return true, util.FromGob(data, v)
-	default:
-		return true, errors.New("The store seems to be configured with a marshal format that's not implemented yet")
-	}
+	return true, c.codec.Unmarshal(data, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -134,16 +118,6 @@ func (c Client) Close() error {
 	return nil
 }
 
-// MarshalFormat is an enum for the available (un-)marshal formats of this gokv.Store implementation.
-type MarshalFormat int
-
-const (
-	// JSON is the MarshalFormat for (un-)marshalling to/from JSON
-	JSON MarshalFormat = iota
-	// Gob is the MarshalFormat for (un-)marshalling to/from gob
-	Gob
-)
-
 // Options are the options for the MongoDB client.
 type Options struct {
 	// Seed servers for the initial connection to the MongoDB cluster.
@@ -160,18 +134,18 @@ type Options struct {
 	// The name of the collection to use.
 	// Optional ("item" by default).
 	CollectionName string
-	// (Un-)marshal format.
-	// Optional (JSON by default).
-	MarshalFormat MarshalFormat
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// ConnectionString: "localhost", DatabaseName: "gokv", CollectionName: "item", MarshalFormat: JSON
+// ConnectionString: "localhost", DatabaseName: "gokv", CollectionName: "item", Codec: encoding.JSON
 var DefaultOptions = Options{
 	ConnectionString: "localhost",
 	DatabaseName:     "gokv",
 	CollectionName:   "item",
-	// No need to set MarshalFormat to JSON because its zero value is fine.
+	Codec:            encoding.JSON,
 }
 
 // NewClient creates a new MongoDB client.
@@ -190,6 +164,9 @@ func NewClient(options Options) (Client, error) {
 	if options.CollectionName == "" {
 		options.CollectionName = DefaultOptions.CollectionName
 	}
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
 
 	session, err := mgo.DialWithTimeout(options.ConnectionString, 2*time.Second)
 	if err != nil {
@@ -199,7 +176,7 @@ func NewClient(options Options) (Client, error) {
 
 	result.c = c
 	result.session = session
-	result.marshalFormat = options.MarshalFormat
+	result.codec = options.Codec
 
 	return result, nil
 }
