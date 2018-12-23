@@ -80,7 +80,10 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
 - NewSQL
     - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
+- Multi-model
     - [ ] [Apache Ignite](https://github.com/apache/ignite)
+    - [ ] [ArangoDB](https://github.com/arangodb/arangodb)
+    - [ ] [OrientDB](https://github.com/orientechnologies/orientdb)
 
 Again:  
 For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  
@@ -254,6 +257,10 @@ Design decisions
     - > Note: In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
 - Similar projects name the structs that are implementations of the store interface according to the backing store, for example `boltdb.BoltDB`, but this leads to so called "stuttering" that's discouraged when writing idiomatic Go. That's why `gokv` uses for example `bbolt.Store` and `syncmap.Store`. For easier differentiation between embedded DBs and DBs that have a client and a server component though, the first ones are called `Store` and the latter ones are called `Client`, for example `redis.Client`.
 - All errors are implementation-specific. We could introduce a `gokv.StoreError` type and define some constants like a `SetError` or something more specific like a `TimeoutError`, but non-specific errors don't help the package user, and specific errors would make it very hard to create and especially maintain a `gokv.Store` implementation. You would need to know exactly in which cases the package (that the implementation uses) returns errors, what the errors mean (to "translate" them) and keep up with changes and additions of errors in the package. So instead, errors are just forwarded. For example, if you use the `dynamodb` package, the returned errors will be errors from the `"github.com/aws/aws-sdk-go` package.
+- Keep the terminology of used packages. This might be controversial, because an abstraction / wrapper *unifies* the interface of the used packages. But:
+    1. Naming is hard. If one used package for an embedded database uses `Path` and another `Directory`, then how should be name the option for the database directory? Maybe `Folder`, to add to the confusion? Also, some users might already have used the packages we use directly and they would wonder about the "new" variable name which has the same meaning.  
+    Using the packages' variable names spares us the need to come up with unified, understandable variable names without alienating users who already used the packages we use directly.
+    2. Only few users are going to switch back and forth between `gokv.Store` implementations, so most user won't even notice the differences in variable names.
 
 Related projects
 ----------------
