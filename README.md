@@ -66,11 +66,12 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
     - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
-    - [X] [Amazon S3](https://aws.amazon.com/s3/) / [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) / [Scaleway Object Storage](https://www.scaleway.com/object-storage/) / [OpenStack Swift](https://github.com/openstack/swift) / [Ceph](https://github.com/ceph/ceph) / [Minio](https://github.com/minio/minio) / ...
+    - [X] [Amazon S3](https://aws.amazon.com/s3/) / [Google Cloud Storage](https://cloud.google.com/storage/) / [Alibaba Object Storage Service (OSS)](https://www.alibabacloud.com/en/product/oss) / [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) / [Scaleway Object Storage](https://www.scaleway.com/object-storage/) / [OpenStack Swift](https://github.com/openstack/swift) / [Ceph](https://github.com/ceph/ceph) / [Minio](https://github.com/minio/minio) / ...
     - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
     - [X] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
     - [X] [Google Cloud Datastore](https://cloud.google.com/datastore/)
     - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
+    - [ ] [Alibaba Table Store](https://www.alibabacloud.com/de/product/table-store)
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
     - [X] [PostgreSQL](https://github.com/postgres/postgres)

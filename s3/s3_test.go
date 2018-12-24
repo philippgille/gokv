@@ -218,6 +218,7 @@ func TestClose(t *testing.T) {
 func checkConnection() bool {
 	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
 	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+	// No S3ForcePathStyle required because we're not accessing a specific bucket here.
 	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID).WithEndpoint(customEndpoint))
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
@@ -238,10 +239,11 @@ func createClient(t *testing.T, codec encoding.Codec) s3.Client {
 	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
 	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
 	options := s3.Options{
-		BucketName:     "gokv",
-		Region:         endpoints.EuCentral1RegionID,
-		CustomEndpoint: customEndpoint,
-		Codec:          codec,
+		BucketName:             "gokv",
+		Region:                 endpoints.EuCentral1RegionID,
+		CustomEndpoint:         customEndpoint,
+		UsePathStyleAddressing: true,
+		Codec: codec,
 	}
 	client, err := s3.NewClient(options)
 	if err != nil {

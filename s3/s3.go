@@ -118,9 +118,11 @@ type Options struct {
 	// Optional (read from shared config file or environment variable if not set).
 	// Environment variable: "AWS_REGION".
 	//
-	// Note: A region is required even when using an S3-compatible cloud service or self-hosted solution.
-	// When running Minio locally for example, you can set any value.
-	// When using Scaleway Object Storage for example, you can set "nl-ams".
+	// Note: A region is also required when using an S3-compatible cloud service and even when using a self-hosted solution.
+	// Example for Google Cloud Storage: "EUROPE-WEST3".
+	// Example for Alibaba Object Storage Service (OSS): "oss-ap-southeast-1".
+	// Example for Scaleway Object Storage: "nl-ams".
+	// Example for a locally running Minio server: "foo" (any value works).
 	Region string
 	// AWS access key ID (part of the credentials).
 	// Optional (read from shared credentials file or environment variable if not set).
@@ -132,11 +134,21 @@ type Options struct {
 	AWSsecretAccessKey string
 	// CustomEndpoint allows you to set a custom S3 service endpoint.
 	// This must be set if you want to use a different S3-compatible cloud service or self-hosted solution.
-	// For Minio for example this could be "http://localhost:9000".
-	// For Scaleway Object Storage this could be "s3.nl-ams.scw.cloud".
+	// Example for Google Cloud Storage: "storage.googleapis.com".
+	// Example for Alibaba Object Storage Service (OSS): "oss-ap-southeast-1.aliyuncs.com" (depending on the region you want to use).
+	// Example for Scaleway Object Storage: "s3.nl-ams.scw.cloud" (depending on the region you want to use).
+	// Example for a locally running Minio server: "http://localhost:9000".
 	// If you don't include "http://", then HTTPS (with TLS) will be used.
 	// Optional ("" by default)
 	CustomEndpoint string
+	// S3 differentiates between "virtual hosted bucket addressing" and "path-style addressing".
+	// Example URL for the virtual host style: http://BUCKET.s3.amazonaws.com/KEY.
+	// Example UL for the path style: http://s3.amazonaws.com/BUCKET/KEY.
+	// Most S3-compatible servers work with both styles,
+	// but some work only with the virtual host style (e.g. Alibaba Object Storage Service (OSS))
+	// and some work only with the path style (especially self-hosted services like a Minio server running on localhost).
+	// Optional (false by default).
+	UsePathStyleAddressing bool
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
@@ -146,11 +158,11 @@ type Options struct {
 // Region: "" (use shared config file or environment variable),
 // AWSaccessKeyID: "" (use shared credentials file or environment variable),
 // AWSsecretAccessKey: "" (use shared credentials file or environment variable),
-// CustomEndpoint: "", Codec: encoding.JSON
+// CustomEndpoint: "", UsePathStyleAddressing: false, Codec: encoding.JSON
 var DefaultOptions = Options{
 	Codec: encoding.JSON,
 	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
-	// or CustomEndpoint because their Go zero values are fine.
+	// CustomEndpoint or UsePathStyleAddressing because their Go zero values are fine.
 }
 
 // NewClient creates a new S3 client.
@@ -191,17 +203,10 @@ func NewClient(options Options) (Client, error) {
 		config = config.WithCredentials(creds)
 	}
 	if options.CustomEndpoint != "" {
-		// Not only the endpoint must be set, but also the path style must be forced.
-		// By default, S3 uses "virtual hosting", e.g. an object is available with http://BUCKET.s3.amazonaws.com/KEY.
-		// But for example self-hosted solutions like Minio don't support this.
-		// They require http://s3.amazonaws.com/BUCKET/KEY.
-		// Note that when using the path style with the original Amazon S3 service though,
-		// the region must be used as subdomain.
-		// E.g.: http://s3-eu-west-1.amazonaws.com/mybucket/puppy.jpg.
-		//
-		// See https://github.com/aws/aws-sdk-go/blob/eede7b5ad63d23f46805d59ed100c33a3635931a/aws/config.go#L118
-		// and http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html.
-		config = config.WithEndpoint(options.CustomEndpoint).WithS3ForcePathStyle(true)
+		config = config.WithEndpoint(options.CustomEndpoint)
+	}
+	if options.UsePathStyleAddressing {
+		config = config.WithS3ForcePathStyle(true)
 	}
 	// Use shared config file...
 	sessionOpts := session.Options{

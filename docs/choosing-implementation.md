@@ -90,7 +90,7 @@ Implementations
     - [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
         - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
     - [Amazon S3](https://aws.amazon.com/s3/)
-        - Also works for other S3-compatible cloud services like [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) and [Scaleway Object Storage](https://www.scaleway.com/object-storage/), as well as for self-hosted solutions like [OpenStack Swift](https://github.com/openstack/swift), [Ceph](https://github.com/ceph/ceph) and [Minio](https://github.com/minio/minio)
+        - Also works for other S3-compatible cloud services like [Google Cloud Storage](https://cloud.google.com/storage/), [Alibaba Object Storage Service (OSS)](https://www.alibabacloud.com/en/product/oss), [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) and [Scaleway Object Storage](https://www.scaleway.com/object-storage/), as well as for self-hosted solutions like [OpenStack Swift](https://github.com/openstack/swift), [Ceph](https://github.com/ceph/ceph) and [Minio](https://github.com/minio/minio)
         - S3 is advertised as file storage (website assets, images, videos etc.), but any blob can be stored, so the `[]byte` representation of your value that `gokv` gets after automatically marshalling it can be stored as well
         - S3 is designed for high availability and redundancy, as well as low cost (compared to regular cloud databases)
         - S3 is not meant to match the performance of dedicated key-value stores
