@@ -100,7 +100,7 @@ func NewClient(options Options) (Client, error) {
 	// Note: Prepared statements are handled differently from other programming languages in Go,
 	// see: http://go-database-sql.org/prepared.html.
 	// TODO: Prepared statements might prevent the use of other databases that are compatible with the PostgreSQL protocol.
-	insertStmt, err := db.Prepare("INSERT INTO " + options.TableName + " (k, v) VALUES ($1, $2) ON CONFLICT (k) DO UPDATE SET v = $2")
+	upsertStmt, err := db.Prepare("INSERT INTO " + options.TableName + " (k, v) VALUES ($1, $2) ON CONFLICT (k) DO UPDATE SET v = $2")
 	if err != nil {
 		return result, err
 	}
@@ -115,7 +115,7 @@ func NewClient(options Options) (Client, error) {
 
 	c := sql.Client{
 		C:          db,
-		InsertStmt: insertStmt,
+		UpsertStmt: upsertStmt,
 		GetStmt:    getStmt,
 		DeleteStmt: deleteStmt,
 		Codec:      options.Codec,
