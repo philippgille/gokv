@@ -19,6 +19,8 @@ vNext
 - Added: Package `freecache` - A `gokv.Store` implementation for [FreeCache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
 - Added: Package `bigcache` - A `gokv.Store` implementation for [BigCache](https://github.com/allegro/bigcache) (issue [#45](https://github.com/philippgille/gokv/issues/45))
 - Added: Package `postgresql` - A `gokv.Store` implementation for [PostgreSQL](https://github.com/postgres/postgres) (issue [#57](https://github.com/philippgille/gokv/issues/57))
+- Added: Package `cockroachdb` - A `gokv.Store` implementation for [CockroachDB](https://github.com/cockroachdb/cockroach) (issue [#62](https://github.com/philippgille/gokv/issues/62))
+
 
 Breaking changes
 ----------------

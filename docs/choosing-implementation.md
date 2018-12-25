@@ -112,7 +112,8 @@ Implementations
         - [The most popular non-relational database](https://db-engines.com/en/ranking)
     - [Apache Cassandra](https://github.com/apache/cassandra) (⚠️Not implemented yet!)
 - NewSQL
-    - [CockroachDB](https://github.com/cockroachdb/cockroach) (⚠️Not implemented yet!)
+    - [CockroachDB](https://github.com/cockroachdb/cockroach)
+        - Inspired by the Google Spanner design, CockroachDB offers horizontal scalability and replication without sacrificing strong consistency
         - [Official comparison with MongoDB and PostgreSQL](https://www.cockroachlabs.com/docs/stable/cockroachdb-in-comparison.html)
     - [TiDB](https://github.com/pingcap/tidb) (⚠️Not implemented yet!)
 - Multi-model

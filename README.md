@@ -79,7 +79,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [X] [MongoDB](https://github.com/mongodb/mongo)
     - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
 - NewSQL
-    - [ ] [CockroachDB](https://github.com/cockroachdb/cockroach)
+    - [X] [CockroachDB](https://github.com/cockroachdb/cockroach)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
 - Multi-model
     - [ ] [Apache Ignite](https://github.com/apache/ignite)
