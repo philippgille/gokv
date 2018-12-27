@@ -19,8 +19,8 @@ type Client struct {
 // Options are the options for the CockroachDB client.
 type Options struct {
 	// Connection URL.
-	// Format: postgres://username:password@[address]/dbname[?param1=value1&...&paramN=valueN].
-	// Example: "postgres://username:password@host:123/dbname?sslmode=verify-full".
+	// Format: postgres://username[:password]@address/dbname[?param1=value1&...&paramN=valueN].
+	// Example: "postgres://roach:secret@localhost:26257/gokv?sslmode=disable".
 	// The database ("dbname" in the example) must already exist.
 	// For a full list of available connection paramters, see:
 	// https://github.com/cockroachdb/docs/blob/560c4227f4d811c5be9dc8e4a5385e508d0c68e5/v2.1/connection-parameters.md#additional-connection-parameters.
