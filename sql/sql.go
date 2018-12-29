@@ -10,7 +10,7 @@ import (
 // Client is a gokv.Store implementation for SQL databases.
 type Client struct {
 	C          *sql.DB
-	InsertStmt *sql.Stmt
+	UpsertStmt *sql.Stmt
 	GetStmt    *sql.Stmt
 	DeleteStmt *sql.Stmt
 	Codec      encoding.Codec
@@ -30,7 +30,7 @@ func (c Client) Set(k string, v interface{}) error {
 		return err
 	}
 
-	_, err = c.InsertStmt.Exec(k, data)
+	_, err = c.UpsertStmt.Exec(k, data)
 	if err != nil {
 		return err
 	}
