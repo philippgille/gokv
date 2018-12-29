@@ -120,7 +120,7 @@ type Options struct {
 	//
 	// Note: A region is also required when using an S3-compatible cloud service and even when using a self-hosted solution.
 	// Example for Google Cloud Storage: "EUROPE-WEST3".
-	// Example for Alibaba Object Storage Service (OSS): "oss-ap-southeast-1".
+	// Example for Alibaba Cloud Object Storage Service (OSS): "oss-ap-southeast-1".
 	// Example for Scaleway Object Storage: "nl-ams".
 	// Example for a locally running Minio server: "foo" (any value works).
 	Region string
@@ -135,7 +135,7 @@ type Options struct {
 	// CustomEndpoint allows you to set a custom S3 service endpoint.
 	// This must be set if you want to use a different S3-compatible cloud service or self-hosted solution.
 	// Example for Google Cloud Storage: "storage.googleapis.com".
-	// Example for Alibaba Object Storage Service (OSS): "oss-ap-southeast-1.aliyuncs.com" (depending on the region you want to use).
+	// Example for Alibaba Cloud Object Storage Service (OSS): "oss-ap-southeast-1.aliyuncs.com" (depending on the region you want to use).
 	// Example for Scaleway Object Storage: "s3.nl-ams.scw.cloud" (depending on the region you want to use).
 	// Example for a locally running Minio server: "http://localhost:9000".
 	// If you don't include "http://", then HTTPS (with TLS) will be used.
@@ -145,7 +145,7 @@ type Options struct {
 	// Example URL for the virtual host style: http://BUCKET.s3.amazonaws.com/KEY.
 	// Example UL for the path style: http://s3.amazonaws.com/BUCKET/KEY.
 	// Most S3-compatible servers work with both styles,
-	// but some work only with the virtual host style (e.g. Alibaba Object Storage Service (OSS))
+	// but some work only with the virtual host style (e.g. Alibaba Cloud Object Storage Service (OSS))
 	// and some work only with the path style (especially self-hosted services like a Minio server running on localhost).
 	// Optional (false by default).
 	UsePathStyleAddressing bool
