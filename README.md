@@ -82,7 +82,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [X] [CockroachDB](https://github.com/cockroachdb/cockroach)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
 - Multi-model
-    - [ ] [Apache Ignite](https://github.com/apache/ignite)
+    - [X] [Apache Ignite](https://github.com/apache/ignite)
     - [ ] [ArangoDB](https://github.com/arangodb/arangodb)
     - [ ] [OrientDB](https://github.com/orientechnologies/orientdb)
 

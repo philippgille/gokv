@@ -117,7 +117,9 @@ Implementations
         - [Official comparison with MongoDB and PostgreSQL](https://www.cockroachlabs.com/docs/stable/cockroachdb-in-comparison.html)
     - [TiDB](https://github.com/pingcap/tidb) (⚠️Not implemented yet!)
 - Multi-model
-    - [Apache Ignite](https://github.com/apache/ignite) (⚠️Not implemented yet!)
+    - [Apache Ignite](https://github.com/apache/ignite)
+        - The `gokv.Store` implementation uses the key-value store model of Ignite.
+        - The key-value store model seems to be meant to be used as cache by default, so the Ignite administrator must ensure the proper configuration for persistence. See: [https://apacheignite.readme.io/docs/distributed-persistent-store](https://apacheignite.readme.io/docs/distributed-persistent-store).
     - [ArangoDB](https://github.com/arangodb/arangodb) (⚠️Not implemented yet!)
     - [OrientDB](https://github.com/orientechnologies/orientdb) (⚠️Not implemented yet!)
         - Claims to be the fastest graph database

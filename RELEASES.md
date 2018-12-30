@@ -20,6 +20,7 @@ vNext
 - Added: Package `bigcache` - A `gokv.Store` implementation for [BigCache](https://github.com/allegro/bigcache) (issue [#45](https://github.com/philippgille/gokv/issues/45))
 - Added: Package `postgresql` - A `gokv.Store` implementation for [PostgreSQL](https://github.com/postgres/postgres) (issue [#57](https://github.com/philippgille/gokv/issues/57))
 - Added: Package `cockroachdb` - A `gokv.Store` implementation for [CockroachDB](https://github.com/cockroachdb/cockroach) (issue [#62](https://github.com/philippgille/gokv/issues/62))
+- Added: Package `ignite` - A `gokv.Store` implementation for [Apache Ignite](https://github.com/apache/ignite) (issue [#64](https://github.com/philippgille/gokv/issues/64))
 
 
 Breaking changes
