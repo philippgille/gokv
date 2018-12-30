@@ -83,10 +83,15 @@ script:
   - docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'
   - go test -v -race -coverprofile=coverage9.txt -covermode=atomic ./cockroachdb
   - docker stop cockroachdb
+  # Test Apache Ignite
+  - docker run -d --rm --name ignite -e "CONFIG_URI=https://raw.githubusercontent.com/apache/ignite/master/examples/config/example-cache.xml" -p 10800:10800 apacheignite/ignite
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage10.txt -covermode=atomic ./ignite
+  - docker stop ignite
 
 after_success:
   # Combine coverage reports.
   # (Using grep to skip the first line of each coverage report (there's probably a more elegant way to do this).)
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt && cat coverage9.txt | grep gokv >> coverage.txt
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt && cat coverage9.txt | grep gokv >> coverage.txt && cat coverage10.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
