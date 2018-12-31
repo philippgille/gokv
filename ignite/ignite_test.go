@@ -202,7 +202,7 @@ func checkConnection() bool {
 }
 
 func createClient(t *testing.T, codec encoding.Codec) ignite.Client {
-	options := ignite.DefaultOptions
+	options := ignite.Options{}
 	client, err := ignite.NewClient(options)
 	if err != nil {
 		t.Fatal(err)
