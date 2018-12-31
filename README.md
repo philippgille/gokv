@@ -60,6 +60,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [X] [Redis](https://github.com/antirez/redis)
     - [X] [Consul](https://github.com/hashicorp/consul)
     - [X] [etcd](https://github.com/etcd-io/etcd)
+    - [ ] [Apache ZooKeeper](https://github.com/apache/zookeeper)
     - [ ] [TiKV](https://github.com/tikv/tikv)
 - Distributed cache (no presistence *by default*)
     - [X] [Memcached](https://github.com/memcached/memcached)

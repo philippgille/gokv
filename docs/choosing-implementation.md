@@ -80,6 +80,7 @@ Implementations
         - It's used for example in [Kubernetes](https://github.com/kubernetes/kubernetes)
         - [Official comparison with ZooKeeper, Consul and some NewSQL databases](https://github.com/etcd-io/etcd/blob/bda28c3ce2740ef5693ca389d34c4209e431ff92/Documentation/learning/why.md#comparison-chart)
         - > Note: *By default*, the maximum request size is 1.5 MiB and the storage size limit is 2 GB. See the [documentation](https://github.com/etcd-io/etcd/blob/73028efce7d3406a19a81efd8106903eae8f4c79/Documentation/dev-guide/limit.md).
+    - [Apache ZooKeeper](https://github.com/apache/zookeeper) (⚠️Not implemented yet!)
     - [TiKV](https://github.com/tikv/tikv) (⚠️Not implemented yet!)
         - Originally created as foundation of [TiDB](https://github.com/pingcap/tidb), but acts as a proper key-value store on its own and [became a project in the CNCF](https://www.cncf.io/blog/2018/08/28/cncf-to-host-tikv-in-the-sandbox/)
 - Distributed cache
@@ -102,6 +103,7 @@ Implementations
     - [Google Cloud Datastore](https://cloud.google.com/datastore/)
     - [Google Cloud Firestore](https://cloud.google.com/firestore/)
         - Currently still in beta, but might become the successor to Cloud Datastore
+    - [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store) (⚠️Not implemented yet!)
 - SQL
     - [MySQL](https://github.com/mysql/mysql-server)
         - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
