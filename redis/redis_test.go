@@ -23,17 +23,18 @@ func TestClient(t *testing.T) {
 	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
+		defer client.Close()
 		test.TestStore(client, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
+		defer client.Close()
 		test.TestStore(client, t)
 	})
 }
@@ -45,17 +46,18 @@ func TestTypes(t *testing.T) {
 	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
+		defer client.Close()
 		test.TestTypes(client, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
+		defer client.Close()
 		test.TestTypes(client, t)
 	})
 }
@@ -67,9 +69,9 @@ func TestClientConcurrent(t *testing.T) {
 	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
 	client := createClient(t, encoding.JSON)
+	defer client.Close()
 
 	goroutineCount := 1000
 
@@ -83,10 +85,10 @@ func TestErrors(t *testing.T) {
 	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
 	// Test empty key
 	client := createClient(t, encoding.JSON)
+	defer client.Close()
 	err := client.Set("", "bar")
 	if err == nil {
 		t.Error("Expected an error")
@@ -108,12 +110,12 @@ func TestNil(t *testing.T) {
 	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
 	// Test setting nil
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
+		defer client.Close()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -122,6 +124,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
+		defer client.Close()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -133,6 +136,7 @@ func TestNil(t *testing.T) {
 	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
 			client := createClient(t, codec)
+			defer client.Close()
 
 			// Prep
 			err := client.Set("foo", test.Foo{Bar: "baz"})
@@ -169,7 +173,6 @@ func TestClose(t *testing.T) {
 	if !checkConnection(testDbNumber) {
 		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
 	}
-	deleteRedisDb(testDbNumber) // Prep for previous test runs
 
 	client := createClient(t, encoding.JSON)
 	err := client.Close()
@@ -185,22 +188,13 @@ func checkConnection(number int) bool {
 		Password: redis.DefaultOptions.Password,
 		DB:       number,
 	})
+	defer client.Close()
 	err := client.Ping().Err()
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
 	return true
-}
-
-// deleteRedisDb deletes all entries of the given DB
-func deleteRedisDb(number int) error {
-	client := goredis.NewClient(&goredis.Options{
-		Addr:     redis.DefaultOptions.Address,
-		Password: redis.DefaultOptions.Password,
-		DB:       number,
-	})
-	return client.FlushDB().Err()
 }
 
 func createClient(t *testing.T, codec encoding.Codec) redis.Client {

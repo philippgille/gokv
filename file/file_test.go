@@ -1,9 +1,12 @@
 package file_test
 
 import (
+	"io/ioutil"
+	"log"
 	"os"
 	"testing"
 
+	"github.com/philippgille/gokv"
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/file"
 	"github.com/philippgille/gokv/test"
@@ -14,13 +17,15 @@ import (
 func TestStore(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
-		store := createStore(t, encoding.JSON)
+		store, path := createStore(t, encoding.JSON)
+		defer cleanUp(store, path)
 		test.TestStore(store, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
-		store := createStore(t, encoding.Gob)
+		store, path := createStore(t, encoding.Gob)
+		defer cleanUp(store, path)
 		test.TestStore(store, t)
 	})
 }
@@ -29,13 +34,15 @@ func TestStore(t *testing.T) {
 func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
-		store := createStore(t, encoding.JSON)
+		store, path := createStore(t, encoding.JSON)
+		defer cleanUp(store, path)
 		test.TestTypes(store, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
-		store := createStore(t, encoding.Gob)
+		store, path := createStore(t, encoding.Gob)
+		defer cleanUp(store, path)
 		test.TestTypes(store, t)
 	})
 }
@@ -43,7 +50,8 @@ func TestTypes(t *testing.T) {
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 // The store is Go map with manual locking via sync.RWMutex, so testing this is important.
 func TestStoreConcurrent(t *testing.T) {
-	store := createStore(t, encoding.JSON)
+	store, path := createStore(t, encoding.JSON)
+	defer cleanUp(store, path)
 
 	goroutineCount := 1000
 
@@ -53,7 +61,8 @@ func TestStoreConcurrent(t *testing.T) {
 // TestErrors tests some error cases.
 func TestErrors(t *testing.T) {
 	// Test empty key
-	store := createStore(t, encoding.JSON)
+	store, path := createStore(t, encoding.JSON)
+	defer cleanUp(store, path)
 	err := store.Set("", "bar")
 	if err == nil {
 		t.Error("Expected an error")
@@ -73,7 +82,8 @@ func TestNil(t *testing.T) {
 	// Test setting nil
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
-		store := createStore(t, encoding.JSON)
+		store, path := createStore(t, encoding.JSON)
+		defer cleanUp(store, path)
 		err := store.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -81,7 +91,8 @@ func TestNil(t *testing.T) {
 	})
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
-		store := createStore(t, encoding.Gob)
+		store, path := createStore(t, encoding.Gob)
+		defer cleanUp(store, path)
 		err := store.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -92,7 +103,8 @@ func TestNil(t *testing.T) {
 
 	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
-			store := createStore(t, codec)
+			store, path := createStore(t, codec)
+			defer cleanUp(store, path)
 
 			// Prep
 			err := store.Set("foo", test.Foo{Bar: "baz"})
@@ -124,27 +136,44 @@ func TestNil(t *testing.T) {
 
 // TestClose tests if the close method returns any errors.
 func TestClose(t *testing.T) {
-	store := createStore(t, encoding.JSON)
+	store, path := createStore(t, encoding.JSON)
+	defer os.RemoveAll(path)
 	err := store.Close()
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func createStore(t *testing.T, codec encoding.Codec) file.Store {
-	tmpDir := os.TempDir() + "/gokv"
-	err := os.RemoveAll(tmpDir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func createStore(t *testing.T, codec encoding.Codec) (file.Store, string) {
+	path := generateRandomTempDBpath(t)
 	options := file.Options{
-		Directory: tmpDir,
+		Directory: path,
 		Codec:     codec,
 	}
 	store, err := file.NewStore(options)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return store
+	return store, path
+}
+
+func generateRandomTempDBpath(t *testing.T) string {
+	path, err := ioutil.TempDir(os.TempDir(), "gokv")
+	if err != nil {
+		t.Fatalf("Generating random DB path failed: %v", err)
+	}
+	return path
+}
+
+// cleanUp cleans up the store (deletes the files that have been created during a test).
+// If an error occurs the test is NOT marked as failed.
+func cleanUp(store gokv.Store, path string) {
+	err := store.Close()
+	if err != nil {
+		log.Printf("Error during cleaning up after a test (during closing the store): %v\n", err)
+	}
+	err = os.RemoveAll(path)
+	if err != nil {
+		log.Printf("Error during cleaning up after a test (during removing the data directory): %v\n", err)
+	}
 }
