@@ -14,12 +14,14 @@ func TestStore(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		store := createStore(t, encoding.JSON)
+		defer store.Close()
 		test.TestStore(store, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		store := createStore(t, encoding.Gob)
+		defer store.Close()
 		test.TestStore(store, t)
 	})
 }
@@ -29,12 +31,14 @@ func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		store := createStore(t, encoding.JSON)
+		defer store.Close()
 		test.TestTypes(store, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		store := createStore(t, encoding.Gob)
+		defer store.Close()
 		test.TestTypes(store, t)
 	})
 }
@@ -42,6 +46,7 @@ func TestTypes(t *testing.T) {
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 func TestStoreConcurrent(t *testing.T) {
 	store := createStore(t, encoding.JSON)
+	defer store.Close()
 
 	goroutineCount := 1000
 
@@ -52,6 +57,7 @@ func TestStoreConcurrent(t *testing.T) {
 func TestErrors(t *testing.T) {
 	// Test empty key
 	store := createStore(t, encoding.JSON)
+	defer store.Close()
 	err := store.Set("", "bar")
 	if err == nil {
 		t.Error("Expected an error")
@@ -72,6 +78,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
 		store := createStore(t, encoding.JSON)
+		defer store.Close()
 		err := store.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -80,6 +87,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
 		store := createStore(t, encoding.Gob)
+		defer store.Close()
 		err := store.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -91,6 +99,7 @@ func TestNil(t *testing.T) {
 	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
 			store := createStore(t, codec)
+			defer store.Close()
 
 			// Prep
 			err := store.Set("foo", test.Foo{Bar: "baz"})
@@ -136,6 +145,7 @@ func TestEvictionOnMaxSize(t *testing.T) {
 		HardMaxCacheSize: 1,
 	}
 	store, err := bigcache.NewStore(options)
+	defer store.Close()
 	if err != nil {
 		t.Fatal(err)
 	}

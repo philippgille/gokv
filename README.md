@@ -158,15 +158,10 @@ func main() {
     if err != nil {
         panic(err)
     }
+    defer client.Close()
 
     // Store, retrieve, print and delete a value
     interactWithStore(client)
-
-    // Close client
-    err = client.Close()
-    if err != nil {
-        panic(err)
-    }
 }
 
 // interactWithStore stores, retrieves, prints and deletes a value.
@@ -204,6 +199,7 @@ func interactWithStore(store gokv.Store) {
 As described in the comments, that code does the following:
 
 1. Create a client for Redis
+   - Some implementations' stores/clients don't require to be closed, but when working with the interface (for example as function parameter) you *must* call `Close()` because you don't know which implementation is passed. Even if you work with a specific implementation you *should* always call `Close()`, so you can easily change the implementation without the risk of forgetting to add the call.
 2. Call `interactWithStore()`, which requires a `gokv.Store` as parameter. This method then:
     1. Stores an object of type `foo` in the Redis server running on `localhost:6379` with the key `foo123`
     2. Retrieves the value for the key `foo123`
