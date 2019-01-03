@@ -189,7 +189,7 @@ func checkConnection() bool {
 }
 
 func createClient(t *testing.T, codec encoding.Codec) consul.Client {
-	options := consul.DefaultOptions
+	options := consul.Options{}
 	options.Folder = "test_" + strconv.FormatInt(time.Now().Unix(), 10)
 	options.Codec = codec
 	client, err := consul.NewClient(options)
