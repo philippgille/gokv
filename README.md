@@ -13,6 +13,7 @@ Contents
     2. [Implementations](#implementations)
     3. [Value types](#value-types)
     4. [Marshal formats](#marshal-formats)
+    5. [Roadmap](#roadmap)
 2. [Usage](#usage)
 3. [Project status](#project-status)
 4. [Motivation](#motivation)
@@ -121,6 +122,17 @@ Differences between the formats:
 - Depending on the use case, the custom (un-)marshal methods of one of the formats might be easier to implement
     - JSON: [`MarshalJSON() ([]byte, error)`](https://godoc.org/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://godoc.org/encoding/json#Unmarshaler)
     - gob: [`GobEncode() ([]byte, error)`](https://godoc.org/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://godoc.org/encoding/gob#GobDecoder)
+
+### Roadmap
+
+- Benchmarks!
+- CLI: A simple command line interface tool that allows you create, read, update and delete key-value pairs in all of the `gokv` storages
+- A `combiner` package that allows you to create a `gokv.Store` which forwards its call to multiple implementations at the same time. So for example you can use `memcached` and `s3` simultaneously to have 1) super fast access but also 2) durable redundant persistent storage.
+- A way to directly configure the clients via the options of the underlying used Go package (e.g. not the `redis.Options` struct in `github.com/philippgille/gokv`, but instead the `redis.Options` struct in `github.com/go-redis/redis`)
+    - Will be optional and discouraged, because this will lead to compile errors in code that uses `gokv` when switching the underlying used Go package, but definitely useful for some people
+- More stores (see stores in [Implementations](#implementations) list with unchecked boxes)
+- Maybe rename the project from `gokv` to `SimpleKV`?
+- Maybe move all implementation packages into a subdirectory, e.g. `github.com/philippgille/gokv/store/redis`?
 
 Usage
 -----
