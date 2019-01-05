@@ -88,10 +88,15 @@ script:
   - sleep 10s
   - go test -v -race -coverprofile=coverage10.txt -covermode=atomic ./ignite
   - docker stop ignite
+  # Test Apache ZooKeeper
+  - docker run -d --rm --name zookeeper -p 2181:2181 zookeeper
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage11.txt -covermode=atomic ./zookeeper
+  - docker stop zookeeper
 
 after_success:
   # Combine coverage reports.
   # (Using grep to skip the first line of each coverage report (there's probably a more elegant way to do this).)
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt && cat coverage9.txt | grep gokv >> coverage.txt && cat coverage10.txt | grep gokv >> coverage.txt
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt && cat coverage9.txt | grep gokv >> coverage.txt && cat coverage10.txt | grep gokv >> coverage.txt && cat coverage11.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
