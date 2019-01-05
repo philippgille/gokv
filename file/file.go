@@ -11,16 +11,18 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
+var defaultFilenameExtension = "json"
+
 // Store is a gokv.Store implementation for storing key-value pairs as files.
 type Store struct {
 	// For locking the locks map
 	// (no two goroutines may create a lock for a filename that doesn't have a lock yet).
 	locksLock *sync.Mutex
 	// For locking file access.
-	fileLocks  map[string]*sync.RWMutex
-	fileSuffix string
-	directory  string
-	codec      encoding.Codec
+	fileLocks         map[string]*sync.RWMutex
+	filenameExtension string
+	directory         string
+	codec             encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -41,8 +43,11 @@ func (s Store) Set(k string, v interface{}) error {
 	// Prepare file lock.
 	lock := s.prepFileLock(escapedKey)
 
-	fileName := escapedKey + s.fileSuffix
-	filePath := filepath.Clean(s.directory + "/" + fileName)
+	filename := escapedKey
+	if s.filenameExtension != "" {
+		filename += "." + s.filenameExtension
+	}
+	filePath := filepath.Clean(s.directory + "/" + filename)
 
 	// File lock and file handling.
 	lock.Lock()
@@ -66,8 +71,11 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 	// Prepare file lock.
 	lock := s.prepFileLock(escapedKey)
 
-	fileName := escapedKey + s.fileSuffix
-	filePath := filepath.Clean(s.directory + "/" + fileName)
+	filename := escapedKey
+	if s.filenameExtension != "" {
+		filename += "." + s.filenameExtension
+	}
+	filePath := filepath.Clean(s.directory + "/" + filename)
 
 	// File lock and file handling.
 	lock.RLock()
@@ -97,8 +105,11 @@ func (s Store) Delete(k string) error {
 	// Prepare file lock.
 	lock := s.prepFileLock(escapedKey)
 
-	fileName := escapedKey + s.fileSuffix
-	filePath := filepath.Clean(s.directory + "/" + fileName)
+	filename := escapedKey
+	if s.filenameExtension != "" {
+		filename += "." + s.filenameExtension
+	}
+	filePath := filepath.Clean(s.directory + "/" + filename)
 
 	// File lock and file handling.
 	lock.Lock()
@@ -135,7 +146,16 @@ type Options struct {
 	// Can be absolute or relative.
 	// Optional ("gokv" by default).
 	Directory string
+	// Extension of the filename, e.g. "json".
+	// This makes it easier for example to open a file with a text editor that supports syntax highlighting.
+	// But it can lead to redundant and/or stale data if you switch the Codec back and forth!
+	// You also should make sure to change this when changing the Codec,
+	// although it doesn't matter for gokv, but it might be confusing when there's a gob file with a ".json" filename extension.
+	// Set to "" to disable.
+	// Optional ("json" by default).
+	FilenameExtension *string
 	// Encoding format.
+	// Note: When you change this, you should also change the FilenameExtension if it's not empty ("").
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
 }
@@ -143,8 +163,9 @@ type Options struct {
 // DefaultOptions is an Options object with default values.
 // Directory: "gokv", Codec: encoding.JSON
 var DefaultOptions = Options{
-	Directory: "gokv",
-	Codec:     encoding.JSON,
+	Directory:         "gokv",
+	FilenameExtension: &defaultFilenameExtension,
+	Codec:             encoding.JSON,
 }
 
 // NewStore creates a new Go map store.
@@ -157,6 +178,9 @@ func NewStore(options Options) (Store, error) {
 	if options.Directory == "" {
 		options.Directory = DefaultOptions.Directory
 	}
+	if options.FilenameExtension == nil {
+		options.FilenameExtension = DefaultOptions.FilenameExtension
+	}
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
 	}
@@ -166,17 +190,10 @@ func NewStore(options Options) (Store, error) {
 		return result, err
 	}
 
-	var fileSuffix string
-	if _, ok := options.Codec.(encoding.JSONcodec); ok {
-		fileSuffix = ".json"
-	} else if _, ok := options.Codec.(encoding.GobCodec); ok {
-		fileSuffix = ".gob"
-	}
-
 	result.directory = options.Directory
 	result.locksLock = new(sync.Mutex)
 	result.fileLocks = make(map[string]*sync.RWMutex)
-	result.fileSuffix = fileSuffix
+	result.filenameExtension = *options.FilenameExtension
 	result.codec = options.Codec
 
 	return result, nil
