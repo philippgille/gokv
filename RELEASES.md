@@ -21,6 +21,7 @@ vNext
 - Added: Package `postgresql` - A `gokv.Store` implementation for [PostgreSQL](https://github.com/postgres/postgres) (issue [#57](https://github.com/philippgille/gokv/issues/57))
 - Added: Package `cockroachdb` - A `gokv.Store` implementation for [CockroachDB](https://github.com/cockroachdb/cockroach) (issue [#62](https://github.com/philippgille/gokv/issues/62))
 - Added: Package `ignite` - A `gokv.Store` implementation for [Apache Ignite](https://github.com/apache/ignite) (issue [#64](https://github.com/philippgille/gokv/issues/64))
+- Added: Package `zookeeper` - A `gokv.Store` implementation for [Apache ZooKeeper](https://github.com/apache/zookeeper) (issue [#66](https://github.com/philippgille/gokv/issues/66))
 
 
 Breaking changes
