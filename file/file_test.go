@@ -148,7 +148,9 @@ func createStore(t *testing.T, codec encoding.Codec) (file.Store, string) {
 	path := generateRandomTempDBpath(t)
 	options := file.Options{
 		Directory: path,
-		Codec:     codec,
+		// Setting no FileNameEnding leads to all Codecs writing ".json" files,
+		// but that doesn't matter to the functionality of gokv.
+		Codec: codec,
 	}
 	store, err := file.NewStore(options)
 	if err != nil {
