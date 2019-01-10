@@ -103,7 +103,8 @@ Implementations
     - [Google Cloud Datastore](https://cloud.google.com/datastore/)
     - [Google Cloud Firestore](https://cloud.google.com/firestore/)
         - Currently still in beta, but might become the successor to Cloud Datastore
-    - [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store) (⚠️Not implemented yet!)
+    - [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store)
+        - > Note: The size limit of the key is 1 KB. The size limit of the value is 2 MB, see the [official documentation](https://github.com/AlibabaCloudDocs/ots/blob/14b54f96867afee4b229f8de8cb34a134592c75a/intl.en-US/Best%20Practices/Data%20Operations.md#store-attribute-columns-in-oss--section)
 - SQL
     - [MySQL](https://github.com/mysql/mysql-server)
         - [The most popular open source relational database management system](https://db-engines.com/en/ranking/relational+dbms)
