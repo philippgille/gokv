@@ -93,6 +93,8 @@ script:
   - sleep 10s
   - go test -v -race -coverprofile=coverage11.txt -covermode=atomic ./zookeeper
   - docker stop zookeeper
+  # Test Alibaba Cloud Table Store
+  # TODO: Currently no emulator exists for Alibaba Cloud Table Store.
 
 after_success:
   # Combine coverage reports.
