@@ -217,7 +217,6 @@ func NewClient(options Options) (Client, error) {
 			Readcap:  options.ReservedReadCap,
 			Writecap: options.ReservedWriteCap,
 		},
-		// TODO: Are IndexMetas required when we don't need any indexes on non-primary key columns?
 		TableMeta: &tablestore.TableMeta{
 			DefinedColumns: []*tablestore.DefinedColumnSchema{&tablestore.DefinedColumnSchema{
 				ColumnType: tablestore.DefinedColumn_BINARY,
