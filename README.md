@@ -73,7 +73,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [X] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
     - [X] [Google Cloud Datastore](https://cloud.google.com/datastore/)
     - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
-    - [ ] [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store)
+    - [X] [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store)
 - SQL
     - [X] [MySQL](https://github.com/mysql/mysql-server)
     - [X] [PostgreSQL](https://github.com/postgres/postgres)

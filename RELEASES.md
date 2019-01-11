@@ -22,6 +22,7 @@ vNext
 - Added: Package `cockroachdb` - A `gokv.Store` implementation for [CockroachDB](https://github.com/cockroachdb/cockroach) (issue [#62](https://github.com/philippgille/gokv/issues/62))
 - Added: Package `ignite` - A `gokv.Store` implementation for [Apache Ignite](https://github.com/apache/ignite) (issue [#64](https://github.com/philippgille/gokv/issues/64))
 - Added: Package `zookeeper` - A `gokv.Store` implementation for [Apache ZooKeeper](https://github.com/apache/zookeeper) (issue [#66](https://github.com/philippgille/gokv/issues/66))
+- Added: Package `tablestore` - A `gokv.Store` implementation for [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store) (issue [#70](https://github.com/philippgille/gokv/issues/70))
 
 
 Breaking changes
