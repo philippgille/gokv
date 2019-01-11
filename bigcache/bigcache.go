@@ -55,7 +55,7 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 
 	data, err := s.s.Get(k)
 	if err != nil {
-		if _, ok := err.(*bigcache.EntryNotFoundError); ok {
+		if err == bigcache.ErrEntryNotFound {
 			return false, nil
 		}
 		return false, err
@@ -81,7 +81,7 @@ func (s Store) Delete(k string) error {
 
 	err := s.s.Delete(k)
 	if err != nil {
-		if _, ok := err.(*bigcache.EntryNotFoundError); ok {
+		if err == bigcache.ErrEntryNotFound {
 			return nil
 		}
 		return err
