@@ -262,47 +262,9 @@ func NewClient(options Options) (Client, error) {
 		if !ok {
 			return result, err
 		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException {
-			keyAttrType := "S" // For "string"
-			keyType := "HASH"  // As opposed to "RANGE"
-			createTableInput := awsdynamodb.CreateTableInput{
-				TableName: &options.TableName,
-				AttributeDefinitions: []*awsdynamodb.AttributeDefinition{{
-					AttributeName: &keyAttrName,
-					AttributeType: &keyAttrType,
-				}},
-				KeySchema: []*awsdynamodb.KeySchemaElement{{
-					AttributeName: &keyAttrName,
-					KeyType:       &keyType,
-				}},
-				ProvisionedThroughput: &awsdynamodb.ProvisionedThroughput{
-					ReadCapacityUnits:  &options.ReadCapacityUnits,
-					WriteCapacityUnits: &options.WriteCapacityUnits,
-				},
-			}
-			_, err := svc.CreateTable(&createTableInput)
+			err = createTable(options.TableName, options.ReadCapacityUnits, options.WriteCapacityUnits, *options.WaitForTableCreation, describeTableInput, svc)
 			if err != nil {
 				return result, err
-			}
-			// If configured (true by default), block until the table is created.
-			// Typical table creation duration is 10 seconds.
-			if *options.WaitForTableCreation {
-				for try := 1; try < 16; try++ {
-					describeTableOutput, err := svc.DescribeTable(&describeTableInput)
-					if err != nil || *describeTableOutput.Table.TableStatus == "CREATING" {
-						time.Sleep(1 * time.Second)
-					} else {
-						break
-					}
-				}
-				// Last try (16th) after 15 seconds of waiting.
-				// Now handle error as such.
-				describeTableOutput, err := svc.DescribeTable(&describeTableInput)
-				if err != nil {
-					return result, errors.New("The DynamoDB table couldn't be created")
-				}
-				if *describeTableOutput.Table.TableStatus == "CREATING" {
-					return result, errors.New("The DynamoDB table took too long to be created")
-				}
 			}
 		} else {
 			return result, err
@@ -314,4 +276,51 @@ func NewClient(options Options) (Client, error) {
 	result.codec = options.Codec
 
 	return result, nil
+}
+
+func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, waitForTableCreation bool, describeTableInput awsdynamodb.DescribeTableInput, svc *awsdynamodb.DynamoDB) error {
+	keyAttrType := "S" // For "string"
+	keyType := "HASH"  // As opposed to "RANGE"
+	createTableInput := awsdynamodb.CreateTableInput{
+		TableName: &tableName,
+		AttributeDefinitions: []*awsdynamodb.AttributeDefinition{{
+			AttributeName: &keyAttrName,
+			AttributeType: &keyAttrType,
+		}},
+		KeySchema: []*awsdynamodb.KeySchemaElement{{
+			AttributeName: &keyAttrName,
+			KeyType:       &keyType,
+		}},
+		ProvisionedThroughput: &awsdynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  &readCapacityUnits,
+			WriteCapacityUnits: &writeCapacityUnits,
+		},
+	}
+	_, err := svc.CreateTable(&createTableInput)
+	if err != nil {
+		return err
+	}
+	// If configured (true by default), block until the table is created.
+	// Typical table creation duration is 10 seconds.
+	if waitForTableCreation {
+		for try := 1; try < 16; try++ {
+			describeTableOutput, err := svc.DescribeTable(&describeTableInput)
+			if err != nil || *describeTableOutput.Table.TableStatus == "CREATING" {
+				time.Sleep(1 * time.Second)
+			} else {
+				break
+			}
+		}
+		// Last try (16th) after 15 seconds of waiting.
+		// Now handle error as such.
+		describeTableOutput, err := svc.DescribeTable(&describeTableInput)
+		if err != nil {
+			return errors.New("The DynamoDB table couldn't be created")
+		}
+		if *describeTableOutput.Table.TableStatus == "CREATING" {
+			return errors.New("The DynamoDB table took too long to be created")
+		}
+	}
+
+	return nil
 }

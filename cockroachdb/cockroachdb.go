@@ -3,6 +3,10 @@ package cockroachdb
 import (
 	gosql "database/sql"
 
+	// pq must just be registered as driver.
+	// We don't need to use the package directly.
+	// This comment is required by golint
+	// ("warning: a blank import should be only in a main or test package, or have a comment justifying it").
 	_ "github.com/lib/pq"
 
 	"github.com/philippgille/gokv/encoding"
@@ -22,7 +26,7 @@ type Options struct {
 	// Format: postgres://username[:password]@address/dbname[?param1=value1&...&paramN=valueN].
 	// Example: "postgres://roach:secret@localhost:26257/gokv?sslmode=disable".
 	// The database ("dbname" in the example) must already exist.
-	// For a full list of available connection paramters, see:
+	// For a full list of available connection parameters, see:
 	// https://github.com/cockroachdb/docs/blob/560c4227f4d811c5be9dc8e4a5385e508d0c68e5/v2.1/connection-parameters.md#additional-connection-parameters.
 	// Optional ("postgres://root@localhost:26257/gokv?sslmode=disable&application_name=gokv" by default,
 	// which will connect to "localhost:26257" as root user and doesn't use TLS,

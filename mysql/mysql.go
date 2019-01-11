@@ -143,32 +143,9 @@ func NewClient(options Options) (Client, error) {
 			// If the package user included a database name in the DataSourceName,
 			// but the database doesn't exist yet, we can try to create + use that database.
 			if driverErr.Number == errDBnotFound {
-				// We can't use the existing db object, because that would lead to the same error again.
-				// So create a new one without database name, but "backup" the user provided database name,
-				// which we need to create the database.
-				userProvidedDBname := cfg.DBName
-				cfg.DBName = ""
-				dsnWithoutDBname := cfg.FormatDSN()
-				tempDB, err := gosql.Open("mysql", dsnWithoutDBname)
-				// This temporary DB must be closed.
-				defer tempDB.Close()
+				err = createDB(cfg, db)
 				if err != nil {
-					return result, err
-				}
-				err = tempDB.Ping()
-				if err != nil {
-					return result, err
-				}
-				// No need to check if userProvidedDBname == "", because in that case the error wouldn't be 1049 (unknown database).
-				// In case the user doesn't have the permission to create a database, an error is returned.
-				err = sql.CreateDB(tempDB, userProvidedDBname)
-				if err != nil {
-					return result, err
-				}
-				// Now the initial ping should work.
-				err = db.Ping()
-				if err != nil {
-					return result, err
+					return result, nil
 				}
 			} else {
 				return result, err
@@ -179,21 +156,8 @@ func NewClient(options Options) (Client, error) {
 	} else if cfg.DBName == "" {
 		// Ping() was successful, but in case the package user didn't include a database name
 		// in the DataSourceName, we must now attempt to create the database.
-		err = sql.CreateDB(db, defaultDBname)
-		if err != nil {
-			return result, err
-		}
-		// Also, we must replace the current value of the db pointer by the new db,
-		// because calling "USE" on a database only works for the single connection that's used
-		// instead of for all connections in the pool.
-		db.Close()
-		cfg.DBName = defaultDBname
-		dsnWithDBname := cfg.FormatDSN()
-		db, err = gosql.Open("mysql", dsnWithDBname)
-		if err != nil {
-			return result, err
-		}
-		err = db.Ping()
+		// Note: createDefaultDB() replaces the value that the db pointer points to.
+		err = createDefaultDB(db, cfg)
 		if err != nil {
 			return result, err
 		}
@@ -245,4 +209,64 @@ func NewClient(options Options) (Client, error) {
 	result.c = &c
 
 	return result, nil
+}
+
+// createDB creates a DB when the DB name is given in the config.
+func createDB(cfg *gosqldriver.Config, db *gosql.DB) error {
+	// We can't use the existing db object, because that would lead to the same error again.
+	// So create a new one without database name, but "backup" the user provided database name,
+	// which we need to create the database.
+	userProvidedDBname := cfg.DBName
+	cfg.DBName = ""
+	dsnWithoutDBname := cfg.FormatDSN()
+	tempDB, err := gosql.Open("mysql", dsnWithoutDBname)
+	// This temporary DB must be closed.
+	defer tempDB.Close()
+	if err != nil {
+		return err
+	}
+	err = tempDB.Ping()
+	if err != nil {
+		return err
+	}
+	// No need to check if userProvidedDBname == "", because in that case the error wouldn't be 1049 (unknown database).
+	// In case the user doesn't have the permission to create a database, an error is returned.
+	err = sql.CreateDB(tempDB, userProvidedDBname)
+	if err != nil {
+		return err
+	}
+	// Now the initial ping should work.
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// createDefaultDB creates a DB with the default name
+// and replaces the value that the db pointer points to
+// by a new sql.DB object.
+func createDefaultDB(db *gosql.DB, cfg *gosqldriver.Config) error {
+	err := sql.CreateDB(db, defaultDBname)
+	if err != nil {
+		return err
+	}
+	// Also, we must replace the current value that the db pointer points to by the new db,
+	// because calling "USE" on a database only works for the single connection that's used
+	// instead of for all connections in the pool.
+	db.Close()
+	cfg.DBName = defaultDBname
+	dsnWithDBname := cfg.FormatDSN()
+	newDB, err := gosql.Open("mysql", dsnWithDBname)
+	if err != nil {
+		return err
+	}
+	*db = *newDB
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

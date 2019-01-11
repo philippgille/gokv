@@ -268,7 +268,7 @@ func CreateSyntheticPartitionKeySupplier(partitionCount uint16) func(string) str
 		// We now need to turn this into <partitionCount> evenly distributed strings.
 		// We take the first couple of bytes and turn them into a number.
 		// Then we use the modulo operation to get the exact count of distinct numbers we need.
-		// To get an even distribution, the number that's devided should be a potentially much higher number
+		// To get an even distribution, the number that's divided should be a potentially much higher number
 		// than the count of distinct numbers we need.
 		//
 		// For example:
@@ -294,7 +294,7 @@ func CreateSyntheticPartitionKeySupplier(partitionCount uint16) func(string) str
 		i4 := uint64(md5Hash[3])
 		i := (i1 << 24) + (i2 << 16) + (i3 << 8) + i4
 
-		// Now i is between 0 and (1.844674407370955e+19 - 1), depending on the input, always reproducable.
+		// Now i is between 0 and (1.844674407370955e+19 - 1), depending on the input, always reproducible.
 		// We still need to reduce the number to <partitionCount> while keeping the even distribution.
 		// Remainder calculation leads exactly to a number that's between 0 and (partitionCount-1).
 		rem := i % uint64(partitionCount)

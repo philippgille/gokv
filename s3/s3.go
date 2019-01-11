@@ -221,34 +221,49 @@ func NewClient(options Options) (Client, error) {
 	svc := awss3.New(session)
 
 	// Create the bucket if it doesn't exist yet.
-	//
-	// When using actual Amazon S3, and trying to create a bucket you already own,
-	// the API returns a proper ErrCodeBucketAlreadyOwnedByYou.
-	// So we can just try to create it immediately and ignore the ErrCodeBucketAlreadyOwnedByYou error.
-	//
-	// But Scaleway Object Storage for example just returns BucketAlreadyExists,
-	// which could also mean that someone else owns it, which would be an error.
-	// So in this case we must do it differently.
 	createBucketInput := awss3.CreateBucketInput{
 		Bucket: aws.String(options.BucketName),
 	}
-	if options.CustomEndpoint == "" {
-		_, err = svc.CreateBucket(&createBucketInput)
+	origS3 := options.CustomEndpoint == ""
+	err = createBucket(origS3, svc, createBucketInput, options.BucketName)
+	if err != nil {
+		return result, err
+	}
+
+	result.c = svc
+	result.bucketName = options.BucketName
+	result.codec = options.Codec
+
+	return result, nil
+}
+
+// createBucket creates the bucket if it doesn't exist yet.
+//
+// When using actual Amazon S3, and trying to create a bucket you already own,
+// the API returns a proper ErrCodeBucketAlreadyOwnedByYou.
+// So we can just try to create it immediately and ignore the ErrCodeBucketAlreadyOwnedByYou error.
+//
+// But Scaleway Object Storage for example just returns BucketAlreadyExists,
+// which could also mean that someone else owns it, which would be an error.
+// So in this case we must do it differently.
+func createBucket(origS3 bool, svc *awss3.S3, createBucketInput awss3.CreateBucketInput, bucketName string) error {
+	if origS3 {
+		_, err := svc.CreateBucket(&createBucketInput)
 		if err != nil {
 			aerr, ok := err.(awserr.Error)
 			if !ok || aerr.Code() != awss3.ErrCodeBucketAlreadyOwnedByYou {
-				return result, err
+				return err
 			}
 		}
 	} else {
 		listBucketsOutput, err := svc.ListBuckets(&awss3.ListBucketsInput{})
 		if err != nil {
-			return result, err
+			return err
 		}
 		ownsBucket := false
 		if listBucketsOutput.Buckets != nil {
 			for _, bucket := range listBucketsOutput.Buckets {
-				if *bucket.Name == options.BucketName {
+				if *bucket.Name == bucketName {
 					ownsBucket = true
 					break
 				}
@@ -257,14 +272,10 @@ func NewClient(options Options) (Client, error) {
 		if !ownsBucket {
 			_, err = svc.CreateBucket(&createBucketInput)
 			if err != nil {
-				return result, err
+				return err
 			}
 		}
 	}
 
-	result.c = svc
-	result.bucketName = options.BucketName
-	result.codec = options.Codec
-
-	return result, nil
+	return nil
 }
