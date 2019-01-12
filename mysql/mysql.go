@@ -156,11 +156,15 @@ func NewClient(options Options) (Client, error) {
 	} else if cfg.DBName == "" {
 		// Ping() was successful, but in case the package user didn't include a database name
 		// in the DataSourceName, we must now attempt to create the database.
-		// Note: createDefaultDB() replaces the value that the db pointer points to.
-		err = createDefaultDB(db, cfg)
+		newDB, err := createDefaultDB(db, cfg)
 		if err != nil {
 			return result, err
 		}
+		// Also, we must replace the current value that the db pointer points to by the new db,
+		// because calling "USE" on a database only works for the single connection that's used
+		// instead of for all connections in the pool.
+		db.Close()
+		db = newDB
 	}
 
 	// Limit number of concurrent connections. Typical max connections on a MySQL server is 100.
@@ -245,28 +249,23 @@ func createDB(cfg *gosqldriver.Config, db *gosql.DB) error {
 }
 
 // createDefaultDB creates a DB with the default name
-// and replaces the value that the db pointer points to
-// by a new sql.DB object.
-func createDefaultDB(db *gosql.DB, cfg *gosqldriver.Config) error {
+// and returns a pointer to the new sql.DB object.
+// It's a new object and you should probably call Close() on the passed db object.
+func createDefaultDB(db *gosql.DB, cfg *gosqldriver.Config) (*gosql.DB, error) {
 	err := sql.CreateDB(db, defaultDBname)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	// Also, we must replace the current value that the db pointer points to by the new db,
-	// because calling "USE" on a database only works for the single connection that's used
-	// instead of for all connections in the pool.
-	db.Close()
 	cfg.DBName = defaultDBname
 	dsnWithDBname := cfg.FormatDSN()
 	newDB, err := gosql.Open("mysql", dsnWithDBname)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	*db = *newDB
-	err = db.Ping()
+	err = newDB.Ping()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return newDB, nil
 }
