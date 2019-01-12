@@ -1,6 +1,7 @@
 package bigcache_test
 
 import (
+	"math/rand"
 	"strconv"
 	"testing"
 
@@ -152,11 +153,12 @@ func TestEvictionOnMaxSize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Save some entry that's at least 1 byte in size 1*1024*1024 times.
+	// Save 1*1024*1024 entries that are at least 1 byte each.
 	// This should lead to reaching the 1 MiB limit.
+	// Note: Storing "foo" 1024*1024 times isn't enough sometimes.
 	count := 1 * 1024 * 1024
 	for i := 0; i < count && err == nil; i++ {
-		err = store.Set(strconv.Itoa(i), "foo")
+		err = store.Set(strconv.Itoa(i), strconv.Itoa(rand.Int()))
 		if err != nil {
 			t.Error(err)
 		}
