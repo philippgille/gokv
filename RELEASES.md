@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+v0.5.0 (2019-01-12)
+-------------------
+
 - Added: Package `encoding` - An abstraction and wrapper for the core functionality of packages like `encoding/json` and `encoding/gob` (issue [#47](https://github.com/philippgille/gokv/issues/47))
 - Added: Package `sql` - It contains shared code for SQL implementations. `mysql` and `postgres` already use it and if you want to create your own SQL implementation you can use it as well. (Useful for issue [#57](https://github.com/philippgille/gokv/issues/57).)
 - Added `gokv.Store` implementations:
