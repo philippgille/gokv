@@ -80,7 +80,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
 - NoSQL
     - [X] [MongoDB](https://github.com/mongodb/mongo)
     - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
-- NewSQL
+- "NewSQL"
     - [X] [CockroachDB](https://github.com/cockroachdb/cockroach)
     - [ ] [TiDB](https://github.com/pingcap/tidb)
 - Multi-model
@@ -137,7 +137,7 @@ Differences between the formats:
 Usage
 -----
 
-First, download the package. You don't need to download *all* sub packages with `go get -u github.com/philippgille/gokv/...`, but only the sub packages you want to work with. This spares you from downloading many unnecessary dependencies.
+First, download the package. You don't need to download *all* subpackages with `go get -u github.com/philippgille/gokv/...`, but only the subpackages you want to work with. This spares you from downloading many unnecessary dependencies.
 
 - For example when you want to work with the `gokv.Store` interface:
     - `go get -u github.com/philippgille/gokv`
