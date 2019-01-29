@@ -32,7 +32,10 @@ type item struct {
 	// - https://github.com/mongodb/docs/blob/e1b05bac8616fdfac13bedd79516a5ac33d4afdf/source/reference/bson-types.txt#L41
 	// - https://github.com/mongodb/docs/blob/85171fd9fcc1cf2a5dc6f297b2b026c86bfbfd9d/source/indexes.txt#L46
 	// - https://github.com/mongodb/docs/blob/81d03d2463bc995a451759ce44087fe7ecd4db74/source/core/sharding-shard-key.txt#L91
-	K string "_id" // There are multiple ways to tag for mgo: https://github.com/globalsign/mgo/blob/113d3961e7311526535a1ef7042196563d442761/bson/bson.go#L538
+	//
+	// There are multiple ways to tag for mgo: https://github.com/globalsign/mgo/blob/113d3961e7311526535a1ef7042196563d442761/bson/bson.go#L538.
+	// But without "bson" go_vet says: "struct field tag `_id` not compatible with reflect.StructTag.Get: bad syntax for struct tag pair"
+	K string `bson:"_id"`
 	V []byte // "v" will be used as field name
 }
 
