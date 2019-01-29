@@ -243,7 +243,7 @@ func createClient(t *testing.T, codec encoding.Codec) s3.Client {
 		Region:                 endpoints.EuCentral1RegionID,
 		CustomEndpoint:         customEndpoint,
 		UsePathStyleAddressing: true,
-		Codec: codec,
+		Codec:                  codec,
 	}
 	client, err := s3.NewClient(options)
 	if err != nil {

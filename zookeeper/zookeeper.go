@@ -155,7 +155,7 @@ func NewClient(options Options) (Client, error) {
 		// "/foo/bar" splits to ["", "foo", "bar"]
 		baseNodes := strings.Split(options.PathPrefix, "/")
 		// Don't care about the first element
-		baseNodes = baseNodes[1:len(baseNodes)]
+		baseNodes = baseNodes[1:]
 		// No need to create any nodes if length == 1 (at this point, after removing the first one),
 		// because that's e.g. "/foo", which is no extra node, just a key prefix.
 		if len(baseNodes) > 1 {

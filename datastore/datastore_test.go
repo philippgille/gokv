@@ -202,7 +202,7 @@ func checkConnection() bool {
 	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	keys := []*gcpdatastore.Key{
-		&gcpdatastore.Key{
+		{
 			Kind: "gokv",
 		},
 	}

@@ -39,12 +39,12 @@ func (c Client) Set(k string, v interface{}) error {
 			Condition: &tablestore.RowCondition{
 				RowExistenceExpectation: tablestore.RowExistenceExpectation_IGNORE,
 			},
-			Columns: []tablestore.AttributeColumn{tablestore.AttributeColumn{
+			Columns: []tablestore.AttributeColumn{{
 				ColumnName: "v",
 				Value:      data,
 			}},
 			PrimaryKey: &tablestore.PrimaryKey{
-				PrimaryKeys: []*tablestore.PrimaryKeyColumn{&tablestore.PrimaryKeyColumn{
+				PrimaryKeys: []*tablestore.PrimaryKeyColumn{{
 					ColumnName: keyAttrName,
 					Value:      k,
 				}},
@@ -72,7 +72,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 			ColumnsToGet: []string{"v"},
 			MaxVersion:   1,
 			PrimaryKey: &tablestore.PrimaryKey{
-				PrimaryKeys: []*tablestore.PrimaryKeyColumn{&tablestore.PrimaryKeyColumn{
+				PrimaryKeys: []*tablestore.PrimaryKeyColumn{{
 					ColumnName: keyAttrName,
 					Value:      k,
 				}},
@@ -117,7 +117,7 @@ func (c Client) Delete(k string) error {
 				RowExistenceExpectation: tablestore.RowExistenceExpectation_IGNORE,
 			},
 			PrimaryKey: &tablestore.PrimaryKey{
-				PrimaryKeys: []*tablestore.PrimaryKeyColumn{&tablestore.PrimaryKeyColumn{
+				PrimaryKeys: []*tablestore.PrimaryKeyColumn{{
 					ColumnName: keyAttrName,
 					Value:      k,
 				}},
@@ -218,11 +218,11 @@ func NewClient(options Options) (Client, error) {
 			Writecap: options.ReservedWriteCap,
 		},
 		TableMeta: &tablestore.TableMeta{
-			DefinedColumns: []*tablestore.DefinedColumnSchema{&tablestore.DefinedColumnSchema{
+			DefinedColumns: []*tablestore.DefinedColumnSchema{{
 				ColumnType: tablestore.DefinedColumn_BINARY,
 				Name:       "v",
 			}},
-			SchemaEntry: []*tablestore.PrimaryKeySchema{&tablestore.PrimaryKeySchema{
+			SchemaEntry: []*tablestore.PrimaryKeySchema{{
 				Name: &keyAttrName,
 				Type: &primaryKeyType,
 			}},
