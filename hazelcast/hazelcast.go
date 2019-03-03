@@ -113,7 +113,7 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// Addresses: "localhost:11211", Timeout: 200 milliseconds, MaxIdleConns: 100, Codec: encoding.JSON
+// Addresses: "localhost:5701", MapName: "gokv", Codec: encoding.JSON
 var DefaultOptions = Options{
 	Address: "localhost:5701",
 	MapName: "gokv",
