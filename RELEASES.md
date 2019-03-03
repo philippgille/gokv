@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added `gokv.Store` implementations:
+    - Package `hazelcast` - A `gokv.Store` implementation for [Hazelcast](https://github.com/hazelcast/hazelcast) (issue [#75](https://github.com/philippgille/gokv/issues/75))
+
 v0.5.0 (2019-01-12)
 -------------------
 

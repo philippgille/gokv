@@ -86,7 +86,7 @@ Implementations
 - Distributed cache
     - [Memcached](https://github.com/memcached/memcached)
         - > Note: Memcached is meant to be used as LRU (Least Recently Used) cache, which means items automatically *expire* and are deleted from the server after not being used for a while. See [Memcached Wiki: Forgetting is a feature](https://github.com/memcached/memcached/wiki/Overview#forgetting-is-a-feature).
-    - [Hazelcast](https://github.com/hazelcast/hazelcast) (⚠️Not implemented yet!)
+    - [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
     - [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
         - > Note: The maximum value size is 400 KB. See the [documentation](https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#string).
