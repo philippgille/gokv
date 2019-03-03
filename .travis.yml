@@ -56,6 +56,7 @@ script:
   # Test Cosmos DB via Azurite
   # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
   #- docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
+  #
   # Test Google Cloud Datastore via "Cloud Datastore Emulator"
   # Using the ":slim" or ":alpine" tag would require the emulator to be installed manually.
   # Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
@@ -95,10 +96,17 @@ script:
   - docker stop zookeeper
   # Test Alibaba Cloud Table Store
   # TODO: Currently no emulator exists for Alibaba Cloud Table Store.
+  #
+  # Test Hazelcast
+  - docker run -d --rm --name hazelcast -p 5701:5701 hazelcast/hazelcast
+  - sleep 10s
+  - go test -v -race -coverprofile=coverage12.txt -covermode=atomic ./hazelcast
+  - docker stop hazelcast
+
 
 after_success:
   # Combine coverage reports.
   # (Using grep to skip the first line of each coverage report (there's probably a more elegant way to do this).)
-  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt && cat coverage9.txt | grep gokv >> coverage.txt && cat coverage10.txt | grep gokv >> coverage.txt && cat coverage11.txt | grep gokv >> coverage.txt
+  - cat coverage1.txt > coverage.txt && cat coverage2.txt | grep gokv >> coverage.txt && cat coverage3.txt | grep gokv >> coverage.txt && cat coverage4.txt | grep gokv >> coverage.txt && cat coverage5.txt | grep gokv >> coverage.txt && cat coverage6.txt | grep gokv >> coverage.txt && cat coverage7.txt | grep gokv >> coverage.txt && cat coverage8.txt | grep gokv >> coverage.txt && cat coverage9.txt | grep gokv >> coverage.txt && cat coverage10.txt | grep gokv >> coverage.txt && cat coverage11.txt | grep gokv >> coverage.txt && cat coverage12.txt | grep gokv >> coverage.txt
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
