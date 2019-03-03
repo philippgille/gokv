@@ -65,7 +65,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
     - [ ] [TiKV](https://github.com/tikv/tikv)
 - Distributed cache (no presistence *by default*)
     - [X] [Memcached](https://github.com/memcached/memcached)
-    - [ ] [Hazelcast](https://github.com/hazelcast/hazelcast)
+    - [X] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
     - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
     - [X] [Amazon S3](https://aws.amazon.com/s3/) / [Google Cloud Storage](https://cloud.google.com/storage/) / [Alibaba Cloud Object Storage Service (OSS)](https://www.alibabacloud.com/en/product/oss) / [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) / [Scaleway Object Storage](https://www.scaleway.com/object-storage/) / [OpenStack Swift](https://github.com/openstack/swift) / [Ceph](https://github.com/ceph/ceph) / [Minio](https://github.com/minio/minio) / ...
