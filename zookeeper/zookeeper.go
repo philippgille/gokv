@@ -120,7 +120,7 @@ func NewClient(options Options) (Client, error) {
 	result := Client{}
 
 	// Precondition check
-	if options.PathPrefix != "" && strings.HasPrefix(options.PathPrefix, "/") == false {
+	if options.PathPrefix != "" && !strings.HasPrefix(options.PathPrefix, "/") {
 		return result, errors.New("The PathPrefix must start with a \\")
 	}
 

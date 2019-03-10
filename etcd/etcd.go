@@ -63,7 +63,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	}
 	kvs := getRes.Kvs
 	// If no value was found return false
-	if kvs == nil || len(kvs) == 0 {
+	if len(kvs) == 0 {
 		return false, nil
 	}
 	data := kvs[0].Value
