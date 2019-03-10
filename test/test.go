@@ -100,7 +100,23 @@ func TestTypes(store gokv.Store, t *testing.T) {
 	structVar := Foo{
 		Bar: "baz",
 	}
+	structWithPrivateFieldVar := Foo{
+		Bar:        "baz",
+		privateBar: "privBaz",
+	}
+	// The differing expected var for structWithPrivateFieldVar
+	structWithPrivateFieldExpectedVar := Foo{
+		Bar: "baz",
+	}
 	privateStructVar := privateFoo{
+		Bar: "baz",
+	}
+	privateStructWithPrivateFieldVar := privateFoo{
+		Bar:        "baz",
+		privateBar: "privBaz",
+	}
+	// The differing expected var for privateStructWithPrivateFieldVar
+	privateStructWithPrivateFieldExpectedVar := privateFoo{
 		Bar: "baz",
 	}
 
@@ -119,9 +135,10 @@ func TestTypes(store gokv.Store, t *testing.T) {
 	testVals := []struct {
 		subTestName string
 		val         interface{}
+		expected    interface{}
 		testGet     func(*testing.T, gokv.Store, string, interface{})
 	}{
-		{"bool", boolVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"bool", boolVar, boolVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(bool)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -130,7 +147,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"float", floatVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"float", floatVar, floatVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(float64)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -139,7 +156,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"int", intVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"int", intVar, intVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(int)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -148,7 +165,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"rune", runeVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"rune", runeVar, runeVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(rune)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -157,7 +174,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"string", stringVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"string", stringVar, stringVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(string)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -166,7 +183,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"struct", structVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"struct", structVar, structVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(Foo)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -175,7 +192,16 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"private struct", privateStructVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"struct with private field", structWithPrivateFieldVar, structWithPrivateFieldExpectedVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+			actualPtr := new(Foo)
+			found, err := store.Get(key, actualPtr)
+			handleGetError(t, err, found)
+			actual := *actualPtr
+			if actual != expected {
+				t.Errorf("Expected: %v, but was: %v", expected, actual)
+			}
+		}},
+		{"private struct", privateStructVar, privateStructVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new(privateFoo)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -184,7 +210,16 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Errorf("Expected: %v, but was: %v", expected, actual)
 			}
 		}},
-		{"slice of bool", sliceOfBool, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"private struct with private field", privateStructWithPrivateFieldVar, privateStructWithPrivateFieldExpectedVar, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+			actualPtr := new(privateFoo)
+			found, err := store.Get(key, actualPtr)
+			handleGetError(t, err, found)
+			actual := *actualPtr
+			if actual != expected {
+				t.Errorf("Expected: %v, but was: %v", expected, actual)
+			}
+		}},
+		{"slice of bool", sliceOfBool, sliceOfBool, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]bool)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -193,7 +228,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of byte", sliceOfByte, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of byte", sliceOfByte, sliceOfByte, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]byte)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -202,7 +237,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of int", sliceOfInt, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of int", sliceOfInt, sliceOfInt, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]int)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -211,7 +246,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of string", sliceOfString, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of string", sliceOfString, sliceOfString, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]string)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -220,7 +255,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of slice of string", sliceOfSliceOfString, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of slice of string", sliceOfSliceOfString, sliceOfSliceOfString, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([][]string)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -229,7 +264,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of struct", sliceOfStruct, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of struct", sliceOfStruct, sliceOfStruct, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]Foo)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -238,7 +273,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 				t.Error(diff)
 			}
 		}},
-		{"slice of private struct", sliceOfPrivateStruct, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
+		{"slice of private struct", sliceOfPrivateStruct, sliceOfPrivateStruct, func(t *testing.T, store gokv.Store, key string, expected interface{}) {
 			actualPtr := new([]privateFoo)
 			found, err := store.Get(key, actualPtr)
 			handleGetError(t, err, found)
@@ -256,7 +291,7 @@ func TestTypes(store gokv.Store, t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			testVal.testGet(t, store, key, testVal.val)
+			testVal.testGet(t, store, key, testVal.expected)
 		})
 	}
 }
