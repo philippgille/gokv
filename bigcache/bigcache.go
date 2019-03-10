@@ -9,8 +9,6 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
-const minSize = 512 * 1024
-
 // Store is a gokv.Store implementation for BigCache.
 type Store struct {
 	s     *bigcache.BigCache

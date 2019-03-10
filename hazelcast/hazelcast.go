@@ -2,7 +2,6 @@ package hazelcast
 
 import (
 	"fmt"
-	"time"
 
 	hazelcast "github.com/hazelcast/hazelcast-go-client"
 	"github.com/hazelcast/hazelcast-go-client/config/property"
@@ -12,8 +11,6 @@ import (
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
-
-var defaultTimeout = 200 * time.Millisecond
 
 // Client is a gokv.Store implementation for Hazelcast.
 type Client struct {
