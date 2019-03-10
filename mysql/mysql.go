@@ -225,6 +225,8 @@ func createDB(cfg *gosqldriver.Config, db *gosql.DB) error {
 	dsnWithoutDBname := cfg.FormatDSN()
 	tempDB, err := gosql.Open("mysql", dsnWithoutDBname)
 	// This temporary DB must be closed.
+	// But let's not return an error in case closing this temporary DB fails.
+	// TODO: Maybe DO return an error? If yes, also change GolangCI-Lint configuration to not exclude this warning.
 	defer tempDB.Close()
 	if err != nil {
 		return err
