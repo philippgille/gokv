@@ -17,15 +17,15 @@ language: go
 go:
   - "1.10"
   - "1.11"
+  - "1.12"
 
 before_install:
   - go version
   - go env
 
-# Don't start Docker containers all at once. The Travis CI VM doesn't have enough memory for that.
-# TODO: Implement a proper wait (e.g. with container health check) instead of sleeping for 10s
 script:
   # Build
   - go build -v ./...
   # Test all packages that don't require a service
-  - go test -v -race -coverprofile=coverage1.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./freecache ./gomap ./leveldb ./syncmap
+  - go test -v -race -count 10 -coverprofile=coverage1.txt -covermode=atomic ./badgerdb ./bbolt ./bigcache ./freecache ./gomap ./leveldb ./syncmap
+  # Snip... (removed all other tests - only the above is relevant for BigCache)
