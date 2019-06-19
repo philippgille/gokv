@@ -6,7 +6,7 @@ import (
 )
 
 type Error struct {
-	errs []error
+	Errs []error
 }
 
 var (
@@ -22,14 +22,14 @@ func newErrors(err ...error) Error {
 }
 
 func (e Error) Error() string {
-	if e.errs == nil {
+	if e.Errs == nil {
 		return "<nil>"
 	}
 
-	s := make([]string, len(e.errs))
+	s := make([]string, len(e.Errs))
 
-	for i := range e.errs {
-		s[i] = e.errs[i].Error()
+	for i := range e.Errs {
+		s[i] = e.Errs[i].Error()
 	}
 
 	return strings.Join(s, " | ")
