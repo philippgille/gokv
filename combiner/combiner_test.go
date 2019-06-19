@@ -8,7 +8,7 @@ import (
 	"github.com/philippgille/gokv/gomap"
 )
 
-func ExampleUsage() {
+func ExampleNewStore() {
 	st, err := combiner.NewStore(combiner.Options{
 		Parallel: true,
 		Backends: []combiner.Backend{
