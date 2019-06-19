@@ -44,13 +44,23 @@ func NewBackend(st gokv.Store, err error) Backend {
 // Returns a new Store. At least two `gokv.Store`s are needed
 // to initialize it. You should call `Close()` when you are done using it.
 func NewStore(options Options) (*Store, error) {
-	if len(options.Backends) < 2 {
+	switch len(options.Backends) {
+	default:
+		// nothing to do
+	case 0:
+		return nil, ErrNotEnoughStores
+	case 1:
+		// close the store
+		err := options.Backends[0].store.Close()
+		if err != nil {
+			return nil, newErrors(ErrNotEnoughStores, err)
+		}
 		return nil, ErrNotEnoughStores
 	}
 	stores := make([]gokv.Store, len(options.Backends))
 	for i := range options.Backends {
 		if options.Backends[i].err != nil {
-			return nil, options.Backends[i].err
+			return nil, closeStores(stores[:i], options.Backends[i].err)
 		}
 		stores[i] = options.Backends[i].store
 	}
@@ -132,8 +142,11 @@ func (s *Store) Get(k string, v interface{}) (bool, error) {
 
 // Implements `gokv.Store`. Closes all the configured `gokv.Store`s.
 func (s *Store) Close() error {
-	var errs []error
-	for _, st := range s.backends {
+	return closeStores(s.backends)
+}
+
+func closeStores(stores []gokv.Store, errs ...error) error {
+	for _, st := range stores {
 		if err := st.Close(); err != nil {
 			errs = append(errs, err)
 		}
