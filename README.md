@@ -134,7 +134,6 @@ Differences between the formats:
 
 - Benchmarks!
 - CLI: A simple command line interface tool that allows you create, read, update and delete key-value pairs in all of the `gokv` storages
-- A `combiner` package that allows you to create a `gokv.Store` which forwards its call to multiple implementations at the same time. So for example you can use `memcached` and `s3` simultaneously to have 1) super fast access but also 2) durable redundant persistent storage.
 - A way to directly configure the clients via the options of the underlying used Go package (e.g. not the `redis.Options` struct in `github.com/philippgille/gokv`, but instead the `redis.Options` struct in `github.com/go-redis/redis`)
     - Will be optional and discouraged, because this will lead to compile errors in code that uses `gokv` when switching the underlying used Go package, but definitely useful for some people
 - More stores (see stores in [Implementations](#implementations) list with unchecked boxes)
