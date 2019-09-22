@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/philippgille/gokv"
-	"github.com/philippgille/gokv/badgerdb"
 	"github.com/philippgille/gokv/bbolt"
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/test"
@@ -154,10 +153,10 @@ func TestNonExistingDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	options := badgerdb.Options{
-		Dir: tmpDir,
+	options := bbolt.Options{
+		Path: tmpDir,
 	}
-	store, err := badgerdb.NewStore(options)
+	store, err := bbolt.NewStore(options)
 	defer cleanUp(store, tmpDir)
 	if err != nil {
 		t.Fatal(err)
