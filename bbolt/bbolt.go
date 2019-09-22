@@ -1,7 +1,7 @@
 package bbolt
 
 import (
-	bolt "github.com/etcd-io/bbolt"
+	bolt "go.etcd.io/bbolt"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
