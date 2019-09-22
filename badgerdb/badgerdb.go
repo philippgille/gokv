@@ -127,9 +127,7 @@ func NewStore(options Options) (Store, error) {
 
 	// Open the Badger database located in the options.Dir directory.
 	// It will be created if it doesn't exist.
-	opts := badger.DefaultOptions
-	opts.Dir = options.Dir
-	opts.ValueDir = opts.Dir
+	opts := badger.DefaultOptions(options.Dir)
 	db, err := badger.Open(opts)
 	if err != nil {
 		return result, err

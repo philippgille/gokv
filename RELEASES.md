@@ -10,6 +10,7 @@ vNext
 
 - Added `gokv.Store` implementations:
     - Package `hazelcast` - A `gokv.Store` implementation for [Hazelcast](https://github.com/hazelcast/hazelcast) (issue [#75](https://github.com/philippgille/gokv/issues/75))
+- Fixed: Compile error in `badgerdb` after a breaking change in BadgerDB 1.6.0
 
 v0.5.0 (2019-01-12)
 -------------------
