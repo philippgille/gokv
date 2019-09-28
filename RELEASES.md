@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added support for Go modules (issue [#81](https://github.com/philippgille/gokv/issues/81))
 - Added `gokv.Store` implementations:
     - Package `hazelcast` - A `gokv.Store` implementation for [Hazelcast](https://github.com/hazelcast/hazelcast) (issue [#75](https://github.com/philippgille/gokv/issues/75))
 - Fixed: Compile error in `badgerdb` after a breaking change in BadgerDB 1.6.0
