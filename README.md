@@ -137,12 +137,12 @@ Differences between the formats:
 Usage
 -----
 
-First, download the package. You don't need to download *all* subpackages with `go get -u github.com/philippgille/gokv/...`, but only the subpackages you want to work with. This spares you from downloading many unnecessary dependencies.
+First, download the module you want to work with:
 
 - For example when you want to work with the `gokv.Store` interface:
-    - `go get -u github.com/philippgille/gokv`
+    - `go get github.com/philippgille/gokv`
 - For example when you want to work with the Redis implementation:
-    - `go get -u github.com/philippgille/gokv/redis`
+    - `go get github.com/philippgille/gokv/redis`
 
 Then you can import and use it.
 
@@ -271,6 +271,7 @@ Design decisions
     1. Naming is hard. If one used package for an embedded database uses `Path` and another `Directory`, then how should be name the option for the database directory? Maybe `Folder`, to add to the confusion? Also, some users might already have used the packages we use directly and they would wonder about the "new" variable name which has the same meaning.  
     Using the packages' variable names spares us the need to come up with unified, understandable variable names without alienating users who already used the packages we use directly.
     2. Only few users are going to switch back and forth between `gokv.Store` implementations, so most user won't even notice the differences in variable names.
+- Each `gokv` implementation is a Go module. This differs from repositories that contain a single Go module with many subpackages, but has the huge advantage that if you only want to work with the Redis client for example, the `go get` will only fetch the Redis dependencies and not the huge amount of dependencies that are used across the whole repository.
 
 Related projects
 ----------------
