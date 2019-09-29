@@ -39,128 +39,17 @@ install:
 # TODO: Implement a proper wait (e.g. with container health check) instead of sleeping for 10s
 script:
   # Build
-  # Helper packages
-  - GO111MODULE="" cd encoding && go build -v
-  - GO111MODULE="" cd .. && cd sql && go build -v
-  - GO111MODULE="" cd .. && cd test && go build -v
-  - GO111MODULE="" cd .. && cd util && go build -v
-  # Implementations
-  - cd .. && cd badgerdb && go build -v
-  - cd .. && cd bbolt && go build -v
-  - cd .. && cd bigcache && go build -v
-  - cd .. && cd cockroachdb && go build -v
-  - cd .. && cd consul && go build -v
-  - cd .. && cd datastore && go build -v
-  - cd .. && cd dynamodb && go build -v
-  - cd .. && cd etcd && go build -v
-  - cd .. && cd file && go build -v
-  - cd .. && cd freecache && go build -v
-  - cd .. && cd gomap && go build -v
-  - cd .. && cd hazelcast && go build -v
-  - cd .. && cd ignite && go build -v
-  - cd .. && cd leveldb && go build -v
-  - cd .. && cd memcached && go build -v
-  - cd .. && cd mongodb && go build -v
-  - cd .. && cd mysql && go build -v
-  - cd .. && cd postgresql && go build -v
-  - cd .. && cd redis && go build -v
-  - cd .. && cd s3 && go build -v
-  - cd .. && cd syncmap && go build -v
-  - cd .. && cd tablestorage && go build -v
-  - cd .. && cd tablestore && go build -v
-  - cd .. && cd zookeeper && go build -v
-  # Examples
-  - cd .. && cd examples && go build -v
-  - cd ..
+  - build/build.sh
 
   # Linter
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.15.0
   - golangci-lint run
 
   # Test
-  # Packages that don't require a service
-  - cd badgerdb && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd bbolt && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd bigcache && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd file && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd freecache && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd gomap && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd leveldb && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd syncmap && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  # Packages that don't require a Docker container
-  - cd .. && cd memcached && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd mongodb && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd mysql && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - cd .. && cd redis && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  # Consul
-  - docker run -d --rm --name consul -p 8500:8500 bitnami/consul
-  - sleep 10s
-  - cd .. && cd consul && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop consul
-  # etcd
-  - docker run -d --rm --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd
-  - sleep 10s
-  - cd .. && cd etcd && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop etcd
-  # DynamoDB via "DynamoDB local"
-  - docker run -d --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local
-  - sleep 10s
-  - cd .. && cd dynamodb && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop dynamodb-local
-  # Cosmos DB via Azurite
-  # There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
-  #- docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
-  #
-  # Test Google Cloud Datastore via "Cloud Datastore Emulator"
-  # Using the ":slim" or ":alpine" tag would require the emulator to be installed manually.
-  # Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
-  # `--host-port` is required because otherwise the server only listens on localhost IN the container.
-  - docker run -d --rm --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081
-  - sleep 10s
-  - cd .. && cd datastore && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop datastore
-  # Amazon S3 via Minio
-  - docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 minio/minio server /data
-  - sleep 10s
-  - cd .. && cd s3 && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop s3
-  # PostgreSQL
-  # It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
-  # starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
-  # Expose port 5433 instead of 5432 because Travis CI already has a service running on 5432.
-  - docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5433:5432 postgres:alpine
-  - sleep 10s
-  - cd .. && cd postgresql && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop postgres
-  # CockroachDB
-  - docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start --insecure
-  - sleep 10s
-  - docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'
-  - cd .. && cd cockroachdb && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop cockroachdb
-  # Apache Ignite
-  - docker run -d --rm --name ignite -e "CONFIG_URI=https://raw.githubusercontent.com/apache/ignite/master/examples/config/example-cache.xml" -p 10800:10800 apacheignite/ignite
-  - sleep 10s
-  - cd .. && cd ignite && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop ignite
-  # Apache ZooKeeper
-  - docker run -d --rm --name zookeeper -p 2181:2181 zookeeper
-  - sleep 10s
-  - cd .. && cd zookeeper && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop zookeeper
-  # Alibaba Cloud Table Store
-  # TODO: Currently no emulator exists for Alibaba Cloud Table Store.
-  #
-  # Hazelcast
-  - docker run -d --rm --name hazelcast -p 5701:5701 hazelcast/hazelcast
-  - sleep 10s
-  - cd .. && cd hazelcast && go test -v -race -coverprofile=coverage.txt -covermode=atomic
-  - docker stop hazelcast
-  - cd ..
+  - build/test.sh
 
 after_success:
-  # Combine coverage reports.
-  # (Using grep to skip the first line of each coverage report (there's probably a more elegant way to do this).)
-  - cat badgerdb/coverage.txt > coverage.txt && cat bbolt/coverage.txt | grep gokv >> coverage.txt && cat bigcache/coverage.txt | grep gokv >> coverage.txt && cat cockroachdb/coverage.txt | grep gokv >> coverage.txt && cat consul/coverage.txt | grep gokv >> coverage.txt && cat datastore/coverage.txt | grep gokv >> coverage.txt && cat dynamodb/coverage.txt | grep gokv >> coverage.txt && cat etcd/coverage.txt | grep gokv >> coverage.txt && cat file/coverage.txt | grep gokv >> coverage.txt && cat freecache/coverage.txt | grep gokv >> coverage.txt && cat gomap/coverage.txt | grep gokv >> coverage.txt && cat hazelcast/coverage.txt | grep gokv >> coverage.txt && cat ignite/coverage.txt | grep gokv >> coverage.txt && cat leveldb/coverage.txt | grep gokv >> coverage.txt && cat memcached/coverage.txt | grep gokv >> coverage.txt && cat mongodb/coverage.txt | grep gokv >> coverage.txt && cat mysql/coverage.txt | grep gokv >> coverage.txt && cat postgresql/coverage.txt | grep gokv >> coverage.txt && cat redis/coverage.txt | grep gokv >> coverage.txt && cat s3/coverage.txt | grep gokv >> coverage.txt && cat syncmap/coverage.txt | grep gokv >> coverage.txt && cat tablestorage/coverage.txt | grep gokv >> coverage.txt && cat tablestore/coverage.txt | grep gokv >> coverage.txt && cat zookeeper/coverage.txt | grep gokv >> coverage.txt
+  # Combine coverage reports
+  - build/combine-coverage.sh
   # Upload coverage data to codecov.io
   - bash <(curl -s https://codecov.io/bash)
