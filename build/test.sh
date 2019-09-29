@@ -20,7 +20,7 @@ for MODULE_NAME in "${array[@]}"; do
 done
 
 # Modules that don't require a Docker container in Travis CI
-#array=( memcached mongodb mysql redis )
+array=( memcached mongodb mysql redis )
 for MODULE_NAME in "${array[@]}"; do
     echo "testing $MODULE_NAME"
     (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
@@ -84,3 +84,5 @@ sleep 10s
 
 # Examples
 # TODO: Currently no tests
+
+cd "$WORKING_DIR"

@@ -15,10 +15,12 @@ export GO111MODULE=on
 # TODO: Currently without modules
 
 # Implementations
-cat "$SCRIPT_DIR"/allmodules | while read -r MODULE_NAME; do
+cat "$SCRIPT_DIR"/implementations | while read -r MODULE_NAME; do
     echo "updating $MODULE_NAME"
     (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go get -u && go mod tidy) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
 done
 
 # Examples
 (cd "$SCRIPT_DIR"/../examples && go get -u && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
+
+cd "$WORKING_DIR"
