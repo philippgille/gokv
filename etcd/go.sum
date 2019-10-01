@@ -93,6 +93,15 @@ github.com/modern-go/reflect2 v1.0.1 h1:9f412s+6RmYXLWZSEzVVgPGK7C2PphHj5RJrvfx9
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
+github.com/philippgille/gokv v0.5.1-0.20190928144926-0fa470d8f0d4/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a h1:8+fq75CyBhH7FhiL9m34fkI81MB2GyjnNy/jPZ1idbg=
+github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a h1:QxSIt4/Eao/PchzFCDdhpeC+YW+G0J8ky3ffJpsD1/8=
+github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
+github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a h1:ZBeVU0JxItFmfZiL9qtdwe+l3rSXwDrEX3wwiW8vQCo=
+github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:KT34smKZN1y03tEug35ctW6VnyXPySUt6VCCsBXBBe0=
+github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a h1:EJKkHXZwL1p8SxoXIcjJrX9LJG7MNuzcTUd73EA4Idg=
+github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

@@ -1,4 +1,4 @@
-github.com/philippgille/gokv/encoding v0.0.0-20190929161440-07d380f5709c h1:qcHKCknwLDYpXSsdnpLqBwD2zKsa9gaSgeYqiDv29J4=
-github.com/philippgille/gokv/encoding v0.0.0-20190929161440-07d380f5709c/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
-github.com/philippgille/gokv/util v0.0.0-20190929161440-07d380f5709c h1:LFLnU7EeZfjNrHAEfHl8le+hgdlllRy6GKlg591VDO8=
-github.com/philippgille/gokv/util v0.0.0-20190929161440-07d380f5709c/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=
+github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a h1:QxSIt4/Eao/PchzFCDdhpeC+YW+G0J8ky3ffJpsD1/8=
+github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
+github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a h1:EJKkHXZwL1p8SxoXIcjJrX9LJG7MNuzcTUd73EA4Idg=
+github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=

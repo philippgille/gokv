@@ -1,5 +1,14 @@
 github.com/go-test/deep v1.0.4 h1:u2CU3YKy9I2pmu9pX0eq50wCgjfGIt539SqR7FbHiho=
 github.com/go-test/deep v1.0.4/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
+github.com/philippgille/gokv v0.5.1-0.20190928144926-0fa470d8f0d4/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a h1:8+fq75CyBhH7FhiL9m34fkI81MB2GyjnNy/jPZ1idbg=
+github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a h1:QxSIt4/Eao/PchzFCDdhpeC+YW+G0J8ky3ffJpsD1/8=
+github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
+github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a h1:ZBeVU0JxItFmfZiL9qtdwe+l3rSXwDrEX3wwiW8vQCo=
+github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:KT34smKZN1y03tEug35ctW6VnyXPySUt6VCCsBXBBe0=
+github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a h1:EJKkHXZwL1p8SxoXIcjJrX9LJG7MNuzcTUd73EA4Idg=
+github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=
 go.etcd.io/bbolt v1.3.3 h1:MUGmc65QhB3pIlaQ5bB4LwqSj6GIonVJXpZiaKNyaKk=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 golang.org/x/sys v0.0.0-20190927073244-c990c680b611 h1:q9u40nxWT5zRClI/uU9dHCiYGottAg6Nzz4YUQyHxdA=
