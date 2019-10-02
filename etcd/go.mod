@@ -20,10 +20,9 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.11.2 // indirect
 	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a // indirect
-	github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a
-	github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a
-	github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a
+	github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634
+	github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634
+	github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634
 	github.com/prometheus/client_golang v1.1.0 // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4 // indirect
 	github.com/prometheus/common v0.7.0 // indirect
@@ -39,7 +38,6 @@ require (
 	golang.org/x/sys v0.0.0-20190927073244-c990c680b611 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190927181202-20e1ac93f88c // indirect
 	google.golang.org/grpc v1.24.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect

@@ -9,10 +9,9 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.3.0 // indirect
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a // indirect
-	github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a
-	github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a
-	github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a
+	github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634
+	github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634
+	github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634
 	github.com/satori/go.uuid v1.2.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect

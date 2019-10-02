@@ -23,6 +23,14 @@ github.com/onsi/ginkgo v1.10.1/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.7.0 h1:XPnZz8VVBHjVsy1vzJmRwIcSwiUO+JFfrv/xGiigmME=
 github.com/onsi/gomega v1.7.0/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
+github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a h1:8+fq75CyBhH7FhiL9m34fkI81MB2GyjnNy/jPZ1idbg=
+github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634 h1:U1lUMQ09wKdtGGasRKNnNVlOGSiB017wu5/wK27ptpo=
+github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
+github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634 h1:4TpD8D+6MfOT9n+NdoqTmEyvpQgzynETzaWd+Hde/T4=
+github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634/go.mod h1:v2Rp8C1tpC7e+oW59KCPlwEh3gr/PDSd/l5bBzCGn2A=
+github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634 h1:amdd5uaFPc332k9ZNqK8KiRzDxHH9pHAvK5dbHZ7O7w=
+github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

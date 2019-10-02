@@ -6,10 +6,9 @@ require (
 	cloud.google.com/go/datastore v1.0.0
 	cloud.google.com/go/storage v1.0.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
-	github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a // indirect
-	github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a
-	github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a
-	github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a
+	github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634
+	github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634
+	github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634
 	go.opencensus.io v0.22.1 // indirect
 	golang.org/x/exp v0.0.0-20190927203820-447a159532ef // indirect
 	golang.org/x/net v0.0.0-20190926025831-c00fd9afed17 // indirect

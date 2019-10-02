@@ -1,4 +1,3 @@
-github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9 h1:HD8gA2tkByhMAwYaFAX9w2l7vxvBQ5NMoxDrkhqhtn4=
 github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9/go.mod h1:bOvUY6CB00SOBii9/FifXqc0awNKxLFCL/+pkDPuyl8=
 github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 h1:cTp8I5+VIoKjsnZuH8vjyaysT/ses3EvZeaV/1UkF2M=
 github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96/go.mod h1:bOvUY6CB00SOBii9/FifXqc0awNKxLFCL/+pkDPuyl8=
@@ -20,7 +19,6 @@ github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25Kn
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/go-test/deep v1.0.4 h1:u2CU3YKy9I2pmu9pX0eq50wCgjfGIt539SqR7FbHiho=
 github.com/go-test/deep v1.0.4/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
-github.com/golang/protobuf v1.3.1 h1:YF8+flBXS5eO826T4nzqPrxfhQThhXl0YzfuUPu4SBg=
 github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.2 h1:6nsPYzhq5kReh6QImI3k5qWzO4PEbvbIW2cwSfR/6xs=
 github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
@@ -35,15 +33,16 @@ github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czP
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
-github.com/philippgille/gokv v0.5.1-0.20190928144926-0fa470d8f0d4/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
 github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a h1:8+fq75CyBhH7FhiL9m34fkI81MB2GyjnNy/jPZ1idbg=
 github.com/philippgille/gokv v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
-github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a h1:QxSIt4/Eao/PchzFCDdhpeC+YW+G0J8ky3ffJpsD1/8=
-github.com/philippgille/gokv/encoding v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
-github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a h1:ZBeVU0JxItFmfZiL9qtdwe+l3rSXwDrEX3wwiW8vQCo=
-github.com/philippgille/gokv/test v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:KT34smKZN1y03tEug35ctW6VnyXPySUt6VCCsBXBBe0=
-github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a h1:EJKkHXZwL1p8SxoXIcjJrX9LJG7MNuzcTUd73EA4Idg=
-github.com/philippgille/gokv/util v0.5.1-0.20190929161952-f31a8dbcad2a/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=
+github.com/philippgille/gokv v0.5.1-0.20191001201555-5ac9a20de634 h1:wenKc7SUGXg20RcRGTCI+lUZ+IT6R0sJCc89A8F+aec=
+github.com/philippgille/gokv v0.5.1-0.20191001201555-5ac9a20de634/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634 h1:U1lUMQ09wKdtGGasRKNnNVlOGSiB017wu5/wK27ptpo=
+github.com/philippgille/gokv/encoding v0.0.0-20191001201555-5ac9a20de634/go.mod h1:SjxSrCoeYrYn85oTtroyG1ePY8aE72nvLQlw8IYwAN8=
+github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634 h1:4TpD8D+6MfOT9n+NdoqTmEyvpQgzynETzaWd+Hde/T4=
+github.com/philippgille/gokv/test v0.0.0-20191001201555-5ac9a20de634/go.mod h1:v2Rp8C1tpC7e+oW59KCPlwEh3gr/PDSd/l5bBzCGn2A=
+github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634 h1:amdd5uaFPc332k9ZNqK8KiRzDxHH9pHAvK5dbHZ7O7w=
+github.com/philippgille/gokv/util v0.0.0-20191001201555-5ac9a20de634/go.mod h1:2dBhsJgY/yVIkjY5V3AnDUxUbEPzT6uQ3LvoVT8TR20=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
@@ -64,7 +63,6 @@ github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljT
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
-golang.org/x/net v0.0.0-20190620200207-3b0461eec859 h1:R/3boaszxrf1GEUWTVDzSKVwLmSJpwZ1yqXm8j0v2QI=
 golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20190926025831-c00fd9afed17 h1:qPnAdmjNA41t3QBTx2mFGf/SD1IoslhYu7AmdsVzCcs=
 golang.org/x/net v0.0.0-20190926025831-c00fd9afed17/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
