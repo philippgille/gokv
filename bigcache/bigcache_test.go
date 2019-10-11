@@ -46,6 +46,7 @@ func TestTypes(t *testing.T) {
 
 // TestStoreConcurrent launches a bunch of goroutines that concurrently work with one store.
 func TestStoreConcurrent(t *testing.T) {
+	t.Skip("Examine / fix in #84") // TODO: Examine / fix in #84
 	store := createStore(t, encoding.JSON)
 	defer store.Close()
 
