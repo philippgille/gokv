@@ -137,12 +137,12 @@ Differences between the formats:
 Usage
 -----
 
-First, download the module you want to work with:
+First, download the [module](https://github.com/golang/go/wiki/Modules) you want to work with:
 
 - For example when you want to work with the `gokv.Store` interface:
-    - `go get github.com/philippgille/gokv`
+    - `go get github.com/philippgille/gokv@latest`
 - For example when you want to work with the Redis implementation:
-    - `go get github.com/philippgille/gokv/redis`
+    - `go get github.com/philippgille/gokv/redis@latest`
 
 Then you can import and use it.
 
