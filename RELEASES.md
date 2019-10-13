@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+v0.6.0 (2019-10-13)
+-------------------
+
 - Added support for [Go modules](https://github.com/golang/go/wiki/Modules) (issue [#81](https://github.com/philippgille/gokv/issues/81))
     - All `gokv.Store` implementations are now separate Go modules
 - Added `gokv.Store` implementations:
