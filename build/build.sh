@@ -5,8 +5,6 @@ set -euxo pipefail
 WORKING_DIR="$(pwd)"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-export GO111MODULE=on
-
 # Interface
 echo "building gokv"
 (cd "$SCRIPT_DIR"/.. && go build -v) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
