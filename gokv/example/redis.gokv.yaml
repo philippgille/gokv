@@ -1,0 +1,3 @@
+implementation: redis
+encoding: json
+options: {}
