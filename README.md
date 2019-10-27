@@ -25,6 +25,7 @@ Contents
 4. [Motivation](#motivation)
 5. [Design decisions](#design-decisions)
 6. [Related projects](#related-projects)
+7. [License](#license)
 
 Features
 --------
@@ -313,6 +314,14 @@ Others:
 License
 -------
 
-> Note: The FOSSA scan checks the repository as a whole. If you only use a few select modules, the number of deep dependencies is of course much lower.
+`gokv` is licensed under the [Mozilla Public License Version 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
+
+- [FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
+- [Summary 1](https://choosealicense.com/licenses/mpl-2.0/)
+- [Summary 2](https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2))
+
+Dependencies might be licensed under other licenses.
+
+> Note: The FOSSA scan checks the repository as a whole. If you only use a few select modules, the number of deep dependencies is of course much lower and the obligations might only be a subset of the listed ones.
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv?ref=badge_large)
