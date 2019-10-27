@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Improved: Updated dependencies of all modules after adding tags for all modules (`go get -u -t`)
+
 v0.6.0 (2019-10-13)
 -------------------
 
