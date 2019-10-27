@@ -1,4 +1,4 @@
 github.com/go-test/deep v1.0.4 h1:u2CU3YKy9I2pmu9pX0eq50wCgjfGIt539SqR7FbHiho=
 github.com/go-test/deep v1.0.4/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
-github.com/philippgille/gokv v0.5.1-0.20191011213304-eb77f15b9c61 h1:GIHjzzfFa5MP+gaNJfa1Y9/L1qjh2NCKWcGIbJVizDs=
-github.com/philippgille/gokv v0.5.1-0.20191011213304-eb77f15b9c61/go.mod h1:OCoWPt+mbYuTO1FUVrQ2SxQU0oaaHBsn6lRhFX3JHOc=
+github.com/philippgille/gokv v0.6.0 h1:fNEx/tSwV73nzlYd3iRYB8F+SEVJNNFzH1gsaT8SK2c=
+github.com/philippgille/gokv v0.6.0/go.mod h1:tjXRFw9xDHgxLS8WJdfYotKGWp8TWqu4RdXjMDG/XBo=
