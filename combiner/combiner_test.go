@@ -1,33 +1,41 @@
 package combiner_test
 
 import (
-	"fmt"
+	"testing"
 
 	"github.com/philippgille/gokv/combiner"
 	"github.com/philippgille/gokv/file"
 	"github.com/philippgille/gokv/gomap"
 )
 
-func ExampleNewStore() {
-	st, err := combiner.NewStore(combiner.Options{
-		Parallel: true,
-		Backends: []combiner.Backend{
-			combiner.MustBackend(gomap.NewStore(gomap.DefaultOptions)),
-			combiner.NewBackend(file.NewStore(file.DefaultOptions)),
-		},
-	})
+// TestCombiner tests the basic functionality of the combiner.
+func TestCombiner(t *testing.T) {
+	gomapStore := gomap.NewStore(gomap.DefaultOptions)
+	fileStore, err := file.NewStore(file.DefaultOptions)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-	defer st.Close()
-
-	st.Set("something", 123)
-
-	var x int
-	_, err = st.Get("something", &x)
+	combiner, err := combiner.NewCombiner(combiner.DefaultOptions, gomapStore, fileStore)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
+	}
+	defer combiner.Close()
+
+	err = combiner.Set("foo", "bar")
+	if err != nil {
+		t.Error(err)
 	}
 
-	fmt.Println(x) // should print '123'
+	var result string
+	found, err := combiner.Get("foo", &result)
+	if err != nil {
+		t.Error(err)
+	}
+	if !found {
+		t.Error("Value not found")
+	}
+
+	if result != "bar" {
+		t.Errorf(`Expected "bar", but got %v`, result)
+	}
 }

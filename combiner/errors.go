@@ -1,36 +1,32 @@
 package combiner
 
 import (
-	"errors"
 	"strings"
 )
 
-type Error struct {
-	Errs []error
+// MultiError contains a list of errors.
+type MultiError struct {
+	Errors []error
 }
 
-var (
-	ErrNotEnoughStores = newError("at least 2 stores needed")
-)
-
-func newError(err string) Error {
-	return newErrors(errors.New("combiner: " + err))
-}
-
-func newErrors(err ...error) Error {
-	return Error{err}
-}
-
-func (e Error) Error() string {
-	if e.Errs == nil {
+func (e MultiError) Error() string {
+	if e.Errors == nil {
 		return "<nil>"
 	}
 
-	s := make([]string, len(e.Errs))
+	s := make([]string, len(e.Errors))
 
-	for i := range e.Errs {
-		s[i] = e.Errs[i].Error()
+	for i := range e.Errors {
+		s[i] = e.Errors[i].Error()
 	}
 
 	return strings.Join(s, " | ")
+}
+
+func (e *MultiError) addError(err error) {
+	e.Errors = append(e.Errors, err)
+}
+
+func newMultiError(err ...error) MultiError {
+	return MultiError{err}
 }
