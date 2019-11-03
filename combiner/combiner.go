@@ -1,8 +1,10 @@
 package combiner
 
 import (
+	"context"
 	"errors"
 	"reflect"
+	"runtime"
 
 	"github.com/philippgille/gokv"
 	"github.com/philippgille/gokv/util"
@@ -21,6 +23,13 @@ const (
 	// and makes sure all Get calls find a result and they're deeply equal.
 	// It returns early upon encountering any error.
 	SequentialWaitAll Strategy = iota // 0, so it's the default value for a Strategy
+	// ParallelWaitAll is similar to SequentialWaitAll with the only difference
+	// that the Set/Get/Delete/Close operations are forwarded to the configured stores
+	// in parallel. The operation still blocks until all goroutines are finished,
+	// leading to the same guarantees (no error returned means all ops successful, all results deeply equal).
+	// There's also the same early return in case of an error.
+	// So as soon as an error is encountered, the operations in the remaining goroutines are canceled.
+	ParallelWaitAll
 	// SequentialWaitFirst only blocks until the first store is finished with the operation,
 	// independent of a success.
 	//
@@ -84,6 +93,35 @@ func (s Combiner) Set(k string, v interface{}) error {
 				return newMultiError(err)
 			}
 		}
+	case ParallelWaitAll:
+		sem := make(chan struct{}, runtime.NumCPU())
+		ctx, cancel := context.WithCancel(context.Background())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				select {
+				case <-ctx.Done():
+					// Don't call Set if ctx cancel was called,
+					// which is the case when an error occurs in of the goroutines.
+				case errChan <- store.Set(k, v):
+				}
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				// Stop remaining Set operations in goroutines immediately
+				cancel()
+				// Don't close errChan! A goroutine could still be in a Set call,
+				// which would lead to sending an error to a closed channel, which would lead to a panic.
+				return newMultiError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
 	case SequentialWaitFirst:
 		err := s.stores[0].Set(k, v)
 		if err != nil {
@@ -168,6 +206,8 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 			prevVal = v
 		}
 		foundResult = prevFound
+	case ParallelWaitAll:
+		return foundResult, newMultiError(errors.New("Strategy ParallelWaitAll not implemented for Get yet"))
 	case SequentialWaitFirst:
 		var err error // For not having to use `:=` in the next step, which would lead to foundResult not being overwritten
 		foundResult, err = s.stores[0].Get(k, v)
@@ -232,6 +272,35 @@ func (s Combiner) Delete(k string) error {
 				return newMultiError(err)
 			}
 		}
+	case ParallelWaitAll:
+		sem := make(chan struct{}, runtime.NumCPU())
+		ctx, cancel := context.WithCancel(context.Background())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				select {
+				case <-ctx.Done():
+					// Don't call Delete if ctx cancel was called,
+					// which is the case when an error occurs in of the goroutines.
+				case errChan <- store.Delete(k):
+				}
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				// Stop remaining Delete operations in goroutines immediately
+				cancel()
+				// Don't close errChan! A goroutine could still be in a Delete call,
+				// which would lead to sending an error to a closed channel, which would lead to a panic.
+				return newMultiError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
 	case SequentialWaitFirst:
 		err := s.stores[0].Delete(k)
 		if err != nil {
@@ -289,6 +358,35 @@ func (s Combiner) Close() error {
 				return newMultiError(err)
 			}
 		}
+	case ParallelWaitAll:
+		sem := make(chan struct{}, runtime.NumCPU())
+		ctx, cancel := context.WithCancel(context.Background())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				select {
+				case <-ctx.Done():
+					// Don't call Close if ctx cancel was called,
+					// which is the case when an error occurs in of the goroutines.
+				case errChan <- store.Close():
+				}
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				// Stop remaining Close operations in goroutines immediately
+				cancel()
+				// Don't close errChan! A goroutine could still be in a Close call,
+				// which would lead to sending an error to a closed channel, which would lead to a panic.
+				return newMultiError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
 	case SequentialWaitFirst:
 		err := s.stores[0].Close()
 		if err != nil {
