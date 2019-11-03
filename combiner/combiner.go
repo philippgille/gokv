@@ -123,6 +123,8 @@ func (s Combiner) Set(k string, v interface{}) error {
 				}
 			}(s.stores[nextIndex:])
 		}
+	default:
+		return newMultiError(errors.New("The handling of the configured Set strategy is not implemented yet"))
 	}
 	return nil
 }
@@ -206,6 +208,8 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 			return false, multiError
 		}
 		// Otherwise the recent operation was a success.
+	default:
+		return foundResult, newMultiError(errors.New("The handling of the configured Get strategy is not implemented yet"))
 	}
 	return foundResult, nil
 }
@@ -267,6 +271,8 @@ func (s Combiner) Delete(k string) error {
 				}
 			}(s.stores[nextIndex:])
 		}
+	default:
+		return newMultiError(errors.New("The handling of the configured Delete strategy is not implemented yet"))
 	}
 	return nil
 }
@@ -322,6 +328,8 @@ func (s Combiner) Close() error {
 				}
 			}(s.stores[nextIndex:])
 		}
+	default:
+		return newMultiError(errors.New("The handling of the configured Close strategy is not implemented yet"))
 	}
 	return nil
 }
