@@ -46,6 +46,13 @@ const (
 	// Note: It's up to the package user to either use the fastest or most reliable store
 	// as first store in the stores slice.
 	SequentialWaitSuccess
+	// SequentialWaitResult is similar to SequentialWaitSuccess with the only difference
+	// that Get doesn't stop upon success (i.e. no error returned) but upon a found entry.
+	// Only if all stores return no entry and no error, Get also returns no entry and no error.
+	//
+	// Note: It's up to the package user to either use the fastest or most reliable store
+	// as first store in the stores slice.
+	SequentialWaitResult
 )
 
 // Combiner is a `gokv.Store` implementation that forwards its
@@ -88,6 +95,8 @@ func (s Combiner) Set(k string, v interface{}) error {
 			}
 		}(s.stores[1:])
 	case SequentialWaitSuccess:
+		fallthrough
+	case SequentialWaitResult:
 		i := 0
 		multiError := MultiError{}
 		for ; i < len(s.stores); i++ {
@@ -180,6 +189,23 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 			return false, multiError
 		}
 		// Otherwise the recent operation was a success.
+	case SequentialWaitResult:
+		multiError := MultiError{}
+		var err error
+		for _, store := range s.stores {
+			foundResult, err = store.Get(k, v)
+			if err != nil {
+				multiError.addError(err)
+			} else if foundResult {
+				// Success: Stop blocking iteration
+				break
+			}
+		}
+		// Return now if all operations failed.
+		if len(multiError.Errors) == len(s.stores) {
+			return false, multiError
+		}
+		// Otherwise the recent operation was a success.
 	}
 	return foundResult, nil
 }
@@ -213,6 +239,8 @@ func (s Combiner) Delete(k string) error {
 			}
 		}(s.stores[1:])
 	case SequentialWaitSuccess:
+		fallthrough
+	case SequentialWaitResult:
 		i := 0
 		multiError := MultiError{}
 		for ; i < len(s.stores); i++ {
@@ -266,6 +294,8 @@ func (s Combiner) Close() error {
 			}
 		}(s.stores[1:])
 	case SequentialWaitSuccess:
+		fallthrough
+	case SequentialWaitResult:
 		i := 0
 		multiError := MultiError{}
 		for ; i < len(s.stores); i++ {
