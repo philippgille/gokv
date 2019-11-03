@@ -91,7 +91,7 @@ func (s Combiner) Set(k string, v interface{}) error {
 		}
 		go func(stores []gokv.Store) {
 			for _, store := range stores {
-				store.Set(k, v) // Ignore errors
+				_ = store.Set(k, v) // Ignore errors
 			}
 		}(s.stores[1:])
 	case SequentialWaitSuccess:
@@ -119,7 +119,7 @@ func (s Combiner) Set(k string, v interface{}) error {
 		if nextIndex <= len(s.stores) {
 			go func(stores []gokv.Store) {
 				for _, store := range stores {
-					store.Set(k, v) // Ignore errors
+					_ = store.Set(k, v) // Ignore errors
 				}
 			}(s.stores[nextIndex:])
 		}
@@ -239,7 +239,7 @@ func (s Combiner) Delete(k string) error {
 		}
 		go func(stores []gokv.Store) {
 			for _, store := range stores {
-				store.Delete(k) // Ignore errors
+				_ = store.Delete(k) // Ignore errors
 			}
 		}(s.stores[1:])
 	case SequentialWaitSuccess:
@@ -267,7 +267,7 @@ func (s Combiner) Delete(k string) error {
 		if nextIndex <= len(s.stores) {
 			go func(stores []gokv.Store) {
 				for _, store := range stores {
-					store.Delete(k) // Ignore errors
+					_ = store.Delete(k) // Ignore errors
 				}
 			}(s.stores[nextIndex:])
 		}
@@ -296,7 +296,7 @@ func (s Combiner) Close() error {
 		}
 		go func(stores []gokv.Store) {
 			for _, store := range stores {
-				store.Close() // Ignore errors
+				_ = store.Close() // Ignore errors
 			}
 		}(s.stores[1:])
 	case SequentialWaitSuccess:
@@ -324,7 +324,7 @@ func (s Combiner) Close() error {
 		if nextIndex <= len(s.stores) {
 			go func(stores []gokv.Store) {
 				for _, store := range stores {
-					store.Close() // Ignore errors
+					_ = store.Close() // Ignore errors
 				}
 			}(s.stores[nextIndex:])
 		}
