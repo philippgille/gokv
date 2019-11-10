@@ -7,7 +7,7 @@ const (
 	// UpdateSequentialWaitAll blocks until the operation is successfully finished for all stores.
 	// It makes sure all Set and Delete operations are successful.
 	// It returns early upon encountering any error.
-	UpdateSequentialWaitAll UpdateStrategy = iota // 0, so it's the default value for an UpdateStrategy
+	UpdateSequentialWaitAll UpdateStrategy = iota + 1 // Not 0, so it's not accidentally a default value
 	// UpdateParallelWaitAll is similar to UpdateSequentialWaitAll with the only difference
 	// that the Set and Delete operations are forwarded to the configured stores in parallel.
 	// The operation blocks until all goroutines are finished, leading to the same guarantees
@@ -38,7 +38,7 @@ const (
 	// GetSequentialWaitAll blocks until the operation is successfully finished for all stores.
 	// It makes sure all Get calls either find no result or find a result and they're deeply equal.
 	// It returns early upon encountering any error.
-	GetSequentialWaitAll GetStrategy = iota // 0, so it's the default value for a GetStrategy
+	GetSequentialWaitAll GetStrategy = iota + 1 // Not 0, so it's not accidentally a default value
 	// GetSequentialWaitFirst only forwards the call to the first store in the stores slice, independent of an error.
 	// The first store's result is returned, all other stores are always skipped.
 	//
@@ -66,7 +66,7 @@ type CloseStrategy int
 const (
 	// CloseSequentialWaitAll blocks until the operation is successfully finished for all stores.
 	// It returns early upon encountering any error.
-	CloseSequentialWaitAll CloseStrategy = iota // 0, so it's the default value for a CloseStrategy
+	CloseSequentialWaitAll CloseStrategy = iota + 1 // Not 0, so it's not accidentally a default value
 	// CloseParallelWaitAll is similar to CloseSequentialWaitAll with the only difference
 	// that the Close operation is forwarded to the configured stores in parallel.
 	// The operation blocks until all goroutines are finished, leading to the same guarantees

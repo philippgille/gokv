@@ -345,9 +345,11 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// All operations' strategies are set to SequentialWaitAll, the most reliable one.
 var DefaultOptions = Options{
-	// SequentialWaitAll is iota, so 0, so the default value.
+	SetStrategy:    UpdateParallelWaitAll,
+	GetStrategy:    GetSequentialWaitAll,
+	DeleteStrategy: UpdateParallelWaitAll,
+	CloseStrategy:  CloseParallelWaitAll,
 }
 
 // NewCombiner creates a new Combiner.
@@ -362,8 +364,20 @@ func NewCombiner(options Options, stores ...gokv.Store) (Combiner, error) {
 		return result, errors.New("At least two stores must be passed for the creation of a combiner")
 	}
 
-	// No need to check for empty values in options, because the default value of a strategy is 0,
-	// which is SequentialWaitAll, the one meant to be used as default.
+	// Set default values if necessary.
+	// Even if no stategy with int value 0 exists, 0 can still be used.
+	if options.SetStrategy == 0 {
+		options.SetStrategy = DefaultOptions.SetStrategy
+	}
+	if options.GetStrategy == 0 {
+		options.GetStrategy = DefaultOptions.GetStrategy
+	}
+	if options.DeleteStrategy == 0 {
+		options.DeleteStrategy = DefaultOptions.DeleteStrategy
+	}
+	if options.CloseStrategy == 0 {
+		options.CloseStrategy = DefaultOptions.CloseStrategy
+	}
 
 	result.stores = stores
 	result.setStrategy = options.SetStrategy
