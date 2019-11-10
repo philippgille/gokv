@@ -13,66 +13,15 @@ import (
 // Ensure that we satisfy interface.
 var _ gokv.Store = Combiner{}
 
-// Strategy is the strategy with which the combiner should work with the configured stores.
-type Strategy int
-
-const (
-	// SequentialWaitAll is the most reliable strategy.
-	// It blocks until the operation is successfully finished for all stores.
-	// It makes sure all Set and Delete operations are successful,
-	// and makes sure all Get calls find a result and they're deeply equal.
-	// It returns early upon encountering any error.
-	SequentialWaitAll Strategy = iota // 0, so it's the default value for a Strategy
-	// ParallelWaitAll is similar to SequentialWaitAll with the only difference
-	// that the Set/Get/Delete/Close operations are forwarded to the configured stores
-	// in parallel. The operation still blocks until all goroutines are finished,
-	// leading to the same guarantees (no error returned means all ops successful, all results deeply equal).
-	// There's also the same early return in case of an error.
-	// So as soon as an error is encountered, the operations in the remaining goroutines are canceled.
-	ParallelWaitAll
-	// SequentialWaitFirst only blocks until the first store is finished with the operation,
-	// independent of a success.
-	//
-	// For Set and Delete: Upon success, all remaining stores' operations
-	// are executed sequentially in a single goroutine, ignoring their results.
-	// For Get: All remaining stores' operations are skipped.
-	// So essentially Get is always only called on the first store.
-	//
-	// Note: It's up to the package user to either use the fastest or most reliable store
-	// as first store in the stores slice.
-	SequentialWaitFirst
-	// SequentialWaitSuccess blocks until the first successful operation by any store.
-	// This means that a combiner operation is seen as successful even if some (but not all) stores' operation is unsuccessful.
-	//
-	// For Set and Delete: Failures are ignored until the first success,
-	// then the remaining stores' operations are executed sequentially in a single goroutine,
-	// ignoring their results.
-	// If all operations fail, a `combiner.MultiError` is returned, containing the list of errors.
-	// For Get: Failures are ignored until the first success, all remaining stores' operations are skipped.
-	// If all operations fail, a `combiner.MultiError` is returned, containing the list of errors.
-	// Note: When a value is not found during Get, this is not seen as failure. Only errors are failures.
-	//
-	// Note: It's up to the package user to either use the fastest or most reliable store
-	// as first store in the stores slice.
-	SequentialWaitSuccess
-	// SequentialWaitResult is similar to SequentialWaitSuccess with the only difference
-	// that Get doesn't stop upon success (i.e. no error returned) but upon a found entry.
-	// Only if all stores return no entry and no error, Get also returns no entry and no error.
-	//
-	// Note: It's up to the package user to either use the fastest or most reliable store
-	// as first store in the stores slice.
-	SequentialWaitResult
-)
-
 // Combiner is a `gokv.Store` implementation that forwards its
 // calls to other `gokv.Store`s with configurable strategies.
 // At least two stores must be set.
 type Combiner struct {
 	stores         []gokv.Store
-	setStrategy    Strategy
-	getStrategy    Strategy
-	deleteStrategy Strategy
-	closeStrategy  Strategy
+	setStrategy    UpdateStrategy
+	getStrategy    GetStrategy
+	deleteStrategy UpdateStrategy
+	closeStrategy  CloseStrategy
 }
 
 // Set stores the given value for the given key.
@@ -86,14 +35,14 @@ func (s Combiner) Set(k string, v interface{}) error {
 	}
 
 	switch s.setStrategy {
-	case SequentialWaitAll:
+	case UpdateSequentialWaitAll:
 		for _, store := range s.stores {
 			err := store.Set(k, v)
 			if err != nil {
 				return newMultiError(err)
 			}
 		}
-	case ParallelWaitAll:
+	case UpdateParallelWaitAll:
 		sem := make(chan struct{}, runtime.NumCPU())
 		ctx, cancel := context.WithCancel(context.Background())
 		errChan := make(chan error, len(s.stores))
@@ -122,7 +71,7 @@ func (s Combiner) Set(k string, v interface{}) error {
 		}
 		// All values are read from errChan, so we can safely close it
 		close(errChan)
-	case SequentialWaitFirst:
+	case UpdateSequentialWaitFirst:
 		err := s.stores[0].Set(k, v)
 		if err != nil {
 			return newMultiError(err)
@@ -132,9 +81,7 @@ func (s Combiner) Set(k string, v interface{}) error {
 				_ = store.Set(k, v) // Ignore errors
 			}
 		}(s.stores[1:])
-	case SequentialWaitSuccess:
-		fallthrough
-	case SequentialWaitResult:
+	case UpdateSequentialWaitSuccess:
 		i := 0
 		multiError := MultiError{}
 		for ; i < len(s.stores); i++ {
@@ -182,7 +129,7 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 	foundResult := false
 
 	switch s.getStrategy {
-	case SequentialWaitAll:
+	case GetSequentialWaitAll:
 		prevFound := false
 		var prevVal interface{}
 		for i, store := range s.stores {
@@ -206,15 +153,13 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 			prevVal = v
 		}
 		foundResult = prevFound
-	case ParallelWaitAll:
-		return foundResult, newMultiError(errors.New("Strategy ParallelWaitAll not implemented for Get yet"))
-	case SequentialWaitFirst:
+	case GetSequentialWaitFirst:
 		var err error // For not having to use `:=` in the next step, which would lead to foundResult not being overwritten
 		foundResult, err = s.stores[0].Get(k, v)
 		if err != nil {
 			return foundResult, newMultiError(err)
 		}
-	case SequentialWaitSuccess:
+	case GetSequentialWaitSuccess:
 		multiError := MultiError{}
 		var err error
 		for _, store := range s.stores {
@@ -231,7 +176,7 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 			return false, multiError
 		}
 		// Otherwise the recent operation was a success.
-	case SequentialWaitResult:
+	case GetSequentialWaitResult:
 		multiError := MultiError{}
 		var err error
 		for _, store := range s.stores {
@@ -265,14 +210,14 @@ func (s Combiner) Delete(k string) error {
 	}
 
 	switch s.deleteStrategy {
-	case SequentialWaitAll:
+	case UpdateSequentialWaitAll:
 		for _, store := range s.stores {
 			err := store.Delete(k)
 			if err != nil {
 				return newMultiError(err)
 			}
 		}
-	case ParallelWaitAll:
+	case UpdateParallelWaitAll:
 		sem := make(chan struct{}, runtime.NumCPU())
 		ctx, cancel := context.WithCancel(context.Background())
 		errChan := make(chan error, len(s.stores))
@@ -301,7 +246,7 @@ func (s Combiner) Delete(k string) error {
 		}
 		// All values are read from errChan, so we can safely close it
 		close(errChan)
-	case SequentialWaitFirst:
+	case UpdateSequentialWaitFirst:
 		err := s.stores[0].Delete(k)
 		if err != nil {
 			return newMultiError(err)
@@ -311,9 +256,7 @@ func (s Combiner) Delete(k string) error {
 				_ = store.Delete(k) // Ignore errors
 			}
 		}(s.stores[1:])
-	case SequentialWaitSuccess:
-		fallthrough
-	case SequentialWaitResult:
+	case UpdateSequentialWaitSuccess:
 		i := 0
 		multiError := MultiError{}
 		for ; i < len(s.stores); i++ {
@@ -351,14 +294,14 @@ func (s Combiner) Delete(k string) error {
 // Returned errors are of type `combiner.MultiError`
 func (s Combiner) Close() error {
 	switch s.closeStrategy {
-	case SequentialWaitAll:
+	case CloseSequentialWaitAll:
 		for _, store := range s.stores {
 			err := store.Close()
 			if err != nil {
 				return newMultiError(err)
 			}
 		}
-	case ParallelWaitAll:
+	case CloseParallelWaitAll:
 		sem := make(chan struct{}, runtime.NumCPU())
 		ctx, cancel := context.WithCancel(context.Background())
 		errChan := make(chan error, len(s.stores))
@@ -387,45 +330,6 @@ func (s Combiner) Close() error {
 		}
 		// All values are read from errChan, so we can safely close it
 		close(errChan)
-	case SequentialWaitFirst:
-		err := s.stores[0].Close()
-		if err != nil {
-			return newMultiError(err)
-		}
-		go func(stores []gokv.Store) {
-			for _, store := range stores {
-				_ = store.Close() // Ignore errors
-			}
-		}(s.stores[1:])
-	case SequentialWaitSuccess:
-		fallthrough
-	case SequentialWaitResult:
-		i := 0
-		multiError := MultiError{}
-		for ; i < len(s.stores); i++ {
-			store := s.stores[i]
-			err := store.Close()
-			if err != nil {
-				multiError.addError(err)
-			} else {
-				// Success: Stop blocking iteration
-				break // Note: i won't be incremented
-			}
-		}
-		// Return now if all operations failed.
-		if len(multiError.Errors) == len(s.stores) {
-			return multiError
-		}
-		// Otherwise the recent operation was a success.
-		// If more stores are left, go through them in a goroutine.
-		nextIndex := i + 1
-		if nextIndex <= len(s.stores) {
-			go func(stores []gokv.Store) {
-				for _, store := range stores {
-					_ = store.Close() // Ignore errors
-				}
-			}(s.stores[nextIndex:])
-		}
 	default:
 		return newMultiError(errors.New("The handling of the configured Close strategy is not implemented yet"))
 	}
@@ -434,10 +338,10 @@ func (s Combiner) Close() error {
 
 // Options are the options for the combiner.
 type Options struct {
-	SetStrategy    Strategy
-	GetStrategy    Strategy
-	DeleteStrategy Strategy
-	CloseStrategy  Strategy
+	SetStrategy    UpdateStrategy
+	GetStrategy    GetStrategy
+	DeleteStrategy UpdateStrategy
+	CloseStrategy  CloseStrategy
 }
 
 // DefaultOptions is an Options object with default values.
