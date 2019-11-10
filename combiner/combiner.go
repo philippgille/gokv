@@ -36,13 +36,99 @@ func (s Combiner) Set(k string, v interface{}) error {
 
 	switch s.setStrategy {
 	case UpdateSequentialWaitAll:
+		multiError := MultiError{}
+		for _, store := range s.stores {
+			err := store.Set(k, v)
+			if err != nil {
+				multiError.addError(err)
+			}
+		}
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
+	case UpdateParallelWaitAll:
+		multiError := MultiError{}
+		sem := make(chan struct{}, runtime.NumCPU())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				errChan <- store.Set(k, v)
+				return
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				multiError.addError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
+	case UpdateSequentialWaitErrorThenContinue:
+		multiError := MultiError{}
+		continueFrom := 0
+		for i, store := range s.stores {
+			err := store.Set(k, v)
+			if err != nil {
+				multiError.addError(err)
+				// Stop the blocking calls, continue later in a goroutine
+				continueFrom = i + 1
+				break
+			}
+		}
+		// Continue any remaining operations in a goroutine.
+		// `continueFrom == 0` would mean there was no error.
+		// `continueFrom == len(s.stores)` would mean the error occurred for the last store.
+		if continueFrom != 0 && continueFrom < len(s.stores) {
+			go func(stores []gokv.Store) {
+				for _, store := range stores {
+					_ = store.Set(k, v) // Ignore errors
+				}
+				return
+			}(s.stores[continueFrom:])
+		}
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
+	case UpdateParallelWaitErrorThenContinue:
+		sem := make(chan struct{}, runtime.NumCPU())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				errChan <- store.Set(k, v)
+				return
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				// Just return upon the first error,
+				// all remaining ops are executed in goroutines already.
+				//
+				// Don't close errChan! A goroutine could still be in a Set call,
+				// which would lead to sending an error to a closed channel, which would lead to a panic.
+				return newMultiError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
+	case UpdateSequentialWaitErrorThenSkip:
 		for _, store := range s.stores {
 			err := store.Set(k, v)
 			if err != nil {
 				return newMultiError(err)
 			}
 		}
-	case UpdateParallelWaitAll:
+	case UpdateParallelWaitErrorThenSkip:
 		sem := make(chan struct{}, runtime.NumCPU())
 		ctx, cancel := context.WithCancel(context.Background())
 		errChan := make(chan error, len(s.stores))
@@ -52,12 +138,14 @@ func (s Combiner) Set(k string, v interface{}) error {
 				defer func() {
 					<-sem
 				}()
+				// Don't call Set if ctx cancel was called,
+				// which is the case when an error occurs in of the goroutines.
 				select {
 				case <-ctx.Done():
-					// Don't call Set if ctx cancel was called,
-					// which is the case when an error occurs in of the goroutines.
-				case errChan <- store.Set(k, v):
+				default:
+					errChan <- store.Set(k, v)
 				}
+				return
 			}(store)
 		}
 		for i := 0; i < len(s.stores); i++ {
@@ -71,6 +159,33 @@ func (s Combiner) Set(k string, v interface{}) error {
 		}
 		// All values are read from errChan, so we can safely close it
 		close(errChan)
+	case UpdateSequentialWaitNoError:
+		multiError := MultiError{}
+		continueFrom := 0
+		for i, store := range s.stores {
+			err := store.Set(k, v)
+			if err != nil {
+				multiError.addError(err)
+			} else {
+				// Success. Stop blocking iteration!
+				continueFrom = i + 1
+				break
+			}
+		}
+		// Return now if all operations failed.
+		if len(multiError.Errors) == len(s.stores) {
+			return multiError
+		}
+		// Otherwise the recent operation was a success.
+		// If more stores are left, go through them in a goroutine.
+		if continueFrom <= len(s.stores) {
+			go func(stores []gokv.Store) {
+				for _, store := range stores {
+					_ = store.Set(k, v) // Ignore errors
+				}
+				return
+			}(s.stores[continueFrom:])
+		}
 	case UpdateSequentialWaitFirst:
 		err := s.stores[0].Set(k, v)
 		if err != nil {
@@ -80,34 +195,8 @@ func (s Combiner) Set(k string, v interface{}) error {
 			for _, store := range stores {
 				_ = store.Set(k, v) // Ignore errors
 			}
+			return
 		}(s.stores[1:])
-	case UpdateSequentialWaitSuccess:
-		i := 0
-		multiError := MultiError{}
-		for ; i < len(s.stores); i++ {
-			store := s.stores[i]
-			err := store.Set(k, v)
-			if err != nil {
-				multiError.addError(err)
-			} else {
-				// Success: Stop blocking iteration
-				break // Note: i won't be incremented
-			}
-		}
-		// Return now if all operations failed.
-		if len(multiError.Errors) == len(s.stores) {
-			return multiError
-		}
-		// Otherwise the recent operation was a success.
-		// If more stores are left, go through them in a goroutine.
-		nextIndex := i + 1
-		if nextIndex <= len(s.stores) {
-			go func(stores []gokv.Store) {
-				for _, store := range stores {
-					_ = store.Set(k, v) // Ignore errors
-				}
-			}(s.stores[nextIndex:])
-		}
 	default:
 		return newMultiError(errors.New("The handling of the configured Set strategy is not implemented yet"))
 	}
@@ -129,7 +218,7 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 	foundResult := false
 
 	switch s.getStrategy {
-	case GetSequentialWaitAll:
+	case GetSequentialWaitError:
 		prevFound := false
 		var prevVal interface{}
 		for i, store := range s.stores {
@@ -150,33 +239,10 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 				}
 			}
 			prevFound = found
-			prevVal = v
+			prevVal = v // TODO: Probably requires deep copying
 		}
 		foundResult = prevFound
-	case GetSequentialWaitFirst:
-		var err error // For not having to use `:=` in the next step, which would lead to foundResult not being overwritten
-		foundResult, err = s.stores[0].Get(k, v)
-		if err != nil {
-			return foundResult, newMultiError(err)
-		}
-	case GetSequentialWaitSuccess:
-		multiError := MultiError{}
-		var err error
-		for _, store := range s.stores {
-			foundResult, err = store.Get(k, v)
-			if err != nil {
-				multiError.addError(err)
-			} else {
-				// Success: Stop blocking iteration
-				break
-			}
-		}
-		// Return now if all operations failed.
-		if len(multiError.Errors) == len(s.stores) {
-			return false, multiError
-		}
-		// Otherwise the recent operation was a success.
-	case GetSequentialWaitResult:
+	case GetSequentialWaitValue:
 		multiError := MultiError{}
 		var err error
 		for _, store := range s.stores {
@@ -193,6 +259,29 @@ func (s Combiner) Get(k string, v interface{}) (bool, error) {
 			return false, multiError
 		}
 		// Otherwise the recent operation was a success.
+	case GetSequentialWaitNoError:
+		multiError := MultiError{}
+		var err error
+		for _, store := range s.stores {
+			foundResult, err = store.Get(k, v)
+			if err != nil {
+				multiError.addError(err)
+			} else {
+				// Success: Stop blocking iteration
+				break
+			}
+		}
+		// Return now if all operations failed.
+		if len(multiError.Errors) == len(s.stores) {
+			return false, multiError
+		}
+		// Otherwise the recent operation was a success.
+	case GetSequentialWaitFirst:
+		var err error // For not having to use `:=` in the next step, which would lead to foundResult not being overwritten
+		foundResult, err = s.stores[0].Get(k, v)
+		if err != nil {
+			return foundResult, newMultiError(err)
+		}
 	default:
 		return foundResult, newMultiError(errors.New("The handling of the configured Get strategy is not implemented yet"))
 	}
@@ -211,13 +300,99 @@ func (s Combiner) Delete(k string) error {
 
 	switch s.deleteStrategy {
 	case UpdateSequentialWaitAll:
+		multiError := MultiError{}
+		for _, store := range s.stores {
+			err := store.Delete(k)
+			if err != nil {
+				multiError.addError(err)
+			}
+		}
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
+	case UpdateParallelWaitAll:
+		multiError := MultiError{}
+		sem := make(chan struct{}, runtime.NumCPU())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				errChan <- store.Delete(k)
+				return
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				multiError.addError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
+	case UpdateSequentialWaitErrorThenContinue:
+		multiError := MultiError{}
+		continueFrom := 0
+		for i, store := range s.stores {
+			err := store.Delete(k)
+			if err != nil {
+				multiError.addError(err)
+				// Stop the blocking calls, continue later in a goroutine
+				continueFrom = i + 1
+				break
+			}
+		}
+		// Continue any remaining operations in a goroutine.
+		// `continueFrom == 0` would mean there was no error.
+		// `continueFrom == len(s.stores)` would mean the error occurred for the last store.
+		if continueFrom != 0 && continueFrom < len(s.stores) {
+			go func(stores []gokv.Store) {
+				for _, store := range stores {
+					_ = store.Delete(k) // Ignore errors
+				}
+				return
+			}(s.stores[continueFrom:])
+		}
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
+	case UpdateParallelWaitErrorThenContinue:
+		sem := make(chan struct{}, runtime.NumCPU())
+		errChan := make(chan error, len(s.stores))
+		for _, store := range s.stores {
+			go func(store gokv.Store) {
+				sem <- struct{}{}
+				defer func() {
+					<-sem
+				}()
+				errChan <- store.Delete(k)
+				return
+			}(store)
+		}
+		for i := 0; i < len(s.stores); i++ {
+			if err := <-errChan; err != nil {
+				// Just return upon the first error,
+				// all remaining ops are executed in goroutines already.
+				//
+				// Don't close errChan! A goroutine could still be in a Set call,
+				// which would lead to sending an error to a closed channel, which would lead to a panic.
+				return newMultiError(err)
+			}
+		}
+		// All values are read from errChan, so we can safely close it
+		close(errChan)
+	case UpdateSequentialWaitErrorThenSkip:
 		for _, store := range s.stores {
 			err := store.Delete(k)
 			if err != nil {
 				return newMultiError(err)
 			}
 		}
-	case UpdateParallelWaitAll:
+	case UpdateParallelWaitErrorThenSkip:
 		sem := make(chan struct{}, runtime.NumCPU())
 		ctx, cancel := context.WithCancel(context.Background())
 		errChan := make(chan error, len(s.stores))
@@ -227,25 +402,54 @@ func (s Combiner) Delete(k string) error {
 				defer func() {
 					<-sem
 				}()
+				// Don't call Set if ctx cancel was called,
+				// which is the case when an error occurs in of the goroutines.
 				select {
 				case <-ctx.Done():
-					// Don't call Delete if ctx cancel was called,
-					// which is the case when an error occurs in of the goroutines.
-				case errChan <- store.Delete(k):
+				default:
+					errChan <- store.Delete(k)
 				}
+				return
 			}(store)
 		}
 		for i := 0; i < len(s.stores); i++ {
 			if err := <-errChan; err != nil {
-				// Stop remaining Delete operations in goroutines immediately
+				// Stop remaining Set operations in goroutines immediately
 				cancel()
-				// Don't close errChan! A goroutine could still be in a Delete call,
+				// Don't close errChan! A goroutine could still be in a Set call,
 				// which would lead to sending an error to a closed channel, which would lead to a panic.
 				return newMultiError(err)
 			}
 		}
 		// All values are read from errChan, so we can safely close it
 		close(errChan)
+	case UpdateSequentialWaitNoError:
+		multiError := MultiError{}
+		continueFrom := 0
+		for i, store := range s.stores {
+			err := store.Delete(k)
+			if err != nil {
+				multiError.addError(err)
+			} else {
+				// Success. Stop blocking iteration!
+				continueFrom = i + 1
+				break
+			}
+		}
+		// Return now if all operations failed.
+		if len(multiError.Errors) == len(s.stores) {
+			return multiError
+		}
+		// Otherwise the recent operation was a success.
+		// If more stores are left, go through them in a goroutine.
+		if continueFrom <= len(s.stores) {
+			go func(stores []gokv.Store) {
+				for _, store := range stores {
+					_ = store.Delete(k) // Ignore errors
+				}
+				return
+			}(s.stores[continueFrom:])
+		}
 	case UpdateSequentialWaitFirst:
 		err := s.stores[0].Delete(k)
 		if err != nil {
@@ -255,34 +459,8 @@ func (s Combiner) Delete(k string) error {
 			for _, store := range stores {
 				_ = store.Delete(k) // Ignore errors
 			}
+			return
 		}(s.stores[1:])
-	case UpdateSequentialWaitSuccess:
-		i := 0
-		multiError := MultiError{}
-		for ; i < len(s.stores); i++ {
-			store := s.stores[i]
-			err := store.Delete(k)
-			if err != nil {
-				multiError.addError(err)
-			} else {
-				// Success: Stop blocking iteration
-				break // Note: i won't be incremented
-			}
-		}
-		// Return now if all operations failed.
-		if len(multiError.Errors) == len(s.stores) {
-			return multiError
-		}
-		// Otherwise the recent operation was a success.
-		// If more stores are left, go through them in a goroutine.
-		nextIndex := i + 1
-		if nextIndex <= len(s.stores) {
-			go func(stores []gokv.Store) {
-				for _, store := range stores {
-					_ = store.Delete(k) // Ignore errors
-				}
-			}(s.stores[nextIndex:])
-		}
 	default:
 		return newMultiError(errors.New("The handling of the configured Delete strategy is not implemented yet"))
 	}
@@ -295,15 +473,19 @@ func (s Combiner) Delete(k string) error {
 func (s Combiner) Close() error {
 	switch s.closeStrategy {
 	case CloseSequentialWaitAll:
+		multiError := MultiError{}
 		for _, store := range s.stores {
 			err := store.Close()
 			if err != nil {
-				return newMultiError(err)
+				multiError.addError(err)
 			}
 		}
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
 	case CloseParallelWaitAll:
+		multiError := MultiError{}
 		sem := make(chan struct{}, runtime.NumCPU())
-		ctx, cancel := context.WithCancel(context.Background())
 		errChan := make(chan error, len(s.stores))
 		for _, store := range s.stores {
 			go func(store gokv.Store) {
@@ -311,25 +493,20 @@ func (s Combiner) Close() error {
 				defer func() {
 					<-sem
 				}()
-				select {
-				case <-ctx.Done():
-					// Don't call Close if ctx cancel was called,
-					// which is the case when an error occurs in of the goroutines.
-				case errChan <- store.Close():
-				}
+				errChan <- store.Close()
+				return
 			}(store)
 		}
 		for i := 0; i < len(s.stores); i++ {
 			if err := <-errChan; err != nil {
-				// Stop remaining Close operations in goroutines immediately
-				cancel()
-				// Don't close errChan! A goroutine could still be in a Close call,
-				// which would lead to sending an error to a closed channel, which would lead to a panic.
-				return newMultiError(err)
+				multiError.addError(err)
 			}
 		}
 		// All values are read from errChan, so we can safely close it
 		close(errChan)
+		if len(multiError.Errors) > 0 {
+			return multiError
+		}
 	default:
 		return newMultiError(errors.New("The handling of the configured Close strategy is not implemented yet"))
 	}
@@ -347,7 +524,7 @@ type Options struct {
 // DefaultOptions is an Options object with default values.
 var DefaultOptions = Options{
 	SetStrategy:    UpdateParallelWaitAll,
-	GetStrategy:    GetSequentialWaitAll,
+	GetStrategy:    GetSequentialWaitError,
 	DeleteStrategy: UpdateParallelWaitAll,
 	CloseStrategy:  CloseParallelWaitAll,
 }
