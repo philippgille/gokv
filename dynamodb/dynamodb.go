@@ -186,7 +186,7 @@ var DefaultOptions = Options{
 	TableName:            "gokv",
 	ReadCapacityUnits:    5,
 	WriteCapacityUnits:   5,
-	CreateTable:          true
+	CreateTable:          true,
 	WaitForTableCreation: aws.Bool(true),
 	Codec:                encoding.JSON,
 	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
@@ -264,7 +264,7 @@ func NewClient(options Options) (Client, error) {
 		awsErr, ok := err.(awserr.Error)
 		if !ok {
 			return result, err
-		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException && options.CreateTable{
+		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException && options.CreateTable {
 			err = createTable(options.TableName, options.ReadCapacityUnits, options.WriteCapacityUnits, *options.WaitForTableCreation, describeTableInput, svc)
 			if err != nil {
 				return result, err
