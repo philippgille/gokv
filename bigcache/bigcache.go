@@ -3,7 +3,7 @@ package bigcache
 import (
 	"time"
 
-	"github.com/allegro/bigcache"
+	"github.com/allegro/bigcache/v2"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
