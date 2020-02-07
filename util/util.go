@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"time"
 )
 
 // CheckKeyAndValue returns an error if k == "" or if v == nil
@@ -26,4 +27,14 @@ func CheckVal(v interface{}) error {
 		return errors.New("The passed value is nil, which is not allowed")
 	}
 	return nil
+}
+
+const MinExpiration = 10 * time.Second
+
+// CheckExp returns false if expiration time is too small
+func CheckExp(exp time.Duration) bool {
+	if exp < MinExpiration {
+		return true
+	}
+	return false
 }
