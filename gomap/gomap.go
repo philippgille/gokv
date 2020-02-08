@@ -65,6 +65,8 @@ func (s Store) Delete(k string) error {
 		return err
 	}
 
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	delete(s.m, k)
 	return nil
 }
