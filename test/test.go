@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/go-test/deep"
 
@@ -352,5 +353,23 @@ func InteractWithStore(store gokv.Store, key string, t *testing.T, waitGroup *sy
 	_, err = store.Get(key, new(Foo))
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestExpiration(cache gokv.Cache, t *testing.T) {
+	err := cache.SetExp("key", "value", 5*time.Second)
+	if err != nil {
+		t.Error(err)
+	}
+
+	time.Sleep(5 * time.Second)
+
+	r := "value"
+	ok, err := cache.Get("key", &r)
+	if err != nil {
+		t.Error(err)
+	}
+	if ok {
+		t.Error("pair should be removed")
 	}
 }
