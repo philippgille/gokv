@@ -9,8 +9,9 @@ import (
 )
 
 type Store struct {
-	db    *pudge.Db
-	codec encoding.Codec
+	db      *pudge.Db
+	codec   encoding.Codec
+	noCodec bool
 }
 
 func (s Store) Set(k string, v interface{}) error {
@@ -18,12 +19,15 @@ func (s Store) Set(k string, v interface{}) error {
 		return err
 	}
 
-	data, err := s.codec.Marshal(v)
-	if err != nil {
-		return err
+	if !s.noCodec {
+		data, err := s.codec.Marshal(v)
+		if err != nil {
+			return err
+		}
+		return s.db.Set(k, data)
+	} else {
+		return s.db.Set(k, v)
 	}
-
-	return s.db.Set(k, data)
 }
 
 func (s Store) Get(k string, v interface{}) (found bool, err error) {
@@ -31,16 +35,26 @@ func (s Store) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	var data []byte
-	err = s.db.Get(k, &data)
-	if errors.Is(err, pudge.ErrKeyNotFound) {
-		return false, nil
+	if !s.noCodec {
+		var data []byte
+		err = s.db.Get(k, &data)
+		if errors.Is(err, pudge.ErrKeyNotFound) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		return true, s.codec.Unmarshal(data, v)
+	} else {
+		err = s.db.Get(k, v)
+		if errors.Is(err, pudge.ErrKeyNotFound) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		return true, nil
 	}
-	if err != nil {
-		return false, err
-	}
-
-	return true, s.codec.Unmarshal(data, v)
 }
 
 func (s Store) Delete(k string) error {
@@ -82,6 +96,9 @@ type Options struct {
 	// Creating directories mode
 	// Optional (0777 by default).
 	DirMode int
+	// Uses default pudge encoding instead of gokv.Codec
+	// Optional (false by default).
+	NoCodec bool
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
@@ -94,6 +111,7 @@ var DefaultOptions = Options{
 	StoreMode:    FileFirst,
 	FileMode:     0666,
 	DirMode:      0777,
+	NoCodec:      false,
 	Codec:        encoding.JSON,
 }
 
@@ -128,6 +146,7 @@ func NewStore(options Options) (Store, error) {
 
 	result.db = db
 	result.codec = options.Codec
+	result.noCodec = options.NoCodec
 
 	return result, nil
 }
