@@ -55,6 +55,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
 - Embedded
     - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
     - [X] [BadgerDB](https://github.com/dgraph-io/badger)
+    - [X] [BuntDB](https://github.com/tidwall/buntdb)
     - [X] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
     - [X] Local files (one file per key-value pair, with the key being the filename and the value being the file content)
 - Distributed store
