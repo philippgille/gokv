@@ -96,6 +96,19 @@ func TestErrors(t *testing.T) {
 	}
 }
 
+// TestExp tests expiration support.
+//
+// Note: This test is only executed if the initial connection to Redis works.
+func TestExp(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
+	}
+
+	client := createClient(t, encoding.JSON)
+	defer client.Close()
+	test.TestExpiration(client, t)
+}
+
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
 //
 // Note: This test is only executed if the initial connection to Memcached works.
