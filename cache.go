@@ -1,6 +1,6 @@
 package gokv
 
-type Cache struct {
+type Cache interface {
 	Store
 	SetterWithExp
 }
