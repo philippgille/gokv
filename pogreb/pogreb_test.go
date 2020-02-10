@@ -155,7 +155,13 @@ func TestNonExistingDir(t *testing.T) {
 		Path: tmpDir,
 	}
 	store, err := pogreb.NewStore(options)
-	defer cleanUp(store, tmpDir)
+	defer func() {
+		cleanUp(store, tmpDir)
+		err := os.Remove(os.TempDir() + "/pogreb.index")
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
 	if err != nil {
 		t.Fatal(err)
 	}
