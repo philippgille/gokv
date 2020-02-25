@@ -169,6 +169,12 @@ func TestNonExistingDir(t *testing.T) {
 	}
 }
 
+func TestExp(t *testing.T) {
+	store, _ := createStore(t, encoding.JSON)
+	defer store.Close()
+	test.TestExpiration(store, t)
+}
+
 func createStore(t *testing.T, codec encoding.Codec) (badgerdb.Store, string) {
 	randPath := generateRandomTempDBpath(t)
 	options := badgerdb.Options{

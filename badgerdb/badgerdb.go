@@ -2,6 +2,7 @@ package badgerdb
 
 import (
 	"github.com/dgraph-io/badger"
+	"time"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -11,6 +12,26 @@ import (
 type Store struct {
 	db    *badger.DB
 	codec encoding.Codec
+}
+
+func (s Store) SetExp(k string, v interface{}, exp time.Duration) error {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
+	// First turn the passed object into something that BadgerDB can handle
+	data, err := s.codec.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	err = s.db.Update(func(txn *badger.Txn) error {
+		return txn.SetEntry(badger.NewEntry([]byte(k), data).WithTTL(exp))
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Set stores the given value for the given key.
