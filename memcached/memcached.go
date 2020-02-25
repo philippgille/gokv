@@ -17,6 +17,33 @@ type Client struct {
 	codec encoding.Codec
 }
 
+// SetExp works like Set, but supports key expiration
+func (c Client) SetExp(k string, v interface{}, exp time.Duration) error {
+	if !util.CheckExp(exp) {
+		return nil
+	}
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
+	data, err := c.codec.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	item := memcache.Item{
+		Key:        k,
+		Value:      data,
+		Expiration: int32(time.Now().Add(exp).Unix()),
+	}
+	err = c.c.Set(&item)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Set stores the given value for the given key.
 // The key must not be longer than 250 bytes (this is a restriction of Memcached).
 // Values are automatically marshalled to JSON or gob (depending on the configuration).

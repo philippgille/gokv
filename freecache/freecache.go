@@ -2,6 +2,7 @@ package freecache
 
 import (
 	"github.com/coocood/freecache"
+	"time"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -13,6 +14,23 @@ const minSize = 512 * 1024
 type Store struct {
 	s     *freecache.Cache
 	codec encoding.Codec
+}
+
+// SetExp works like Set, but supports key expiration
+func (s Store) SetExp(k string, v interface{}, exp time.Duration) error {
+	if !util.CheckExp(exp) {
+		return nil
+	}
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
+	data, err := s.codec.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	return s.s.Set([]byte(k), data, int(exp.Seconds()))
 }
 
 // Set stores the given value for the given key.

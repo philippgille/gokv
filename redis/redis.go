@@ -2,6 +2,7 @@ package redis
 
 import (
 	"github.com/go-redis/redis"
+	"time"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -11,6 +12,27 @@ import (
 type Client struct {
 	c     *redis.Client
 	codec encoding.Codec
+}
+
+// SetExp works like Set, but supports key expiration
+func (c Client) SetExp(k string, v interface{}, exp time.Duration) error {
+	if !util.CheckExp(exp) {
+		return nil
+	}
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
+	data, err := c.codec.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	err = c.c.Set(k, string(data), exp).Err()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Set stores the given value for the given key.

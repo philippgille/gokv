@@ -65,6 +65,12 @@ func TestErrors(t *testing.T) {
 	}
 }
 
+func TestExp(t *testing.T) {
+	store := createStore(t, encoding.JSON)
+	defer store.Close()
+	test.TestExpiration(store, t)
+}
+
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
 func TestNil(t *testing.T) {
 	// Test setting nil

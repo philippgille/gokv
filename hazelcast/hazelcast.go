@@ -2,6 +2,7 @@ package hazelcast
 
 import (
 	"fmt"
+	"time"
 
 	hazelcast "github.com/hazelcast/hazelcast-go-client"
 	"github.com/hazelcast/hazelcast-go-client/config/property"
@@ -24,6 +25,28 @@ type Client struct {
 	// does the map still work or do we need to get the map from the client again?
 	m     core.Map
 	codec encoding.Codec
+}
+
+// SetExp works like Set, but supports key expiration
+func (c Client) SetExp(k string, v interface{}, exp time.Duration) error {
+	if !util.CheckExp(exp) {
+		return nil
+	}
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
+	data, err := c.codec.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	err = c.m.SetWithTTL(k, data, exp)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Set stores the given value for the given key.
