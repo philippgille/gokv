@@ -255,3 +255,13 @@ func createClient(t *testing.T, codec encoding.Codec) etcd.Client {
 	}
 	return client
 }
+
+func TestExp(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
+	}
+
+	client := createClient(t, encoding.JSON)
+	defer client.Close()
+	test.TestExpiration(client, t)
+}

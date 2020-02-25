@@ -20,6 +20,32 @@ type Client struct {
 	codec   encoding.Codec
 }
 
+func (c Client) SetExp(k string, v interface{}, exp time.Duration) error {
+	if err := util.CheckKeyAndValue(k, v); err != nil {
+		return err
+	}
+
+	// First turn the passed object into something that etcd can handle
+	data, err := c.codec.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.c.Grant(context.TODO(), int64(exp.Seconds()))
+	if err != nil {
+		return err
+	}
+
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	_, err = c.c.Put(ctxWithTimeout, k, string(data), clientv3.WithLease(resp.ID))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
