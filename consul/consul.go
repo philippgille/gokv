@@ -2,6 +2,7 @@ package consul
 
 import (
 	"github.com/hashicorp/consul/api"
+	"sync"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -12,6 +13,7 @@ type Client struct {
 	c      *api.KV
 	folder string
 	codec  encoding.Codec
+	m      *sync.Mutex
 }
 
 // Set stores the given value for the given key.
@@ -31,16 +33,21 @@ func (c Client) Set(k string, v interface{}) error {
 	if c.folder != "" {
 		k = c.folder + "/" + k
 	}
+
+	return c.set(k, data)
+}
+
+func (c Client) set(k string, data []byte) error {
+	c.m.Lock()
+	defer c.m.Unlock()
+
 	kvPair := api.KVPair{
 		Key:   k,
 		Value: data,
 	}
-	_, err = c.c.Put(&kvPair, nil)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	_, err := c.c.Put(&kvPair, nil)
+	return err
 }
 
 // Get retrieves the stored value for the given key.
@@ -57,10 +64,12 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	if c.folder != "" {
 		k = c.folder + "/" + k
 	}
-	kvPair, _, err := c.c.Get(k, nil)
+
+	kvPair, err := c.get(k)
 	if err != nil {
 		return false, err
 	}
+
 	// If no value was found return false
 	if kvPair == nil {
 		return false, nil
@@ -68,6 +77,14 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 	data := kvPair.Value
 
 	return true, c.codec.Unmarshal(data, v)
+}
+
+func (c Client) get(k string) (*api.KVPair, error) {
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	kvPair, _, err := c.c.Get(k, nil)
+	return kvPair, err
 }
 
 // Delete deletes the stored value for the given key.
@@ -81,6 +98,14 @@ func (c Client) Delete(k string) error {
 	if c.folder != "" {
 		k = c.folder + "/" + k
 	}
+
+	return c.delete(k)
+}
+
+func (c Client) delete(k string) error {
+	c.m.Lock()
+	defer c.m.Unlock()
+
 	_, err := c.c.Delete(k, nil)
 	return err
 }
@@ -143,6 +168,7 @@ func NewClient(options Options) (Client, error) {
 	result.c = client.KV()
 	result.folder = options.Folder
 	result.codec = options.Codec
+	result.m = &sync.Mutex{}
 
 	return result, nil
 }
