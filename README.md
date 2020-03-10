@@ -1,7 +1,13 @@
 gokv
 ====
 
-[![GoDoc](http://www.godoc.org/github.com/philippgille/gokv?status.svg)](http://www.godoc.org/github.com/philippgille/gokv) [![Build Status](https://travis-ci.org/philippgille/gokv.svg?branch=master)](https://travis-ci.org/philippgille/gokv) [![Go Report Card](https://goreportcard.com/badge/github.com/philippgille/gokv)](https://goreportcard.com/report/github.com/philippgille/gokv) [![codecov](https://codecov.io/gh/philippgille/gokv/branch/master/graph/badge.svg)](https://codecov.io/gh/philippgille/gokv) [![GitHub Releases](https://img.shields.io/github/release/philippgille/gokv.svg)](https://github.com/philippgille/gokv/releases) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
+[![GoDoc](http://www.godoc.org/github.com/philippgille/gokv?status.svg)](http://www.godoc.org/github.com/philippgille/gokv)
+[![Build Status](https://travis-ci.org/philippgille/gokv.svg?branch=master)](https://travis-ci.org/philippgille/gokv)
+[![Go Report Card](https://goreportcard.com/badge/github.com/philippgille/gokv)](https://goreportcard.com/report/github.com/philippgille/gokv)
+[![codecov](https://codecov.io/gh/philippgille/gokv/branch/master/graph/badge.svg)](https://codecov.io/gh/philippgille/gokv)
+[![GitHub Releases](https://img.shields.io/github/release/philippgille/gokv.svg)](https://github.com/philippgille/gokv/releases)
+[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv?ref=badge_shield)
 
 Simple key-value store abstraction and implementations for Go
 
@@ -19,6 +25,7 @@ Contents
 4. [Motivation](#motivation)
 5. [Design decisions](#design-decisions)
 6. [Related projects](#related-projects)
+7. [License](#license)
 
 Features
 --------
@@ -303,3 +310,18 @@ Others:
 - [ppacher/gokv](https://github.com/ppacher/gokv): Not maintained (no commits in the last 22 months), no Redis, embedded DBs etc., no automatic (un-)marshalling, 1 star (as of 2018-11-28)
     - Nice CLI!
 - [kapitan-k/gokvstore](https://github.com/kapitan-k/gokvstore): Not actively maintained (no commits in the last 10+ months), RocksDB only, requires cgo, no automatic (un-)marshalling, no Git tags/ releases, 1 star (as of 2018-11-28)
+
+License
+-------
+
+`gokv` is licensed under the [Mozilla Public License Version 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
+
+- [FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
+- [Summary 1](https://choosealicense.com/licenses/mpl-2.0/)
+- [Summary 2](https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2))
+
+Dependencies might be licensed under other licenses.
+
+> Note: The FOSSA scan checks the repository as a whole. If you only use a few select modules, the number of deep dependencies is of course much lower and the obligations might only be a subset of the listed ones.
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv?ref=badge_large)
