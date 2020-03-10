@@ -1,7 +1,8 @@
 package badgerdb
 
 import (
-	"github.com/dgraph-io/badger"
+	"github.com/dgraph-io/badger/v2"
+	"time"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -97,6 +98,38 @@ type Options struct {
 	// Directory for storing the DB files.
 	// Optional ("BadgerDB" by default).
 	Dir string
+	// Uses in-memory storage, ignores file-specified options.
+	// Optional (false by default).
+	InMemory bool
+	// When SyncWrites is true all writes are synced to disk.
+	// Optional (false by default).
+	SyncWrites bool
+	// When ReadOnly is true the DB will be opened on read-only mode.
+	// Multiple processes can open the same Badger DB.
+	// Optional (false by default).
+	ReadOnly bool
+	// Truncate indicates whether value log files should be truncated to delete corrupt data, if any.
+	// This option is ignored when ReadOnly is true.
+	// Optional (false by default).
+	Truncate bool
+	// This value specifies how much data cache should hold in memory. A small size of cache means lower
+	// memory consumption and lookups/iterations would take longer. Setting size to zero disables the
+	// cache altogether.
+	// Optional (1 GB by default).
+	MaxCacheSize int64
+
+	// Encryption related options.
+
+	// EncryptionKey is used to encrypt the data with AES. Type of AES is used based on the key
+	// size. For example 16 bytes will use AES-128. 24 bytes will use AES-192. 32 bytes will
+	// use AES-256.
+	// Optional (empty by default).
+	EncryptionKey []byte // encryption key
+	// Key Registry will use this duration to create new keys. If the previous generated
+	// key exceed the given duration. Then the key registry will create new key.
+	// Optional (10 days by default).
+	EncryptionKeyRotationDuration time.Duration // key rotation duration
+
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
@@ -105,8 +138,15 @@ type Options struct {
 // DefaultOptions is an Options object with default values.
 // Dir: "BadgerDB", Codec: encoding.JSON
 var DefaultOptions = Options{
-	Dir:   "BadgerDB",
-	Codec: encoding.JSON,
+	Dir:                           "BadgerDB",
+	InMemory:                      false,
+	SyncWrites:                    false,
+	ReadOnly:                      false,
+	Truncate:                      false,
+	MaxCacheSize:                  1 << 30, // 1 GB, 1 024 576 or 2  bytes
+	EncryptionKey:                 []byte{},
+	EncryptionKeyRotationDuration: 10 * 24 * time.Hour, // Default 10 days.
+	Codec:                         encoding.JSON,
 }
 
 // NewStore creates a new BadgerDB store.
@@ -127,7 +167,14 @@ func NewStore(options Options) (Store, error) {
 
 	// Open the Badger database located in the options.Dir directory.
 	// It will be created if it doesn't exist.
-	opts := badger.DefaultOptions(options.Dir)
+	opts := badger.DefaultOptions(options.Dir).
+		WithInMemory(options.InMemory).
+		WithSyncWrites(options.SyncWrites).
+		WithReadOnly(options.ReadOnly).
+		WithTruncate(options.Truncate).
+		WithMaxCacheSize(options.MaxCacheSize).
+		WithEncryptionKey(options.EncryptionKey).
+		WithEncryptionKeyRotationDuration(options.EncryptionKeyRotationDuration)
 	db, err := badger.Open(opts)
 	if err != nil {
 		return result, err
