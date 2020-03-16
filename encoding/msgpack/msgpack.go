@@ -2,18 +2,18 @@ package msgpack
 
 import "github.com/vmihailenco/msgpack/v4"
 
-// Codec encodes/decodes Go values to/from Msgpack.
+// MsgPack encodes/decodes Go values to/from Msgpack.
 // You can use MsgPack instead of creating an instance of this struct.
-type Codec struct{}
+type MsgPack struct{}
 
 // Marshal encodes a Go value to Msgpack.
-func (c Codec) Marshal(v interface{}) ([]byte, error) {
+func (c MsgPack) Marshal(v interface{}) ([]byte, error) {
 	return msgpack.Marshal(v)
 }
 
 // Unmarshal decodes a Msgpack value into a Go value.
-func (c Codec) Unmarshal(data []byte, v interface{}) error {
+func (c MsgPack) Unmarshal(data []byte, v interface{}) error {
 	return msgpack.Unmarshal(data, v)
 }
 
-var MsgPack = Codec{}
+var Codec = MsgPack{}
