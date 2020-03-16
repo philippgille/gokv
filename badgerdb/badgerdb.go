@@ -102,6 +102,7 @@ type Options struct {
 	// Optional (false by default).
 	InMemory bool
 	// When SyncWrites is true all writes are synced to disk.
+	// This option is ignored when ReadOnly or InMemory is true.
 	// Optional (false by default).
 	SyncWrites bool
 	// When ReadOnly is true the DB will be opened on read-only mode.
@@ -109,7 +110,7 @@ type Options struct {
 	// Optional (false by default).
 	ReadOnly bool
 	// Truncate indicates whether value log files should be truncated to delete corrupt data, if any.
-	// This option is ignored when ReadOnly is true.
+	// This option is ignored when ReadOnly or InMemory is true.
 	// Optional (false by default).
 	Truncate bool
 	// This value specifies how much data cache should hold in memory. A small size of cache means lower
@@ -124,11 +125,11 @@ type Options struct {
 	// size. For example 16 bytes will use AES-128. 24 bytes will use AES-192. 32 bytes will
 	// use AES-256.
 	// Optional (empty by default).
-	EncryptionKey []byte // encryption key
+	EncryptionKey []byte
 	// Key Registry will use this duration to create new keys. If the previous generated
 	// key exceed the given duration. Then the key registry will create new key.
 	// Optional (10 days by default).
-	EncryptionKeyRotationDuration time.Duration // key rotation duration
+	EncryptionKeyRotationDuration time.Duration
 
 	// Encoding format.
 	// Optional (encoding.JSON by default).
@@ -136,14 +137,13 @@ type Options struct {
 }
 
 // DefaultOptions is an Options object with default values.
-// Dir: "BadgerDB", Codec: encoding.JSON
 var DefaultOptions = Options{
 	Dir:                           "BadgerDB",
 	InMemory:                      false,
 	SyncWrites:                    false,
 	ReadOnly:                      false,
 	Truncate:                      false,
-	MaxCacheSize:                  1 << 30, // 1 GB, 1 024 576 or 2  bytes
+	MaxCacheSize:                  1 << 30, // 1 GiB, or 2^30 bytes
 	EncryptionKey:                 []byte{},
 	EncryptionKeyRotationDuration: 10 * 24 * time.Hour, // Default 10 days.
 	Codec:                         encoding.JSON,
@@ -158,11 +158,20 @@ func NewStore(options Options) (Store, error) {
 	result := Store{}
 
 	// Set default values
-	if options.Dir == "" {
+	if options.Dir == "" && !options.InMemory {
 		options.Dir = DefaultOptions.Dir
 	}
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
+	}
+	if options.MaxCacheSize == 0 {
+		options.MaxCacheSize = DefaultOptions.MaxCacheSize
+	}
+	if options.EncryptionKey == nil {
+		options.EncryptionKey = DefaultOptions.EncryptionKey
+	}
+	if options.EncryptionKeyRotationDuration == 0 {
+		options.EncryptionKeyRotationDuration = DefaultOptions.EncryptionKeyRotationDuration
 	}
 
 	// Open the Badger database located in the options.Dir directory.
