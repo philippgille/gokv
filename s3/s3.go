@@ -149,6 +149,9 @@ type Options struct {
 	// and some work only with the path style (especially self-hosted services like a Minio server running on localhost).
 	// Optional (false by default).
 	UsePathStyleAddressing bool
+	// Call createBucket
+	// Optional (false by default)
+	BypassCreateBucket bool
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
@@ -221,13 +224,15 @@ func NewClient(options Options) (Client, error) {
 	svc := awss3.New(session)
 
 	// Create the bucket if it doesn't exist yet.
-	createBucketInput := awss3.CreateBucketInput{
-		Bucket: aws.String(options.BucketName),
-	}
-	origS3 := options.CustomEndpoint == ""
-	err = createBucket(origS3, svc, createBucketInput, options.BucketName)
-	if err != nil {
-		return result, err
+	if !options.BypassCreateBucket {
+		createBucketInput := awss3.CreateBucketInput{
+			Bucket: aws.String(options.BucketName),
+		}
+		origS3 := options.CustomEndpoint == ""
+		err = createBucket(origS3, svc, createBucketInput, options.BucketName)
+		if err != nil {
+			return result, err
+		}
 	}
 
 	result.c = svc
