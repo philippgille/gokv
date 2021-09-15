@@ -14,4 +14,6 @@ var (
 	JSON = JSONcodec{}
 	// Gob is a GobCodec that encodes/decodes Go values to/from gob.
 	Gob = GobCodec{}
+	// TOML is a TOMLcodec that encodes/decodes Go values to/from TOML.
+	TOML = TOMLcodec{}
 )
