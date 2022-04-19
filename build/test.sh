@@ -41,6 +41,10 @@ sleep 10s
 docker run -d --rm --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081
 sleep 10s
 (cd "$SCRIPT_DIR"/../datastore && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop datastore) || (cd "$WORKING_DIR" && echo " failed" && docker stop datastore && exit 1)
+# Google Cloud Firestore
+docker run -d --rm --name firestore-emulator --env "FIRESTORE_PROJECT_ID=dummy-project-id" --env "PORT=8080" -p 8080:8080 mtlynch/firestore-emulator-docker
+sleep 10s
+(cd "$SCRIPT_DIR"/../firestore && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop firestore) || (cd "$WORKING_DIR" && echo " failed" && docker stop firestore && exit 1)
 # DynamoDB via "DynamoDB local"
 docker run -d --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local
 sleep 10s
