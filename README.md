@@ -7,7 +7,6 @@ gokv
 [![codecov](https://codecov.io/gh/philippgille/gokv/branch/master/graph/badge.svg)](https://codecov.io/gh/philippgille/gokv)
 [![GitHub Releases](https://img.shields.io/github/release/philippgille/gokv.svg)](https://github.com/philippgille/gokv/releases)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv?ref=badge_shield)
 
 Simple key-value store abstraction and implementations for Go
 
@@ -321,7 +320,3 @@ License
 - [Summary 2](https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2))
 
 Dependencies might be licensed under other licenses.
-
-> Note: The FOSSA scan checks the repository as a whole. If you only use a few select modules, the number of deep dependencies is of course much lower and the obligations might only be a subset of the listed ones.
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fphilippgille%2Fgokv?ref=badge_large)
