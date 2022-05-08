@@ -26,7 +26,7 @@ done
 
 # Modules that require a Docker container
 # CockroachDB
-docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start --insecure
+docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure
 sleep 10s
 docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'
 (cd "$SCRIPT_DIR"/../cockroachdb && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop cockroachdb) || (cd "$WORKING_DIR" && echo " failed" && docker stop cockroachdb && exit 1)
