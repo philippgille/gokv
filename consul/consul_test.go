@@ -66,7 +66,9 @@ func TestClientConcurrent(t *testing.T) {
 
 	client := createClient(t, encoding.JSON)
 
-	goroutineCount := 1000
+	// With 1000 we get rate limiting errors from the Consul container,
+	// despite setting CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}'.
+	goroutineCount := 500
 
 	test.TestConcurrentInteractions(t, goroutineCount, client)
 }

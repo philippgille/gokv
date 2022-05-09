@@ -31,7 +31,7 @@ sleep 10s
 docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'
 (cd "$SCRIPT_DIR"/../cockroachdb && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop cockroachdb) || (cd "$WORKING_DIR" && echo " failed" && docker stop cockroachdb && exit 1)
 # Consul
-docker run -d --rm --name consul -p 8500:8500 bitnami/consul
+docker run -d --rm --name consul -e CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}' -p 8500:8500 bitnami/consul
 sleep 10s
 (cd "$SCRIPT_DIR"/../consul && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop consul) || (cd "$WORKING_DIR" && echo " failed" && docker stop consul && exit 1)
 # Google Cloud Datastore via "Cloud Datastore Emulator"
