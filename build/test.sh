@@ -75,8 +75,13 @@ docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINI
 sleep 10s
 (cd "$SCRIPT_DIR"/../s3 && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop s3) || (cd "$WORKING_DIR" && echo " failed" && docker stop s3 && exit 1)
 # Tablestorage via Azurite
-# There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
+# In the past there was this problem: https://github.com/Azure/Azurite/issues/121
+# With this Docker image:
 #docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
+# Now with the official image it still doesn't work. // TODO: Investigate / create GitHub issue.
+#docker run -d --rm --name azurite -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite-table
+#sleep 10s
+#(cd "$SCRIPT_DIR"/../tablestorage && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop azurite) || (cd "$WORKING_DIR" && echo " failed" && docker stop azurite && exit 1)
 #
 # Alibaba Cloud Table Store
 # TODO: Currently no emulator exists for Alibaba Cloud Table Store.
