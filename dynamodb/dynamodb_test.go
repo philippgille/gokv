@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	awsdynamodb "github.com/aws/aws-sdk-go/service/dynamodb"
@@ -20,6 +21,13 @@ import (
 // For "DynamoDB local" Docker container.
 // See https://hub.docker.com/r/amazon/dynamodb-local/.
 var customEndpoint = "http://localhost:8000"
+
+// TestConnection only tests the connection to the local DynamoDB, allowing to work on connection options with `go test -run TestConnection .` for example.
+func TestConnection(t *testing.T) {
+	if !checkConnection() {
+		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
+	}
+}
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
@@ -106,14 +114,14 @@ func TestErrors(t *testing.T) {
 	options := dynamodb.Options{
 		AWSaccessKeyID: "foo",
 	}
-	client, err = dynamodb.NewClient(options)
+	_, err = dynamodb.NewClient(options)
 	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	options = dynamodb.Options{
 		AWSsecretAccessKey: "foo",
 	}
-	client, err = dynamodb.NewClient(options)
+	_, err = dynamodb.NewClient(options)
 	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
 		t.Error("An error was expected, but didn't occur.")
 	}
@@ -206,7 +214,17 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID).WithEndpoint(customEndpoint))
+	sess, err := session.NewSessionWithOptions(session.Options{
+		Config: aws.Config{
+			CredentialsChainVerboseErrors: aws.Bool(true),
+			// Local DynamoDB requires credentials, and with the shared config disabled these must be explicitly provided.
+			Credentials: credentials.NewStaticCredentials("foo", "foo", ""),
+			Endpoint:    aws.String(customEndpoint),
+			Region:      aws.String(endpoints.EuCentral1RegionID),
+		},
+		Profile:           session.DefaultSharedConfigProfile,
+		SharedConfigState: session.SharedConfigDisable,
+	})
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
@@ -229,9 +247,11 @@ func checkConnection() bool {
 
 func createClient(t *testing.T, codec encoding.Codec) dynamodb.Client {
 	options := dynamodb.Options{
-		Region:         endpoints.EuCentral1RegionID,
-		CustomEndpoint: customEndpoint,
-		Codec:          codec,
+		Region:             endpoints.EuCentral1RegionID,
+		AWSaccessKeyID:     "foo",
+		AWSsecretAccessKey: "foo",
+		CustomEndpoint:     customEndpoint,
+		Codec:              codec,
 	}
 	client, err := dynamodb.NewClient(options)
 	if err != nil {
