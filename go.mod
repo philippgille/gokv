@@ -1,3 +1,3 @@
 module github.com/philippgille/gokv
 
-go 1.13
+go 1.18
