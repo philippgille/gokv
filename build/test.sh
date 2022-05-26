@@ -17,14 +17,7 @@ for MODULE_NAME in "${array[@]}"; do
     (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
 done
 
-# Modules that don't require a Docker container in Travis CI
-array=( redis )
-for MODULE_NAME in "${array[@]}"; do
-    echo "testing $MODULE_NAME"
-    (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
-done
-
-# Modules that require a Docker container
+# Modules that require a service
 # CockroachDB
 docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure
 sleep 10s
@@ -73,6 +66,10 @@ sleep 10s
 docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres:alpine
 sleep 10s
 (cd "$SCRIPT_DIR"/../postgresql && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop postgres) || (cd "$WORKING_DIR" && echo " failed" && docker stop postgres && exit 1)
+# Redis
+docker run -d --rm --name redis -p 6379:6379 redis
+sleep 10s
+(cd "$SCRIPT_DIR"/../redis && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop redis) || (cd "$WORKING_DIR" && echo " failed" && docker stop redis && exit 1)
 # Amazon S3 via Minio
 docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 minio/minio server /data
 sleep 10s
