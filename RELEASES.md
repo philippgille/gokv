@@ -9,7 +9,11 @@ vNext
 -----
 
 - Improved: Update `BigCache` dependency to v2 (#89 by @janisz)
-- Improved: Updated dependencies of all modules after adding tags for all modules (`go get -u -t`)
+- Improved: Updated dependencies of all modules within the same major version
+    - So except for a few required major version updates, all dependencies are now up-to-date as of 2022-05-07
+- Improved: Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some
+- Improved: Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies
+- Improved: `dyanamodb` tests are now independent of any AWS config/credential file
 - Fixed: `gomap` data race (#90 by @tdakkota)
     - Includes a regression test covering most (if not all) storage-specific implementations 👍
 

@@ -17,21 +17,14 @@ for MODULE_NAME in "${array[@]}"; do
     (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
 done
 
-# Modules that don't require a Docker container in Travis CI
-array=( memcached mongodb mysql redis )
-for MODULE_NAME in "${array[@]}"; do
-    echo "testing $MODULE_NAME"
-    (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
-done
-
-# Modules that require a Docker container
+# Modules that require a service
 # CockroachDB
-docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start --insecure
+docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure
 sleep 10s
 docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'
 (cd "$SCRIPT_DIR"/../cockroachdb && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop cockroachdb) || (cd "$WORKING_DIR" && echo " failed" && docker stop cockroachdb && exit 1)
 # Consul
-docker run -d --rm --name consul -p 8500:8500 bitnami/consul
+docker run -d --rm --name consul -e CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}' -p 8500:8500 bitnami/consul
 sleep 10s
 (cd "$SCRIPT_DIR"/../consul && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop consul) || (cd "$WORKING_DIR" && echo " failed" && docker stop consul && exit 1)
 # Google Cloud Datastore via "Cloud Datastore Emulator"
@@ -54,23 +47,41 @@ docker run -d --rm --name hazelcast -p 5701:5701 hazelcast/hazelcast
 sleep 10s
 (cd "$SCRIPT_DIR"/../hazelcast && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop hazelcast) || (cd "$WORKING_DIR" && echo " failed" && docker stop hazelcast && exit 1)
 # Apache Ignite
-docker run -d --rm --name ignite -e "CONFIG_URI=https://raw.githubusercontent.com/apache/ignite/master/examples/config/example-cache.xml" -p 10800:10800 apacheignite/ignite
+docker run -d --rm --name ignite -p 10800:10800 apacheignite/ignite
 sleep 10s
 (cd "$SCRIPT_DIR"/../ignite && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop ignite) || (cd "$WORKING_DIR" && echo " failed" && docker stop ignite && exit 1)
+# Memcached
+docker run -d --rm --name memcached -p 11211:11211 memcached
+sleep 10s
+(cd "$SCRIPT_DIR"/../memcached && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop memcached) || (cd "$WORKING_DIR" && echo " failed" && docker stop memcached && exit 1)
+# MongoDB
+docker run -d --rm --name mongodb -p 27017:27017 mongo
+sleep 10s
+(cd "$SCRIPT_DIR"/../mongodb && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop mongodb) || (cd "$WORKING_DIR" && echo " failed" && docker stop mongodb && exit 1)
+# MySQL
+docker run -d --rm --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 mysql
+sleep 10s
+(cd "$SCRIPT_DIR"/../mysql && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop mysql) || (cd "$WORKING_DIR" && echo " failed" && docker stop mysql && exit 1)
 # PostgreSQL
-# It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
-# starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
-# Expose port 5433 instead of 5432 because Travis CI already has a service running on 5432.
-docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5433:5432 postgres:alpine
+docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres:alpine
 sleep 10s
 (cd "$SCRIPT_DIR"/../postgresql && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop postgres) || (cd "$WORKING_DIR" && echo " failed" && docker stop postgres && exit 1)
+# Redis
+docker run -d --rm --name redis -p 6379:6379 redis
+sleep 10s
+(cd "$SCRIPT_DIR"/../redis && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop redis) || (cd "$WORKING_DIR" && echo " failed" && docker stop redis && exit 1)
 # Amazon S3 via Minio
 docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 minio/minio server /data
 sleep 10s
 (cd "$SCRIPT_DIR"/../s3 && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop s3) || (cd "$WORKING_DIR" && echo " failed" && docker stop s3 && exit 1)
 # Tablestorage via Azurite
-# There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121
+# In the past there was this problem: https://github.com/Azure/Azurite/issues/121
+# With this Docker image:
 #docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
+# Now with the official image it still doesn't work. // TODO: Investigate / create GitHub issue.
+#docker run -d --rm --name azurite -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite-table
+#sleep 10s
+#(cd "$SCRIPT_DIR"/../tablestorage && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop azurite) || (cd "$WORKING_DIR" && echo " failed" && docker stop azurite && exit 1)
 #
 # Alibaba Cloud Table Store
 # TODO: Currently no emulator exists for Alibaba Cloud Table Store.

@@ -263,11 +263,11 @@ func TestSyntheticPartitionKeySupplier(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	// This is the standard storage emulator connection string.
-	// Although the Go SDK seems to have problems with TableEndpoint (it seems to expect an EndpointSuffix),
-	// this works, because the Go SDK recognizes the emulator account name and then handles the connection string and things like base URL differently.
-	// TODO: There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121.
-	// connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+	// This is the standard storage emulator connection string,
+	// see https://github.com/Azure/Azurite/blob/v3.17.1/README.md#connection-strings.
+	// And it leads to a regular emulator client. But the Go SDK doesn't seem to work with it. // TODO: Investigate / create GitHub issue.
+	//connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+	// Alternatively test with a provided conn string for example for the real Azure.
 	connString, found := os.LookupEnv(connectionStringEnvVar)
 	if !found {
 		fmt.Println("No connection string found in the environment variable")
@@ -280,24 +280,20 @@ func checkConnection() bool {
 	}
 	tableService := storageClient.GetTableService()
 	tableServicePtr := &tableService
-	serviceProps, err := tableServicePtr.GetServiceProperties()
+	_, err = tableServicePtr.QueryTables(storage.MinimalMetadata, nil)
 	if err != nil {
-		fmt.Printf("Error retrieving service properties: %v\n", err)
-		return false
-	}
-	if serviceProps.HourMetrics.Version == "" {
-		fmt.Printf("The returned service properties seem to be empty: %v\n", err)
+		fmt.Printf("Error retrieving table info: %v\n", err)
 		return false
 	}
 	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) tablestorage.Client {
-	// This is the standard storage emulator connection string.
-	// Although the Go SDK seems to have problems with TableEndpoint (it seems to expect an EndpointSuffix),
-	// this works, because the Go SDK recognizes the emulator account name and then handles the connection string and things like base URL differently.
-	// TODO: There are problems with Azurite, see: https://github.com/Azure/Azurite/issues/121.
-	// connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+	// This is the standard storage emulator connection string,
+	// see https://github.com/Azure/Azurite/blob/v3.17.1/README.md#connection-strings.
+	// And it leads to a regular emulator client. But the Go SDK doesn't seem to work with it. // TODO: Investigate / create GitHub issue.
+	//connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+	// Alternatively test with a provided conn string for example for the real Azure.
 	connString, found := os.LookupEnv(connectionStringEnvVar)
 	if !found {
 		t.Fatal(errors.New("No connection string found in the environment variable"))

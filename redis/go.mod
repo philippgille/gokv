@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/redis
 go 1.18
 
 require (
-	github.com/go-redis/redis v6.15.6+incompatible
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
 	github.com/philippgille/gokv/util v0.6.0

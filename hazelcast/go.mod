@@ -3,15 +3,19 @@ module github.com/philippgille/gokv/hazelcast
 go 1.18
 
 require (
-	github.com/hazelcast/hazelcast-go-client v0.0.0-20190530123621-6cf767c2f31a
+	github.com/hazelcast/hazelcast-go-client v1.2.0
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
 	github.com/philippgille/gokv/util v0.6.0
 )
 
 require (
-	github.com/apache/thrift v0.12.0 // indirect
+	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
+	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/go-test/deep v1.0.4 // indirect
 	github.com/philippgille/gokv v0.6.0 // indirect
-	github.com/stretchr/testify v1.4.0 // indirect
+	github.com/shirou/gopsutil/v3 v3.21.5 // indirect
+	github.com/tklauser/go-sysconf v0.3.4 // indirect
+	github.com/tklauser/numcpus v0.2.1 // indirect
+	golang.org/x/sys v0.0.0-20210217105451-b926d437f341 // indirect
 )

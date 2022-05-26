@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/client/v3"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/etcd"
