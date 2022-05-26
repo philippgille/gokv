@@ -54,7 +54,7 @@ docker run -d --rm --name hazelcast -p 5701:5701 hazelcast/hazelcast
 sleep 10s
 (cd "$SCRIPT_DIR"/../hazelcast && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop hazelcast) || (cd "$WORKING_DIR" && echo " failed" && docker stop hazelcast && exit 1)
 # Apache Ignite
-docker run -d --rm --name ignite -e "CONFIG_URI=https://raw.githubusercontent.com/apache/ignite/master/examples/config/example-cache.xml" -p 10800:10800 apacheignite/ignite
+docker run -d --rm --name ignite -p 10800:10800 apacheignite/ignite
 sleep 10s
 (cd "$SCRIPT_DIR"/../ignite && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop ignite) || (cd "$WORKING_DIR" && echo " failed" && docker stop ignite && exit 1)
 # PostgreSQL
