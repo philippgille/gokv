@@ -18,7 +18,7 @@ for MODULE_NAME in "${array[@]}"; do
 done
 
 # Modules that don't require a Docker container in Travis CI
-array=( mysql redis )
+array=( redis )
 for MODULE_NAME in "${array[@]}"; do
     echo "testing $MODULE_NAME"
     (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
@@ -65,6 +65,10 @@ sleep 10s
 docker run -d --rm --name mongodb -p 27017:27017 mongo
 sleep 10s
 (cd "$SCRIPT_DIR"/../mongodb && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop mongodb) || (cd "$WORKING_DIR" && echo " failed" && docker stop mongodb && exit 1)
+# MySQL
+docker run -d --rm --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 mysql
+sleep 10s
+(cd "$SCRIPT_DIR"/../mysql && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop mysql) || (cd "$WORKING_DIR" && echo " failed" && docker stop mysql && exit 1)
 # PostgreSQL
 # It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
 # starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
