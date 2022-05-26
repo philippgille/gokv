@@ -190,8 +190,7 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	// Need to use port 5433 because 5432 is already used by another service on Travis CI
-	db, err := sql.Open("postgres", "postgres://postgres:secret@localhost:5433/?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:secret@localhost:5432/?sslmode=disable")
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
@@ -209,8 +208,7 @@ func checkConnection() bool {
 
 func createClient(t *testing.T, codec encoding.Codec) postgresql.Client {
 	options := postgresql.Options{
-		// Need to use port 5433 because 5432 is already used by another service on Travis CI
-		ConnectionURL: "postgres://postgres:secret@localhost:5433/gokv?sslmode=disable",
+		ConnectionURL: "postgres://postgres:secret@localhost:5432/gokv?sslmode=disable",
 		Codec:         codec,
 		// Higher values seem to lead to issues on Travis CI when using MySQL,
 		// so let's just use the same value here.

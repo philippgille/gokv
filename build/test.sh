@@ -70,10 +70,7 @@ docker run -d --rm --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 
 sleep 10s
 (cd "$SCRIPT_DIR"/../mysql && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop mysql) || (cd "$WORKING_DIR" && echo " failed" && docker stop mysql && exit 1)
 # PostgreSQL
-# It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
-# starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
-# Expose port 5433 instead of 5432 because Travis CI already has a service running on 5432.
-docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5433:5432 postgres:alpine
+docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres:alpine
 sleep 10s
 (cd "$SCRIPT_DIR"/../postgresql && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop postgres) || (cd "$WORKING_DIR" && echo " failed" && docker stop postgres && exit 1)
 # Amazon S3 via Minio

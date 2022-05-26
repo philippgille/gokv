@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/postgresql
 go 1.18
 
 require (
-	github.com/lib/pq v1.2.0
+	github.com/lib/pq v1.10.5
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/sql v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
