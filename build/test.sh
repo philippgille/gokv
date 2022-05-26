@@ -18,7 +18,7 @@ for MODULE_NAME in "${array[@]}"; do
 done
 
 # Modules that don't require a Docker container in Travis CI
-array=( memcached mongodb mysql redis )
+array=( mongodb mysql redis )
 for MODULE_NAME in "${array[@]}"; do
     echo "testing $MODULE_NAME"
     (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go test -v -race -coverprofile=coverage.txt -covermode=atomic) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
@@ -57,6 +57,10 @@ sleep 10s
 docker run -d --rm --name ignite -p 10800:10800 apacheignite/ignite
 sleep 10s
 (cd "$SCRIPT_DIR"/../ignite && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop ignite) || (cd "$WORKING_DIR" && echo " failed" && docker stop ignite && exit 1)
+# Memcached
+docker run -d --rm --name memcached -p 11211:11211 memcached
+sleep 10s
+(cd "$SCRIPT_DIR"/../memcached && go test -v -race -coverprofile=coverage.txt -covermode=atomic && docker stop memcached) || (cd "$WORKING_DIR" && echo " failed" && docker stop memcached && exit 1)
 # PostgreSQL
 # It's available as Travis CI service, but let's try to be as independent as possible from any CI service,
 # starting with PostgreSQL and change the others later as well. (TODO: Turn services into Docker containers!)
