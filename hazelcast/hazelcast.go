@@ -1,12 +1,11 @@
 package hazelcast
 
 import (
+	"context"
 	"fmt"
 
 	hazelcast "github.com/hazelcast/hazelcast-go-client"
-	"github.com/hazelcast/hazelcast-go-client/config/property"
-	"github.com/hazelcast/hazelcast-go-client/core"
-	"github.com/hazelcast/hazelcast-go-client/core/logger"
+	"github.com/hazelcast/hazelcast-go-client/logger"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -14,15 +13,10 @@ import (
 
 // Client is a gokv.Store implementation for Hazelcast.
 type Client struct {
-	// hazelcast.Client is an interface, so don't use a pointer here
-	// For the Set(), Get() and Delete() operations we only need the core.Map,
-	// but we need the client for Close().
-	c hazelcast.Client
-	// core.Map is an interface, so don't use a pointer here
-	//
+	c *hazelcast.Client
 	// TODO: When a Hazelcast server dies and the client creates new connections to the new server,
 	// does the map still work or do we need to get the map from the client again?
-	m     core.Map
+	m     *hazelcast.Map
 	codec encoding.Codec
 }
 
@@ -40,7 +34,7 @@ func (c Client) Set(k string, v interface{}) error {
 		return err
 	}
 
-	err = c.m.Set(k, data)
+	err = c.m.Set(context.Background(), k, data)
 	if err != nil {
 		return err
 	}
@@ -59,7 +53,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	hazelcastValue, err := c.m.Get(k)
+	hazelcastValue, err := c.m.Get(context.Background(), k)
 	if err != nil {
 		return false, err
 	}
@@ -84,13 +78,13 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	return c.m.Delete(k)
+	return c.m.Delete(context.Background(), k)
 }
 
 // Close closes the client.
 // This must be called to properly shut down connections and services (e.g. HeartBeatService).
 func (c Client) Close() error {
-	c.c.Shutdown()
+	c.c.Shutdown(context.Background())
 	return nil
 }
 
@@ -133,24 +127,14 @@ func NewClient(options Options) (Client, error) {
 	}
 
 	config := hazelcast.NewConfig()
-	config.NetworkConfig().AddAddress(options.Address)
-	// During NewClientWithConfig() Hazelcast calls internal.init() on the client,
-	// which in turn calls internal.initLogger(), which just sets the logger.DefaultLogger if no logger is defined.
-	// We don't want the verbose logging, so we need to turn this off.
-	// It doesn't work with setting a logger in the following way:
-	//hazelcastDefaultLogger := logger.New()
-	//offLogLevel, _ := logger.GetLogLevel(logger.OffLevel)
-	//hazelcastDefaultLogger.Level = offLogLevel
-	//config.LoggerConfig().SetLogger(hazelcastDefaultLogger)
-	// Instead, the correct way is documented in the GitHub repository's README:
-	// https://github.com/hazelcast/hazelcast-go-client#782-logging-configuration
-	config.SetProperty(property.LoggingLevel.Name(), logger.OffLevel)
-	client, err := hazelcast.NewClientWithConfig(config)
+	config.Cluster.Network.SetAddresses(options.Address)
+	config.Logger.Level = logger.OffLevel
+	client, err := hazelcast.StartNewClientWithConfig(context.Background(), config)
 	if err != nil {
 		return result, err
 	}
 
-	hazelcastMap, err := client.GetMap(options.MapName)
+	hazelcastMap, err := client.GetMap(context.Background(), options.MapName)
 	if err != nil {
 		return result, err
 	}

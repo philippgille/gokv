@@ -1,12 +1,12 @@
 package hazelcast_test
 
 import (
+	"context"
 	"log"
 	"testing"
 
 	hazelcastOrig "github.com/hazelcast/hazelcast-go-client"
-	"github.com/hazelcast/hazelcast-go-client/config/property"
-	"github.com/hazelcast/hazelcast-go-client/core/logger"
+	"github.com/hazelcast/hazelcast-go-client/logger"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/hazelcast"
@@ -173,19 +173,9 @@ func TestClose(t *testing.T) {
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
 	config := hazelcastOrig.NewConfig()
-	config.NetworkConfig().AddAddress(hazelcast.DefaultOptions.Address)
-	// During NewClientWithConfig() Hazelcast calls internal.init() on the client,
-	// which in turn calls internal.initLogger(), which just sets the logger.DefaultLogger if no logger is defined.
-	// We don't want the verbose logging, so we need to turn this off.
-	// It doesn't work with setting a logger in the following way:
-	//hazelcastDefaultLogger := logger.New()
-	//offLogLevel, _ := logger.GetLogLevel(logger.OffLevel)
-	//hazelcastDefaultLogger.Level = offLogLevel
-	//config.LoggerConfig().SetLogger(hazelcastDefaultLogger)
-	// Instead, the correct way is documented in the GitHub repository's README:
-	// https://github.com/hazelcast/hazelcast-go-client#782-logging-configuration
-	config.SetProperty(property.LoggingLevel.Name(), logger.OffLevel)
-	_, err := hazelcastOrig.NewClientWithConfig(config)
+	config.Cluster.Network.SetAddresses(hazelcast.DefaultOptions.Address)
+	config.Logger.Level = logger.OffLevel
+	_, err := hazelcastOrig.StartNewClientWithConfig(context.Background(), config)
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
