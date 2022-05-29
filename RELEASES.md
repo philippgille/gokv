@@ -14,6 +14,7 @@ vNext
 - Improved: Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some
 - Improved: Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies
 - Improved: `dyanamodb` tests are now independent of any AWS config/credential file
+- Improved: Migrated CI from Travis CI to GitHub Actions
 - Fixed: `gomap` data race (#90 by @tdakkota)
     - Includes a regression test covering most (if not all) storage-specific implementations 👍
 
