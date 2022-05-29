@@ -8,14 +8,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
-- Improved: Update `BigCache` dependency to v2 (#89 by @janisz)
-- Improved: Updated dependencies of all modules within the same major version
+- Improved: Update `BigCache` dependency to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
+- Improved: Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108))
     - So except for a few required major version updates, all dependencies are now up-to-date as of 2022-05-07
-- Improved: Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some
-- Improved: Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies
-- Improved: `dyanamodb` tests are now independent of any AWS config/credential file
-- Improved: Migrated CI from Travis CI to GitHub Actions
-- Fixed: `gomap` data race (#90 by @tdakkota)
+- Improved: Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some (PR [#108](https://github.com/philippgille/gokv/pull/108))
+- Improved: Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies (PR [#108](https://github.com/philippgille/gokv/pull/108))
+- Improved: `dyanamodb` tests are now independent of any AWS config/credential file (PR [#108](https://github.com/philippgille/gokv/pull/108))
+- Improved: Migrated CI from Travis CI to GitHub Actions (PR [#110](https://github.com/philippgille/gokv/pull/110))
+- Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
     - Includes a regression test covering most (if not all) storage-specific implementations 👍
 
 v0.6.0 (2019-10-13)
