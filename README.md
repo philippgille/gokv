@@ -1,7 +1,7 @@
 gokv
 ====
 
-[![GoDoc](http://www.godoc.org/github.com/philippgille/gokv?status.svg)](http://www.godoc.org/github.com/philippgille/gokv)
+[![Go Reference](https://pkg.go.dev/badge/github.com/philippgille/gokv.svg)](https://pkg.go.dev/github.com/philippgille/gokv)
 [![Build status](https://github.com/philippgille/gokv/actions/workflows/test.yml/badge.svg)](https://github.com/philippgille/gokv/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/philippgille/gokv)](https://goreportcard.com/report/github.com/philippgille/gokv)
 [![codecov](https://codecov.io/gh/philippgille/gokv/branch/master/graph/badge.svg)](https://codecov.io/gh/philippgille/gokv)
@@ -42,7 +42,7 @@ type Store interface {
 }
 ```
 
-There are detailed descriptions of the methods in the [docs](https://www.godoc.org/github.com/philippgille/gokv#Store) and in the [code](https://github.com/philippgille/gokv/blob/master/store.go). You should read them if you plan to write your own `gokv.Store` implementation or if you create a Go package with a method that takes a `gokv.Store` as parameter, so you know exactly what happens in the background.
+There are detailed descriptions of the methods in the [docs](https://pkg.go.dev/badge/github.com/philippgille/gokv#Store) and in the [code](https://github.com/philippgille/gokv/blob/master/store.go). You should read them if you plan to write your own `gokv.Store` implementation or if you create a Go package with a method that takes a `gokv.Store` as parameter, so you know exactly what happens in the background.
 
 ### Implementations
 
@@ -51,7 +51,7 @@ Some of the following databases aren't specifically engineered for storing key-v
 Feel free to suggest more stores by creating an [issue](https://github.com/philippgille/gokv/issues) or even add an actual implementation - [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com).
 
 For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  
-For the GoDoc of specific implementations, see [https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories](https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories).
+For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/philippgille/gokv#section-directories>.
 
 - Local in-memory
     - [X] Go `sync.Map`
@@ -96,7 +96,7 @@ For the GoDoc of specific implementations, see [https://www.godoc.org/github.com
 
 Again:  
 For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  
-For the GoDoc of specific implementations, see [https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories](https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories).
+For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/philippgille/gokv#section-directories>.
 
 ### Value types
 
@@ -104,7 +104,7 @@ Most Go packages for key-value stores just accept a `[]byte` as value, which req
 
 The kind of (un-)marshalling is left to the implementation. All implementations in this repository currently support JSON and [gob](https://blog.golang.org/gobs-of-data) by using the `encoding` subpackage in this repository, which wraps the core functionality of the standard library's `encoding/json` and `encoding/gob` packages. See [Marshal formats](#marshal-formats) for details.
 
-For unexported struct fields to be (un-)marshalled to/from JSON/gob, the respective custom (un-)marshalling methods need to be implemented as methods of the struct (e.g. `MarshalJSON() ([]byte, error)` for custom marshalling into JSON). See [Marshaler](https://godoc.org/encoding/json#Marshaler) and [Unmarshaler](https://godoc.org/encoding/json#Unmarshaler) for JSON, and [GobEncoder](https://godoc.org/encoding/gob#GobEncoder) and [GobDecoder](https://godoc.org/encoding/gob#GobDecoder) for gob.
+For unexported struct fields to be (un-)marshalled to/from JSON/gob, the respective custom (un-)marshalling methods need to be implemented as methods of the struct (e.g. `MarshalJSON() ([]byte, error)` for custom marshalling into JSON). See [Marshaler](https://pkg.go.dev/encoding/json#Marshaler) and [Unmarshaler](https://pkg.go.dev/encoding/json#Unmarshaler) for JSON, and [GobEncoder](https://pkg.go.dev/encoding/gob#GobEncoder) and [GobDecoder](https://pkg.go.dev/encoding/gob#GobDecoder) for gob.
 
 To improve performance you can also implement the custom (un-)marshalling methods so that no reflection is used by the `encoding/json` / `encoding/gob` packages. This is not a disadvantage of using a generic key-value store package, it's the same as if you would use a concrete key-value store package which only accepts `[]byte`, requiring you to (un-)marshal your structs.
 
@@ -126,8 +126,8 @@ Differences between the formats:
 - Depending on the struct, one of the formats might be faster
 - Depending on the struct, one of the formats might lead to a lower storage size
 - Depending on the use case, the custom (un-)marshal methods of one of the formats might be easier to implement
-    - JSON: [`MarshalJSON() ([]byte, error)`](https://godoc.org/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://godoc.org/encoding/json#Unmarshaler)
-    - gob: [`GobEncode() ([]byte, error)`](https://godoc.org/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://godoc.org/encoding/gob#GobDecoder)
+    - JSON: [`MarshalJSON() ([]byte, error)`](https://pkg.go.dev/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://pkg.go.dev/encoding/json#Unmarshaler)
+    - gob: [`GobEncode() ([]byte, error)`](https://pkg.go.dev/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://pkg.go.dev/encoding/gob#GobDecoder)
 
 ### Roadmap
 
