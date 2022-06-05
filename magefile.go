@@ -1,4 +1,4 @@
-// +build mage
+//go:build mage
 
 package main
 
