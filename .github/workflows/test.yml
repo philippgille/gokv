@@ -11,20 +11,26 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
+      - run: |
+          git clone --depth 1 --branch v1.13.0 https://github.com/magefile/mage
+          cd mage
+          go run bootstrap.go
 
-      - run: go version
-      - run: go env
-      - run: docker version
+      - run: |
+          go version
+          go env
+          mage -version
+          docker version
 
       # First build to check for compile errors
-      - run: build/build.sh
+      - run: mage build
       # Then lint, taking `.golangci.yml` into account
       - uses: golangci/golangci-lint-action@v3
       # Finally test all modules
       # This starts and stops Docker containers for services like PostgreSQL, Redis etc.
       # Takes up to 10m on GitHub Actions
       # TODO: Change workflow so that when only one module is changed, only that module's tests are run
-      - run: build/test.sh
+      - run: mage test
 
       # Combining of coverage reports not required with the action, which detects all reports in subdirectories and uploads all of them
       #- run: build/combine-coverage.sh
