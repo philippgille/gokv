@@ -3,41 +3,59 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
+	"errors"
+	"runtime"
 
-	"github.com/magefile/mage/mg" // mg contains helpful utility functions, like Deps
+	"github.com/bitfield/script"
+	"github.com/magefile/mage/sh"
 )
 
-// Default target to run when none is specified
-// If not set, running mage will list available targets
-// var Default = Build
+// Update updates the dependencies of all modules.
+// It only updates direct dependencies within the same major version, like `go get` with `@latest` does.
+// It doesn't update transitive dependencies, like `go get -u` does.
+// It also runs `go mod tidy` for all modules after updating.
+func Update() error {
+	switch runtime.GOOS {
+	case "windows":
+		return sh.Run("./build/update-deps.ps1")
+	case "darwin":
+		fallthrough
+	case "linux":
+		return sh.Run("./build/update-deps.sh")
+	}
+	return errors.New("your OS is not supported")
+}
 
-// A build step that requires additional params, or platform specific steps for example
+// Build builds all modules.
 func Build() error {
-	mg.Deps(InstallDeps)
-	fmt.Println("Building...")
-	cmd := exec.Command("go", "build", "-o", "MyApp", ".")
-	return cmd.Run()
+	switch runtime.GOOS {
+	case "windows":
+		return sh.Run("./build/build.ps1")
+	case "darwin":
+		fallthrough
+	case "linux":
+		return sh.Run("./build/build.sh")
+	}
+	return errors.New("your OS is not supported")
 }
 
-// A custom install step if you need your bin someplace other than go/bin
-func Install() error {
-	mg.Deps(Build)
-	fmt.Println("Installing...")
-	return os.Rename("./MyApp", "/usr/bin/MyApp")
+// Test tests all modules.
+func Test() error {
+	switch runtime.GOOS {
+	// TODO: Support Windows. Instead of writing a test.ps1, implement it here in the magefile to also replace the test.sh.
+	case "darwin":
+		fallthrough
+	case "linux":
+		return sh.Run("./build/test.sh")
+	}
+	return errors.New("your OS is not supported")
 }
 
-// Manage your deps, or running package managers.
-func InstallDeps() error {
-	fmt.Println("Installing Deps...")
-	cmd := exec.Command("go", "get", "github.com/stretchr/piglatin")
-	return cmd.Run()
-}
-
-// Clean up after yourself
-func Clean() {
-	fmt.Println("Cleaning...")
-	os.RemoveAll("MyApp")
+// Clean cleans the build/test output, like coverage.txt files
+func Clean() error {
+	p := script.FindFiles(".").
+		Match("coverage.txt").
+		ExecForEach("rm ./{{.}}") // On Windows `rm` works as it's an alias for Remove-Item
+	p.Wait()
+	return p.Error()
 }
