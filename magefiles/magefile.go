@@ -39,16 +39,40 @@ func Build() error {
 	return errors.New("your OS is not supported")
 }
 
-// Test tests all modules.
-func Test() error {
-	switch runtime.GOOS {
-	// TODO: Support Windows. Instead of writing a test.ps1, implement it here in the magefile to also replace the test.sh.
-	case "darwin":
-		fallthrough
-	case "linux":
-		return sh.Run("./build/test.sh")
+// Test tests the given module. Pass "all" to test all modules.
+func Test(module string) error {
+	if module == "all" {
+		// Helper packages and examples currently don't have tests, so currently for *all* tests we can just iterate all `gokv.Store` implementations
+		// TODO: Add tests for helper and example packages, then change this behavior.
+		impls, err := script.File("./build/implementations").Slice()
+		if err != nil {
+			return err
+		}
+		for _, impl := range impls {
+			err = testImpl(impl)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	}
-	return errors.New("your OS is not supported")
+
+	switch module {
+	case "encoding", "sql", "test", "util":
+		return errors.New("module " + module + " doesn't have any tests")
+	case "examples":
+		return errors.New("examples don't have any tests")
+	}
+
+	i, err := script.File("./build/implementations").Match(module).CountLines()
+	if err != nil {
+		return err
+	}
+	if i == 0 {
+		return errors.New("module from parameter not found")
+	}
+
+	return testImpl(module)
 }
 
 // Clean cleans the build/test output, like coverage.txt files
