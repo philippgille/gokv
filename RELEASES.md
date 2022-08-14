@@ -15,6 +15,8 @@ vNext
 - Improved: Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies (PR [#108](https://github.com/philippgille/gokv/pull/108))
 - Improved: `dyanamodb` tests are now independent of any AWS config/credential file (PR [#108](https://github.com/philippgille/gokv/pull/108))
 - Improved: Migrated CI from Travis CI to GitHub Actions (PR [#110](https://github.com/philippgille/gokv/pull/110))
+- Improved: Migrated from Bash and PowerShell build/test scripts to [Mage](https://github.com/magefile/mage) (PR [#111](https://github.com/philippgille/gokv/pull/111))
+    - With this comes also the improvement that individual modules can now be tested. Like `mage test redis`. For testing all modules there's `mage test all`.
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
     - Includes a regression test covering most (if not all) storage-specific implementations 👍
 
