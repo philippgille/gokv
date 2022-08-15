@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/hazelcast
 go 1.18
 
 require (
-	github.com/hazelcast/hazelcast-go-client v1.2.0
+	github.com/hazelcast/hazelcast-go-client v1.3.0
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
 	github.com/philippgille/gokv/util v0.6.0
