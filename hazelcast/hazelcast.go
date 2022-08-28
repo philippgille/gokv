@@ -14,8 +14,7 @@ import (
 // Client is a gokv.Store implementation for Hazelcast.
 type Client struct {
 	c *hazelcast.Client
-	// TODO: When a Hazelcast server dies and the client creates new connections to the new server,
-	// does the map still work or do we need to get the map from the client again?
+	// This map still works even after a temporary connection loss.
 	m     *hazelcast.Map
 	codec encoding.Codec
 }
