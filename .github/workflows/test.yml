@@ -1,5 +1,6 @@
 name: test
-on: [push] # TODO: Add pull_request?
+# Push is enough even for PRs from maintainers, but not from contributors
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
