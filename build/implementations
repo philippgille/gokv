@@ -15,6 +15,7 @@ leveldb
 memcached
 mongodb
 mysql
+nop
 postgresql
 redis
 s3
