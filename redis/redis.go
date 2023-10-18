@@ -1,7 +1,10 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
+	"context"
+	"time"
+
+	"github.com/redis/go-redis/v9"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -30,7 +33,10 @@ func (c Client) Set(k string, v interface{}) error {
 		return err
 	}
 
-	err = c.c.Set(k, string(data), 0).Err()
+	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err = c.c.Set(tctx, k, string(data), 0).Err()
 	if err != nil {
 		return err
 	}
@@ -48,7 +54,10 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	dataString, err := c.c.Get(k).Result()
+	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	dataString, err := c.c.Get(tctx, k).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return false, nil
@@ -67,7 +76,10 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	_, err := c.c.Del(k).Result()
+	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	_, err := c.c.Del(tctx, k).Result()
 	return err
 }
 
@@ -121,7 +133,10 @@ func NewClient(options Options) (Client, error) {
 		DB:       options.DB,
 	})
 
-	err := client.Ping().Err()
+	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err := client.Ping(tctx).Err()
 	if err != nil {
 		return result, err
 	}
