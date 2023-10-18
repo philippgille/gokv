@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/philippgille/gokv/encoding"
@@ -103,6 +104,12 @@ type Options struct {
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
+	// Redis opentelemtry Tracing
+	// Optional (false by default).
+	EnableTracing bool
+	// Redis opentelemtry Metrics
+	// Optional (false by default).
+	EnableMetrics bool
 }
 
 // DefaultOptions is an Options object with default values.
@@ -132,6 +139,17 @@ func NewClient(options Options) (Client, error) {
 		Password: options.Password,
 		DB:       options.DB,
 	})
+
+	if options.EnableTracing {
+		if err := redisotel.InstrumentTracing(client); err != nil {
+			return result, err
+		}
+	}
+	if options.EnableMetrics {
+		if err := redisotel.InstrumentMetrics(client); err != nil {
+			return result, err
+		}
+	}
 
 	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
