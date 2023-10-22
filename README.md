@@ -114,6 +114,7 @@ This repository contains the subpackage `encoding`, which is an abstraction and 
 
 - [X] JSON
 - [X] [gob](https://blog.golang.org/gobs-of-data)
+- [X] [proto](https://pkg.go.dev/github.com/golang/protobuf/proto)
 
 More formats will be supported in the future (e.g. XML).
 
@@ -128,6 +129,7 @@ Differences between the formats:
 - Depending on the use case, the custom (un-)marshal methods of one of the formats might be easier to implement
     - JSON: [`MarshalJSON() ([]byte, error)`](https://pkg.go.dev/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://pkg.go.dev/encoding/json#Unmarshaler)
     - gob: [`GobEncode() ([]byte, error)`](https://pkg.go.dev/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://pkg.go.dev/encoding/gob#GobDecoder)
+    - proto: [`Marshal(proto.Message) ([]byte, error)`](https://pkg.go.dev/github.com/golang/protobuf/proto#Marshal) and [`Unmarshal([]byte, proto.Message) error`](https://pkg.go.dev/github.com/golang/protobuf/proto#Unmarshal)
 
 ### Roadmap
 
