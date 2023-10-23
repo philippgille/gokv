@@ -22,10 +22,13 @@ type entity struct {
 	V []byte `datastore:"v,noindex"`
 }
 
+var defaultTimeout = 2 * time.Second
+
 // Client is a gokv.Store implementation for Cloud Datastore.
 type Client struct {
-	c     *datastore.Client
-	codec encoding.Codec
+	c       *datastore.Client
+	timeOut time.Duration
+	codec   encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -42,7 +45,7 @@ func (c Client) Set(k string, v interface{}) error {
 		return err
 	}
 
-	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
 	defer cancel()
 	key := datastore.Key{
 		Kind: kind,
@@ -67,7 +70,7 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
 	defer cancel()
 	key := datastore.Key{
 		Kind: kind,
@@ -94,7 +97,7 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
 	defer cancel()
 	key := datastore.Key{
 		Kind: kind,
@@ -119,15 +122,19 @@ type Options struct {
 	// GOOGLE_APPLICATION_CREDENTIALS environment variable.
 	// Optional ("" by default, leading to a lookup via environment variable).
 	CredentialsFile string
+	// The timeout for operations.
+	// Optional (2 * time.Second by default).
+	Timeout *time.Duration
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// CredentialsFile: "", Codec: encoding.JSON
+// CredentialsFile: "", Timeout: 2 * time.Second, Codec: encoding.JSON
 var DefaultOptions = Options{
-	Codec: encoding.JSON,
+	Timeout: &defaultTimeout,
+	Codec:   encoding.JSON,
 	// No need to set CredentialsFile because its Go zero value is fine.
 }
 
@@ -143,6 +150,9 @@ func NewClient(options Options) (Client, error) {
 	}
 
 	// Set default values
+	if options.Timeout == nil {
+		options.Timeout = DefaultOptions.Timeout
+	}
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
 	}
@@ -162,6 +172,7 @@ func NewClient(options Options) (Client, error) {
 	}
 
 	result.c = dsClient
+	result.timeOut = *options.Timeout
 	result.codec = options.Codec
 
 	return result, nil
