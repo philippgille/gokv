@@ -131,3 +131,13 @@ func NewClient(options Options) (Client, error) {
 
 	return result, nil
 }
+
+// NewWithClient method creates a new `gokv.redis.Client` with given `redis.Client`.
+// redis related options are ignored, only Codec is applicable
+// The client is expected to be fully configured, with an address of a Redis server/cluster etc.
+func NewWithClient(rc *redis.Client, options Options) *Client {
+	if options.Codec == nil {
+		options.Codec = DefaultOptions.Codec
+	}
+	return &Client{c: rc, codec: options.Codec}
+}
