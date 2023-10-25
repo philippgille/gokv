@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	gosql "database/sql"
 
 	// Usually a blank import is enough as it calls the package's init() function and loads the driver,
@@ -29,6 +30,12 @@ type Client struct {
 // The length of the key must not exceed 255 characters.
 // The key must not be "" and the value must not be nil.
 func (c Client) Set(k string, v any) error {
+	ctx := context.Background()
+	return c.SetWithContext(ctx, k, v)
+}
+
+// SetWithContext is exactly like Set function just with added context as first argument.
+func (c Client) SetWithContext(_ context.Context, k string, v any) error {
 	// It's tempting to remove this "wrapper" method
 	// and just use *sql.Client as embedded field,
 	// But we need this explicit method for a different GoDoc
@@ -44,6 +51,12 @@ func (c Client) Set(k string, v any) error {
 // The length of the key must not exceed 255 characters.
 // The key must not be "" and the pointer must not be nil.
 func (c Client) Get(k string, v any) (found bool, err error) {
+	ctx := context.Background()
+	return c.GetWithContext(ctx, k, v)
+}
+
+// GetWithContext is exactly like Get function just with added context as first argument.
+func (c Client) GetWithContext(_ context.Context, k string, v any) (found bool, err error) {
 	// It's tempting to remove this "wrapper" method
 	// and just use *sql.Client as embedded field,
 	// But we need this explicit method for a different GoDoc
@@ -56,6 +69,12 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 // The length of the key must not exceed 255 characters.
 // The key must not be "".
 func (c Client) Delete(k string) error {
+	ctx := context.Background()
+	return c.DeleteWithContext(ctx, k)
+}
+
+// DeleteWithContext is exactly like Delete function just with added context as first argument.
+func (c Client) DeleteWithContext(_ context.Context, k string) error {
 	// It's tempting to remove this "wrapper" method
 	// and just use *sql.Client as embedded field,
 	// But we need this explicit method for a different GoDoc

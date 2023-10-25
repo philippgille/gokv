@@ -25,6 +25,13 @@ type Client struct {
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
 func (c Client) Set(k string, v any) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	return c.SetWithContext(ctx, k, v)
+}
+
+// SetWithContext is exactly like Set function just with added context as first argument.
+func (c Client) SetWithContext(ctx context.Context, k string, v any) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
@@ -35,9 +42,7 @@ func (c Client) Set(k string, v any) error {
 		return err
 	}
 
-	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
-	defer cancel()
-	_, err = c.c.Put(ctxWithTimeout, k, string(data))
+	_, err = c.c.Put(ctx, k, string(data))
 	if err != nil {
 		return err
 	}
@@ -52,13 +57,18 @@ func (c Client) Set(k string, v any) error {
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
 func (c Client) Get(k string, v any) (found bool, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	return c.GetWithContext(ctx, k, v)
+}
+
+// GetWithContext is exactly like Get function just with added context as first argument.
+func (c Client) GetWithContext(ctx context.Context, k string, v any) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
-	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
-	defer cancel()
-	getRes, err := c.c.Get(ctxWithTimeout, k)
+	getRes, err := c.c.Get(ctx, k)
 	if err != nil {
 		return false, err
 	}
@@ -76,13 +86,18 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 // Deleting a non-existing key-value pair does NOT lead to an error.
 // The key must not be "".
 func (c Client) Delete(k string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	return c.DeleteWithContext(ctx, k)
+}
+
+// DeleteWithContext is exactly like Delete function just with added context as first argument.
+func (c Client) DeleteWithContext(ctx context.Context, k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
 	}
 
-	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), c.timeOut)
-	defer cancel()
-	_, err := c.c.Delete(ctxWithTimeout, k)
+	_, err := c.c.Delete(ctx, k)
 	return err
 }
 
