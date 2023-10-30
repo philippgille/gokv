@@ -1,17 +1,17 @@
-package nop_test
+package noop_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/philippgille/gokv"
-	"github.com/philippgille/gokv/nop"
+	"github.com/philippgille/gokv/noop"
 )
 
 func TestNop(t *testing.T) {
 	t.Parallel()
 
-	var s gokv.Store = nop.NewStore()
+	var s gokv.Store = noop.NewStore()
 
 	if err := s.Set("foo", 1); err != nil {
 		t.Error(err)
@@ -38,7 +38,7 @@ func TestNop(t *testing.T) {
 func TestInputValidation(t *testing.T) {
 	t.Parallel()
 
-	var s gokv.Store = nop.NewStore()
+	var s gokv.Store = noop.NewStore()
 
 	{
 		err := s.Set("", 1)

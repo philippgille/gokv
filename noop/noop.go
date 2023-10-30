@@ -1,4 +1,4 @@
-package nop
+package noop
 
 import "github.com/philippgille/gokv/util"
 
@@ -37,7 +37,7 @@ func (s Store) Close() error {
 	return nil
 }
 
-// NewStore creates a new nop Store that implements gokv.Store interface.
+// NewStore creates a new noop Store that implements gokv.Store interface.
 func NewStore() Store {
 	return Store{}
 }
