@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+- Added: New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
+- Added: New store implementation: `noop` (PR [#126](https://github.com/philippgille/gokv/pull/126) by [@peczenyj](https://github.com/peczenyj))
+- Added: Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
 - Improved: Update `BigCache` dependency to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
 - Improved: Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108))
     - So except for a few required major version updates, all dependencies are now up-to-date as of 2022-05-07
@@ -17,6 +20,9 @@ vNext
 - Improved: Migrated CI from Travis CI to GitHub Actions (PR [#110](https://github.com/philippgille/gokv/pull/110))
 - Improved: Migrated from Bash and PowerShell build/test scripts to [Mage](https://github.com/magefile/mage) (PR [#111](https://github.com/philippgille/gokv/pull/111))
     - With this comes also the improvement that individual modules can now be tested. Like `mage test redis`. For testing all modules there's `mage test all`.
+- Improved: Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@juze](https://github.com/yuce))
+- Improved: Added more Go versions in CI test matrix (PR [#134](https://github.com/philippgille/gokv/pull/134) by [@glimchb](https://github.com/glimchb))
+- Improved: Use GitHub action for Mage (PR [#135](https://github.com/philippgille/gokv/pull/135) by [@glimchb](https://github.com/glimchb))
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
     - Includes a regression test covering most (if not all) storage-specific implementations 👍
 
