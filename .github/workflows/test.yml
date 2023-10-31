@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         go: [ '1.19', '1.20', '1.21' ]
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +24,12 @@ jobs:
         with:
           version: v1.15.0
           install-only: true
+
+      - name: Setup docker (missing on MacOS)
+        if: contains(runner.os, 'macos')
+        run: |
+          brew install docker
+          colima start
 
       - run: |
           go version
