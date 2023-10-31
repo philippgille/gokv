@@ -18,7 +18,7 @@ func testImpl(impl string) error {
 	// Implementations that don't require a separate service
 
 	switch impl {
-	case "badgerdb", "bbolt", "bigcache", "file", "freecache", "gomap", "leveldb", "syncmap":
+	case "badgerdb", "bbolt", "bigcache", "file", "freecache", "gomap", "leveldb", "syncmap", "noop":
 		if err := os.Chdir("./" + impl); err != nil {
 			return err
 		}
