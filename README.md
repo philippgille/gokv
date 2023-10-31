@@ -93,6 +93,8 @@ For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/ph
     - [X] [Apache Ignite](https://github.com/apache/ignite)
     - [ ] [ArangoDB](https://github.com/arangodb/arangodb)
     - [ ] [OrientDB](https://github.com/orientechnologies/orientdb)
+- Misc
+    - [X] Go `nop` does nothing except validate the inputs, if applicable.
 
 Again:  
 For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  

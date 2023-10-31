@@ -126,3 +126,5 @@ Implementations
     - [ArangoDB](https://github.com/arangodb/arangodb) (⚠️Not implemented yet!)
     - [OrientDB](https://github.com/orientechnologies/orientdb) (⚠️Not implemented yet!)
         - Claims to be the fastest graph database
+- Misc
+    - Go `nop` does nothing except validate the inputs, if applicable.
