@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -87,6 +88,11 @@ func testImpl(impl string) error {
 		dockerCmd = `docker run -d --rm --name zookeeper -p 2181:2181 zookeeper`
 	default:
 		return errors.New("unknown `gokv.Store` implementation")
+	}
+
+	// TODO: until docker images for windows appear, skip those test for windows
+	if dockerCmd != "" && runtime.GOOS == "windows" {
+		return nil
 	}
 
 	// For some implementations there's no way to test with a Docker container yet.
