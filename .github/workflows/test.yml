@@ -12,10 +12,10 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
-      - run: |
-          git clone --depth 1 --branch v1.13.0 https://github.com/magefile/mage
-          cd mage
-          go run bootstrap.go
+      - uses: magefile/mage-action@v3
+        with:
+          version: v1.13.0
+          install-only: true
 
       - run: |
           go version
