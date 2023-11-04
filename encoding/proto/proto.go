@@ -1,4 +1,4 @@
-package encoding
+package proto
 
 import (
 	"errors"
