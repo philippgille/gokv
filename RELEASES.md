@@ -11,6 +11,7 @@ vNext
 - Added: New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
 - Added: New store implementation: `noop` (PR [#126](https://github.com/philippgille/gokv/pull/126) by [@peczenyj](https://github.com/peczenyj))
 - Added: Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
+- Added: Optional timeout configuration for `redis` store implementation (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Improved: Update `BigCache` dependency to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
 - Improved: Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108))
     - So except for a few required major version updates, all dependencies are now up-to-date as of 2022-05-07
@@ -23,8 +24,13 @@ vNext
 - Improved: Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@juze](https://github.com/yuce))
 - Improved: Added more Go versions in CI test matrix (PR [#134](https://github.com/philippgille/gokv/pull/134) by [@glimchb](https://github.com/glimchb))
 - Improved: Use GitHub action for Mage (PR [#135](https://github.com/philippgille/gokv/pull/135) by [@glimchb](https://github.com/glimchb))
+- Improved: Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
     - Includes a regression test covering most (if not all) storage-specific implementations 👍
+
+### Breaking changes
+
+- `redis` store now has a default timeout of 2 seconds (previously no timeout). You can customize/remove the timeout via the store's config. (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 
 v0.6.0 (2019-10-13)
 -------------------
@@ -55,8 +61,7 @@ v0.5.0 (2019-01-12)
     - Package `freecache` - A `gokv.Store` implementation for [FreeCache](https://github.com/coocood/freecache) (issue [#44](https://github.com/philippgille/gokv/issues/44))
     - Package `bigcache` - A `gokv.Store` implementation for [BigCache](https://github.com/allegro/bigcache) (issue [#45](https://github.com/philippgille/gokv/issues/45))
 
-Breaking changes
-----------------
+### Breaking changes
 
 - The `MarshalFormat` enums were removed from all packages that contained `gokv.Store` implementations. Instead the shared package `encoding` was introduced (required for issue [#47](https://github.com/philippgille/gokv/issues/47))
 
