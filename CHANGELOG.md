@@ -27,6 +27,7 @@ vNext
 - Improved: Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
+- Fixed: Double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
 
 ### Breaking changes
 
