@@ -1,4 +1,4 @@
-module github.com/philippgille/gokv/examples
+module github.com/philippgille/gokv/examples/redis
 
 go 1.18
 
