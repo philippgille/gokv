@@ -1,16 +1,22 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
+	"context"
+	"time"
+
+	"github.com/redis/go-redis/v9"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
 
+var defaultTimeout = 2 * time.Second
+
 // Client is a gokv.Store implementation for Redis.
 type Client struct {
-	c     *redis.Client
-	codec encoding.Codec
+	c       *redis.Client
+	timeOut time.Duration
+	codec   encoding.Codec
 }
 
 // Set stores the given value for the given key.
@@ -30,7 +36,10 @@ func (c Client) Set(k string, v interface{}) error {
 		return err
 	}
 
-	err = c.c.Set(k, string(data), 0).Err()
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+
+	err = c.c.Set(tctx, k, string(data), 0).Err()
 	if err != nil {
 		return err
 	}
@@ -48,7 +57,10 @@ func (c Client) Get(k string, v interface{}) (found bool, err error) {
 		return false, err
 	}
 
-	dataString, err := c.c.Get(k).Result()
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+
+	dataString, err := c.c.Get(tctx, k).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return false, nil
@@ -67,7 +79,10 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	_, err := c.c.Del(k).Result()
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+
+	_, err := c.c.Del(tctx, k).Result()
 	return err
 }
 
@@ -88,15 +103,19 @@ type Options struct {
 	// DB to use.
 	// Optional (0 by default).
 	DB int
+	// The timeout for operations.
+	// Optional (2 * time.Second by default).
+	Timeout *time.Duration
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
-// Address: "localhost:6379", Password: "", DB: 0, Codec: encoding.JSON
+// Address: "localhost:6379", Password: "", DB: 0, Timeout: 2 * time.Second, Codec: encoding.JSON
 var DefaultOptions = Options{
 	Address: "localhost:6379",
+	Timeout: &defaultTimeout,
 	Codec:   encoding.JSON,
 	// No need to set Password or DB because their Go zero values are fine for that.
 }
@@ -111,6 +130,9 @@ func NewClient(options Options) (Client, error) {
 	if options.Address == "" {
 		options.Address = DefaultOptions.Address
 	}
+	if options.Timeout == nil {
+		options.Timeout = DefaultOptions.Timeout
+	}
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
 	}
@@ -121,12 +143,16 @@ func NewClient(options Options) (Client, error) {
 		DB:       options.DB,
 	})
 
-	err := client.Ping().Err()
+	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	err := client.Ping(tctx).Err()
 	if err != nil {
 		return result, err
 	}
 
 	result.c = client
+	result.timeOut = *options.Timeout
 	result.codec = options.Codec
 
 	return result, nil

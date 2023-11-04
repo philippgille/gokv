@@ -1,10 +1,11 @@
 package redis_test
 
 import (
+	"context"
 	"log"
 	"testing"
 
-	goredis "github.com/go-redis/redis"
+	goredis "github.com/redis/go-redis/v9"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/redis"
@@ -189,7 +190,7 @@ func checkConnection(number int) bool {
 		DB:       number,
 	})
 	defer client.Close()
-	err := client.Ping().Err()
+	err := client.Ping(context.Background()).Err()
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
