@@ -6,6 +6,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// Convenience variable for simpler usage in gokv store options.
+//
+//	options := redis.Options{
+//		Encoding: proto.Codec,
+//	}
+var Codec = PBcodec{}
+
 // PBcodec encodes/decodes Go values to/from protocol buffers.
 type PBcodec struct{}
 
