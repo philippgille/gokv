@@ -240,7 +240,7 @@ Everything else works the same way. `interactWithStore()` is completely unaffect
 Project status
 --------------
 
-> Note: `gokv`'s API is not stable yet and is under active development. Upcoming releases are likely to contain breaking changes as long as the version is `v0.x.y`. You should use vendoring to prevent bad surprises. This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) and all notable changes to this project are documented in [RELEASES.md](https://github.com/philippgille/gokv/blob/master/RELEASES.md).
+> Note: `gokv`'s API is not stable yet and is under active development. Upcoming releases are likely to contain breaking changes as long as the version is `v0.x.y`. You should use vendoring to prevent bad surprises. This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) and all notable changes to this project are documented in [CHANGELOG.md](https://github.com/philippgille/gokv/blob/master/CHANGELOG.md).
 
 Planned interface methods until `v1.0.0`:
 
