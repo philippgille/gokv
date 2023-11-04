@@ -14,6 +14,4 @@ var (
 	JSON = JSONcodec{}
 	// Gob is a GobCodec that encodes/decodes Go values to/from gob.
 	Gob = GobCodec{}
-	// PB is a PBcodec that encodes/decodes Go values to/from Protocol Buffers.
-	PB = PBcodec{}
 )
