@@ -47,7 +47,7 @@ func interactWithStore(store gokv.Store) {
 		panic("Value not found")
 	}
 
-	fmt.Printf("foo: %+v", *retrievedVal) // Prints `foo: {Bar:baz}`
+	fmt.Printf("foo: %+v\n", *retrievedVal) // Prints `foo: {Bar:baz}`
 
 	// Delete value
 	err = store.Delete("foo123")

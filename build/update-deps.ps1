@@ -19,4 +19,5 @@ cat "$PSScriptRoot/implementations" | foreach {
 
 # Examples
 echo "updating examples"
-cd "$PSScriptRoot/../examples"; go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all); go mod tidy; cd $workingDir
+cd "$PSScriptRoot/../examples/redis"; go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all); go mod tidy; cd $workingDir
+cd "$PSScriptRoot/../examples/proto_encoding"; go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all); go mod tidy; cd $workingDir

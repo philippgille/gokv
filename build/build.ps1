@@ -18,4 +18,5 @@ cat "$PSScriptRoot/implementations" | foreach {
 
 # Examples
 echo "building examples"
-cd "$PSScriptRoot/../examples"; go build -v; cd $workingDir
+cd "$PSScriptRoot/../examples/redis"; go build -v; cd $workingDir
+cd "$PSScriptRoot/../examples/proto_encoding"; go build -v; cd $workingDir

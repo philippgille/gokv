@@ -20,6 +20,7 @@ Contents
     4. [Marshal formats](#marshal-formats)
     5. [Roadmap](#roadmap)
 2. [Usage](#usage)
+    1. [Examples](#examples)
 3. [Project status](#project-status)
 4. [Motivation](#motivation)
 5. [Design decisions](#design-decisions)
@@ -236,6 +237,10 @@ Now let's say you don't want to use Redis but Consul instead. You just have to m
 3. Replace `redis.NewClient(options)` by `consul.NewClient(options)`
 
 Everything else works the same way. `interactWithStore()` is completely unaffected.
+
+### Examples
+
+See the [examples](https://github.com/philippgille/gokv/tree/master/examples) directory for more code examples.
 
 Project status
 --------------

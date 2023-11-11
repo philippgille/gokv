@@ -24,6 +24,7 @@ done
 
 # Examples
 echo "building examples"
-(cd "$SCRIPT_DIR"/../examples && go build -v) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
+(cd "$SCRIPT_DIR"/../examples/redis && go build -v) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
+(cd "$SCRIPT_DIR"/../examples/proto_encoding && go build -v) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
 
 cd "$WORKING_DIR"
