@@ -17,7 +17,7 @@ import (
 func Update() error {
 	switch runtime.GOOS {
 	case "windows":
-		return sh.Run("./build/update-deps.ps1")
+		return sh.Run("pwsh.exe", "./build/update-deps.ps1")
 	case "darwin":
 		fallthrough
 	case "linux":
@@ -30,7 +30,7 @@ func Update() error {
 func Build() error {
 	switch runtime.GOOS {
 	case "windows":
-		return sh.Run("./build/build.ps1")
+		return sh.Run("pwsh.exe", "./build/build.ps1")
 	case "darwin":
 		fallthrough
 	case "linux":
