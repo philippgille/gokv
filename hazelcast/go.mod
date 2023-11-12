@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/hazelcast
 
-go 1.18
+go 1.20
 
 require (
 	github.com/hazelcast/hazelcast-go-client v1.3.0

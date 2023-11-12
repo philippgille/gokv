@@ -1,6 +1,6 @@
 module github.com/philippgille/magefiles
 
-go 1.18
+go 1.20
 
 require (
 	github.com/bitfield/script v0.20.2

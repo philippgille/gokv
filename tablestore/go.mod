@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/tablestore
 
-go 1.18
+go 1.20
 
 require (
 	github.com/aliyun/aliyun-tablestore-go-sdk v4.1.3+incompatible

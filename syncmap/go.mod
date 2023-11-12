@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/syncmap
 
-go 1.18
+go 1.20
 
 require (
 	github.com/philippgille/gokv/encoding v0.6.0

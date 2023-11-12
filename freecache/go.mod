@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/freecache
 
-go 1.18
+go 1.20
 
 require (
 	github.com/coocood/freecache v1.2.1

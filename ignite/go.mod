@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/ignite
 
-go 1.18
+go 1.20
 
 require (
 	github.com/amsokol/ignite-go-client v0.12.2
