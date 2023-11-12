@@ -9,6 +9,7 @@ vNext
 -----
 
 - Added: New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
+  - Usage example added in PR [#144](https://github.com/philippgille/gokv/pull/144)
 - Added: New store implementation: `noop` (PR [#126](https://github.com/philippgille/gokv/pull/126) by [@peczenyj](https://github.com/peczenyj))
 - Added: Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
 - Added: Optional timeout configuration for `redis` store implementation (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
@@ -25,6 +26,7 @@ vNext
 - Improved: Added more Go versions in CI test matrix (PR [#134](https://github.com/philippgille/gokv/pull/134) by [@glimchb](https://github.com/glimchb))
 - Improved: Use GitHub action for Mage (PR [#135](https://github.com/philippgille/gokv/pull/135) by [@glimchb](https://github.com/glimchb))
 - Improved: Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
+- Improved: Added Windows to CI build matrix (PR [#139](https://github.com/philippgille/gokv/pull/139) by [@glimchb](https://github.com/glimchb))
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
 - Fixed: Double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
