@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/consul
 
-go 1.18
+go 1.20
 
 require (
 	github.com/hashicorp/consul/api v1.12.0

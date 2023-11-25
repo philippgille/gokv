@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/etcd
 
-go 1.18
+go 1.20
 
 require (
 	github.com/philippgille/gokv/encoding v0.6.0

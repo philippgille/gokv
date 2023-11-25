@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/badgerdb
 
-go 1.18
+go 1.20
 
 require (
 	github.com/dgraph-io/badger v1.6.2

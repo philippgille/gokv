@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/noop
 
-go 1.18
+go 1.20
 
 require (
 	github.com/philippgille/gokv v0.6.0

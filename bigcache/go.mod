@@ -1,6 +1,6 @@
 module github.com/philippgille/gokv/bigcache
 
-go 1.18
+go 1.20
 
 require (
 	github.com/allegro/bigcache/v2 v2.2.5
