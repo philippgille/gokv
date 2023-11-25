@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/hazelcast
 go 1.20
 
 require (
-	github.com/hazelcast/hazelcast-go-client v1.3.0
+	github.com/hazelcast/hazelcast-go-client v1.4.1
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
 	github.com/philippgille/gokv/util v0.6.0
@@ -17,5 +17,5 @@ require (
 	github.com/shirou/gopsutil/v3 v3.21.5 // indirect
 	github.com/tklauser/go-sysconf v0.3.4 // indirect
 	github.com/tklauser/numcpus v0.2.1 // indirect
-	golang.org/x/sys v0.0.0-20210217105451-b926d437f341 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 )

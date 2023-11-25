@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/tablestorage
 go 1.20
 
 require (
-	github.com/Azure/azure-sdk-for-go v63.4.0+incompatible
+	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
 	github.com/philippgille/gokv/util v0.6.0
