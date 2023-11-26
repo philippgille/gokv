@@ -28,8 +28,8 @@ func (c Client) Set(k string, v any) error {
 	}
 
 	// First turn the passed object into something that Redis can handle
-	// (the Set method takes an any, but the Get method only returns a string,
-	// so it can be assumed that the any parameter type is only for convenience
+	// (the Set method takes an interface{}, but the Get method only returns a string,
+	// so it can be assumed that the interface{} parameter type is only for convenience
 	// for a couple of builtin types like int etc.).
 	data, err := c.codec.Marshal(v)
 	if err != nil {

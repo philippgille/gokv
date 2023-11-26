@@ -2,7 +2,7 @@ package gokv
 
 // Store is an abstraction for different key-value store implementations.
 // A store must be able to store, retrieve and delete key-value pairs,
-// with the key being a string and the value being any Go any.
+// with the key being a string and the value being any Go interface{}.
 type Store interface {
 	// Set stores the given value for the given key.
 	// The implementation automatically marshalls the value.

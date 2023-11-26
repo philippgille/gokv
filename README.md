@@ -103,7 +103,7 @@ For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/ph
 
 ### Value types
 
-Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `any` as parameter), including structs, and automatically (un-)marshals the value.
+Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `any`/`interface{}` as parameter), including structs, and automatically (un-)marshals the value.
 
 The kind of (un-)marshalling is left to the implementation. All implementations in this repository currently support JSON and [gob](https://blog.golang.org/gobs-of-data) by using the `encoding` subpackage in this repository, which wraps the core functionality of the standard library's `encoding/json` and `encoding/gob` packages. See [Marshal formats](#marshal-formats) for details.
 
