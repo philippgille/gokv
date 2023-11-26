@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	clientv3 "go.etcd.io/etcd/client/v3"
+
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/etcd"
 	"github.com/philippgille/gokv/test"
-	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
