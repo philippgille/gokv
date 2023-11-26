@@ -27,6 +27,7 @@ vNext
 - Improved: Use GitHub action for Mage (PR [#135](https://github.com/philippgille/gokv/pull/135) by [@glimchb](https://github.com/glimchb))
 - Improved: Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Improved: Added Windows to CI build matrix (PR [#139](https://github.com/philippgille/gokv/pull/139) by [@glimchb](https://github.com/glimchb))
+- Improved: Updated Mage from 1.13 to 1.15 (PR [#148](https://github.com/philippgille/gokv/pull/148))
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
 - Fixed: Double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
