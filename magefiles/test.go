@@ -13,27 +13,26 @@ import (
 	"github.com/bitfield/script"
 )
 
-func testImpl(impl string) error {
+func testImpl(impl string) (err error) {
 	fmt.Println("Testing", impl)
 
 	// Implementations that don't require a separate service
 
 	switch impl {
 	case "badgerdb", "bbolt", "bigcache", "file", "freecache", "gomap", "leveldb", "syncmap", "noop":
-		if err := os.Chdir("./" + impl); err != nil {
+		if err = os.Chdir("./" + impl); err != nil {
 			return err
 		}
 		defer os.Chdir("..") // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
 
-		out, err := script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
-		// In case of a test error, just returning err wouldn't print the go test output details, so we need to print out as well.
+		var out string
+		out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
 		fmt.Println(out)
 		return err
 	}
 
 	// Implementations that require a separate service
 
-	var err error
 	var dockerCmd string
 	var setup func() error
 	// TODO: Check quoting on Windows
@@ -41,7 +40,8 @@ func testImpl(impl string) error {
 	case "cockroachdb":
 		dockerCmd = `docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure`
 		setup = func() error {
-			out, err := script.Exec(`docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'`).String()
+			var out string
+			out, err = script.Exec(`docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'`).String()
 			if err != nil {
 				// Print the output here, as it could be more info than what's in err.
 				fmt.Println(out)
@@ -79,9 +79,9 @@ func testImpl(impl string) error {
 	case "tablestorage": // Tablestorage via Azurite
 		// In the past there was this problem: https://github.com/Azure/Azurite/issues/121
 		// With this Docker image:
-		//docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
+		// docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
 		// Now with the official image it still doesn't work. // TODO: Investigate / create GitHub issue.
-		//docker run -d --rm --name azurite -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite-table
+		// docker run -d --rm --name azurite -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite-table
 	case "tablestore":
 		// Currently no emulator exists for Alibaba Cloud Table Store.
 	case "zookeeper":
@@ -116,11 +116,11 @@ func testImpl(impl string) error {
 		defer func() {
 			out, err2 := script.Exec("docker stop " + containerID).String()
 			if err2 != nil {
-				// Set err for returning, but only if it's not set yet
+				// Set err for returning, but only if it's not set yet.
+				// ⚠️ Make sure all below errors are set to `err` with `err = ` and not shadowed with `:=`.
 				if err == nil {
 					err = err2
 				}
-				// Set the err var from outer scope, so it's the one returned from the outer function.
 				// Depending on the error, printing the output could be interesting, as it could be more info than what's in err.
 				fmt.Println(out)
 			}
@@ -144,8 +144,8 @@ func testImpl(impl string) error {
 	}
 	defer os.Chdir("..") // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
 
-	out, err := script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
-	// In case of a test error, just returning err wouldn't print the go test output details, so we need to print out as well.
+	var out string
+	out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
 	fmt.Println(out)
 
 	// If err is nil, the above deferred functions might set it
