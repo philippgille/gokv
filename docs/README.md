@@ -3,9 +3,9 @@ gokv documentation
 
 The basic usage is shown in the repository's root [README](../README.md).
 
-Implementation-specific documentation can be found in the GoDoc of the subpackages. An overview of all subpackage GoDocs can be found on the GoDoc site of the main package: [https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories](https://www.godoc.org/github.com/philippgille/gokv#pkg-subdirectories).
+Implementation-specific documentation can be found in the Godoc of the subpackages. An overview of all subpackage Godocs can be found on the Godoc site of the main package: <https://pkg.go.dev/github.com/philippgille/gokv#section-directories>.
 
-This documentation only contains documentation that's not as purely technical as the GoDoc, and not as exemplary as the repository's root README.
+This documentation only contains documentation that's not as purely technical as the Godoc, and not as exemplary as the repository's root README.
 
 Contents
 --------
