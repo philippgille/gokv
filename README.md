@@ -14,13 +14,13 @@ Contents
 --------
 
 1. [Features](#features)
-    1. [Simple interface](#simple-interface)
-    2. [Implementations](#implementations)
-    3. [Value types](#value-types)
-    4. [Marshal formats](#marshal-formats)
-    5. [Roadmap](#roadmap)
+   1. [Simple interface](#simple-interface)
+   2. [Implementations](#implementations)
+   3. [Value types](#value-types)
+   4. [Marshal formats](#marshal-formats)
+   5. [Roadmap](#roadmap)
 2. [Usage](#usage)
-    1. [Examples](#examples)
+   1. [Examples](#examples)
 3. [Project status](#project-status)
 4. [Motivation](#motivation)
 5. [Design decisions](#design-decisions)
@@ -55,47 +55,47 @@ For differences between the implementations, see [Choosing an implementation](do
 For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/philippgille/gokv#section-directories>.
 
 - Local in-memory
-    - [X] Go `sync.Map`
-    - [X] Go `map` (with `sync.RWMutex`)
-    - [X] [FreeCache](https://github.com/coocood/freecache)
-    - [X] [BigCache](https://github.com/allegro/bigcache)
+  - [X] Go `sync.Map`
+  - [X] Go `map` (with `sync.RWMutex`)
+  - [X] [FreeCache](https://github.com/coocood/freecache)
+  - [X] [BigCache](https://github.com/allegro/bigcache)
 - Embedded
-    - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
-    - [X] [BadgerDB](https://github.com/dgraph-io/badger)
-    - [X] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
-    - [X] Local files (one file per key-value pair, with the key being the filename and the value being the file content)
+  - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
+  - [X] [BadgerDB](https://github.com/dgraph-io/badger)
+  - [X] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
+  - [X] Local files (one file per key-value pair, with the key being the filename and the value being the file content)
 - Distributed store
-    - [X] [Redis](https://github.com/antirez/redis)
-    - [X] [Consul](https://github.com/hashicorp/consul)
-    - [X] [etcd](https://github.com/etcd-io/etcd)
-    - [X] [Apache ZooKeeper](https://github.com/apache/zookeeper)
-    - [ ] [TiKV](https://github.com/tikv/tikv)
+  - [X] [Redis](https://github.com/antirez/redis)
+  - [X] [Consul](https://github.com/hashicorp/consul)
+  - [X] [etcd](https://github.com/etcd-io/etcd)
+  - [X] [Apache ZooKeeper](https://github.com/apache/zookeeper)
+  - [ ] [TiKV](https://github.com/tikv/tikv)
 - Distributed cache (no presistence *by default*)
-    - [X] [Memcached](https://github.com/memcached/memcached)
-    - [X] [Hazelcast](https://github.com/hazelcast/hazelcast)
+  - [X] [Memcached](https://github.com/memcached/memcached)
+  - [X] [Hazelcast](https://github.com/hazelcast/hazelcast)
 - Cloud
-    - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
-    - [X] [Amazon S3](https://aws.amazon.com/s3/) / [Google Cloud Storage](https://cloud.google.com/storage/) / [Alibaba Cloud Object Storage Service (OSS)](https://www.alibabacloud.com/en/product/oss) / [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) / [Scaleway Object Storage](https://www.scaleway.com/object-storage/) / [OpenStack Swift](https://github.com/openstack/swift) / [Ceph](https://github.com/ceph/ceph) / [Minio](https://github.com/minio/minio) / ...
-    - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
-    - [X] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
-    - [X] [Google Cloud Datastore](https://cloud.google.com/datastore/)
-    - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
-    - [X] [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store)
+  - [X] [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
+  - [X] [Amazon S3](https://aws.amazon.com/s3/) / [Google Cloud Storage](https://cloud.google.com/storage/) / [Alibaba Cloud Object Storage Service (OSS)](https://www.alibabacloud.com/en/product/oss) / [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/) / [Scaleway Object Storage](https://www.scaleway.com/object-storage/) / [OpenStack Swift](https://github.com/openstack/swift) / [Ceph](https://github.com/ceph/ceph) / [Minio](https://github.com/minio/minio) / ...
+  - [ ] [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/)
+  - [X] [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/)
+  - [X] [Google Cloud Datastore](https://cloud.google.com/datastore/)
+  - [ ] [Google Cloud Firestore](https://cloud.google.com/firestore/)
+  - [X] [Alibaba Cloud Table Store](https://www.alibabacloud.com/de/product/table-store)
 - SQL
-    - [X] [MySQL](https://github.com/mysql/mysql-server)
-    - [X] [PostgreSQL](https://github.com/postgres/postgres)
+  - [X] [MySQL](https://github.com/mysql/mysql-server)
+  - [X] [PostgreSQL](https://github.com/postgres/postgres)
 - NoSQL
-    - [X] [MongoDB](https://github.com/mongodb/mongo)
-    - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
+  - [X] [MongoDB](https://github.com/mongodb/mongo)
+  - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
 - "NewSQL"
-    - [X] [CockroachDB](https://github.com/cockroachdb/cockroach)
-    - [ ] [TiDB](https://github.com/pingcap/tidb)
+  - [X] [CockroachDB](https://github.com/cockroachdb/cockroach)
+  - [ ] [TiDB](https://github.com/pingcap/tidb)
 - Multi-model
-    - [X] [Apache Ignite](https://github.com/apache/ignite)
-    - [ ] [ArangoDB](https://github.com/arangodb/arangodb)
-    - [ ] [OrientDB](https://github.com/orientechnologies/orientdb)
+  - [X] [Apache Ignite](https://github.com/apache/ignite)
+  - [ ] [ArangoDB](https://github.com/arangodb/arangodb)
+  - [ ] [OrientDB](https://github.com/orientechnologies/orientdb)
 - Misc
-    - [X] Go `noop` does nothing except validate the inputs, if applicable.
+  - [X] Go `noop` does nothing except validate the inputs, if applicable.
 
 Again:  
 For differences between the implementations, see [Choosing an implementation](docs/choosing-implementation.md).  
@@ -130,9 +130,9 @@ Differences between the formats:
 - Depending on the struct, one of the formats might be faster
 - Depending on the struct, one of the formats might lead to a lower storage size
 - Depending on the use case, the custom (un-)marshal methods of one of the formats might be easier to implement
-    - JSON: [`MarshalJSON() ([]byte, error)`](https://pkg.go.dev/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://pkg.go.dev/encoding/json#Unmarshaler)
-    - gob: [`GobEncode() ([]byte, error)`](https://pkg.go.dev/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://pkg.go.dev/encoding/gob#GobDecoder)
-    - proto: [`Marshal(proto.Message) ([]byte, error)`](https://pkg.go.dev/google.golang.org/protobuf/proto#Marshal) and [`Unmarshal([]byte, proto.Message) error`](https://pkg.go.dev/google.golang.org/protobuf/proto#Unmarshal)
+  - JSON: [`MarshalJSON() ([]byte, error)`](https://pkg.go.dev/encoding/json#Marshaler) and [`UnmarshalJSON([]byte) error`](https://pkg.go.dev/encoding/json#Unmarshaler)
+  - gob: [`GobEncode() ([]byte, error)`](https://pkg.go.dev/encoding/gob#GobEncoder) and [`GobDecode([]byte) error`](https://pkg.go.dev/encoding/gob#GobDecoder)
+  - proto: [`Marshal(proto.Message) ([]byte, error)`](https://pkg.go.dev/google.golang.org/protobuf/proto#Marshal) and [`Unmarshal([]byte, proto.Message) error`](https://pkg.go.dev/google.golang.org/protobuf/proto#Unmarshal)
 
 ### Roadmap
 
@@ -140,7 +140,7 @@ Differences between the formats:
 - CLI: A simple command line interface tool that allows you create, read, update and delete key-value pairs in all of the `gokv` storages
 - A `combiner` package that allows you to create a `gokv.Store` which forwards its call to multiple implementations at the same time. So for example you can use `memcached` and `s3` simultaneously to have 1) super fast access but also 2) durable redundant persistent storage.
 - A way to directly configure the clients via the options of the underlying used Go package (e.g. not the `redis.Options` struct in `github.com/philippgille/gokv`, but instead the `redis.Options` struct in `github.com/go-redis/redis`)
-    - Will be optional and discouraged, because this will lead to compile errors in code that uses `gokv` when switching the underlying used Go package, but definitely useful for some people
+  - Will be optional and discouraged, because this will lead to compile errors in code that uses `gokv` when switching the underlying used Go package, but definitely useful for some people
 - More stores (see stores in [Implementations](#implementations) list with unchecked boxes)
 - Maybe rename the project from `gokv` to `SimpleKV`?
 - Maybe move all implementation packages into a subdirectory, e.g. `github.com/philippgille/gokv/store/redis`?
@@ -151,9 +151,9 @@ Usage
 First, download the [module](https://github.com/golang/go/wiki/Modules) you want to work with:
 
 - For example when you want to work with the `gokv.Store` interface:
-    - `go get github.com/philippgille/gokv@latest`
+  - `go get github.com/philippgille/gokv@latest`
 - For example when you want to work with the Redis implementation:
-    - `go get github.com/philippgille/gokv/redis@latest`
+  - `go get github.com/philippgille/gokv/redis@latest`
 
 Then you can import and use it.
 
@@ -276,10 +276,10 @@ Design decisions
 ----------------
 
 - `gokv` is primarily an abstraction for **key-value stores**, not caches, so there's no need for cache eviction and timeouts.
-    - It's still possible to have cache eviction. In some cases you can configure it on the server, or in case of Memcached it's even the default. Or you can have an implementation-specific `Option` that configures the key-value store client to set a timeout on some key-value pair when storing it in the server. But this should be implementation-specific and not be part of the interface methods, which would require *every* implementation to support cache eviction.
+  - It's still possible to have cache eviction. In some cases you can configure it on the server, or in case of Memcached it's even the default. Or you can have an implementation-specific `Option` that configures the key-value store client to set a timeout on some key-value pair when storing it in the server. But this should be implementation-specific and not be part of the interface methods, which would require *every* implementation to support cache eviction.
 - The package should be usable without having to write additional code, so structs should be (un-)marshalled automatically, without having to implement `MarshalJSON()` / `GobEncode()` and `UnmarshalJSON()` / `GobDecode()` first. It's still possible to implement these methods to customize the (un-)marshalling, for example to include unexported fields, or for higher performance (because the `encoding/json` / `encoding/gob` package doesn't have to use reflection).
 - It should be easy to create your own store implementations, as well as to review and maintain the code of this repository, so there should be as few interface methods as possible, but still enough so that functions taking the `gokv.Store` interface as parameter can do everything that's usually required when working with a key-value store. For example, a boolean return value for the `Delete` method that indicates whether a value was actually deleted (because it was previously present) can be useful, but isn't a must-have, and also it would require some `Store` implementations to implement the check by themselves (because the existing libraries don't support it), which would unnecessarily decrease performance for those who don't need it. Or as another example, a `Watch(key string) (<-chan Notification, error)` method that sends notifications via a Go channel when the value of a given key changes is nice to have for a few use cases, but in most cases it's not required.
-    - > Note: In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
+  - > Note: In the future we might add another interface, so that there's one for the basic operations and one for advanced uses.
 - Similar projects name the structs that are implementations of the store interface according to the backing store, for example `boltdb.BoltDB`, but this leads to so called "stuttering" that's discouraged when writing idiomatic Go. That's why `gokv` uses for example `bbolt.Store` and `syncmap.Store`. For easier differentiation between embedded DBs and DBs that have a client and a server component though, the first ones are called `Store` and the latter ones are called `Client`, for example `redis.Client`.
 - All errors are implementation-specific. We could introduce a `gokv.StoreError` type and define some constants like a `SetError` or something more specific like a `TimeoutError`, but non-specific errors don't help the package user, and specific errors would make it very hard to create and especially maintain a `gokv.Store` implementation. You would need to know exactly in which cases the package (that the implementation uses) returns errors, what the errors mean (to "translate" them) and keep up with changes and additions of errors in the package. So instead, errors are just forwarded. For example, if you use the `dynamodb` package, the returned errors will be errors from the `"github.com/aws/aws-sdk-go` package.
 - Keep the terminology of used packages. This might be controversial, because an abstraction / wrapper *unifies* the interface of the used packages. But:
@@ -292,31 +292,31 @@ Related projects
 ----------------
 
 - [libkv](https://github.com/docker/libkv)
-    - Uses `[]byte` as value, no automatic (un-)marshalling of structs
-    - No support for Redis, BadgerDB, Go map, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
-    - Not actively maintained anymore (3 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
+  - Uses `[]byte` as value, no automatic (un-)marshalling of structs
+  - No support for Redis, BadgerDB, Go map, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
+  - Not actively maintained anymore (3 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
 - [valkeyrie](https://github.com/abronan/valkeyrie)
-    - Fork of libkv
-    - Same disadvantage: Uses `[]byte` as value, no automatic (un-)marshalling of structs
-    - No support for BadgerDB, Go map, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
+  - Fork of libkv
+  - Same disadvantage: Uses `[]byte` as value, no automatic (un-)marshalling of structs
+  - No support for BadgerDB, Go map, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
 - [gokvstores](https://github.com/ulule/gokvstores)
-    - Only supports Redis and local in-memory cache
-    - Not actively maintained anymore (4 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
-    - 13 stars (as of 2018-10-13)
+  - Only supports Redis and local in-memory cache
+  - Not actively maintained anymore (4 direct commits + 1 merged PR in the last 10+ months, as of 2018-10-13)
+  - 13 stars (as of 2018-10-13)
 - [gokv](https://github.com/gokv)
-    - Requires a `json.Marshaler` / `json.Unmarshaler` as parameter, so you always need to explicitly implement their methods for your structs, and also you can't use gob or other formats for (un-)marshaling.
-    - No support for Consul, etcd, bbolt / Bolt, BadgerDB, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
-    - Separate repo for each implementation, which has advantages and disadvantages
-    - No releases (makes it harder to use with package managers like dep)
-    - 2-7 stars (depending on the repository, as of 2018-10-13)
+  - Requires a `json.Marshaler` / `json.Unmarshaler` as parameter, so you always need to explicitly implement their methods for your structs, and also you can't use gob or other formats for (un-)marshaling.
+  - No support for Consul, etcd, bbolt / Bolt, BadgerDB, MongoDB, AWS DynamoDB, Memcached, MySQL, ...
+  - Separate repo for each implementation, which has advantages and disadvantages
+  - No releases (makes it harder to use with package managers like dep)
+  - 2-7 stars (depending on the repository, as of 2018-10-13)
 
 Others:
 
 - [gladkikhartem/gokv](https://github.com/gladkikhartem/gokv): No `Delete()` method, no Redis, embedded DBs etc., no Git tags / releases, no stars (as of 2018-11-28)
 - [bradberger/gokv](https://github.com/bradberger/gokv): Not maintained (no commits in the last 22 months), no Redis, Consul etc., no Git tags / releases, 1 star (as of 2018-11-28)
-    - This package inspired me to implement something similar to its `Codec`.
+  - This package inspired me to implement something similar to its `Codec`.
 - [ppacher/gokv](https://github.com/ppacher/gokv): Not maintained (no commits in the last 22 months), no Redis, embedded DBs etc., no automatic (un-)marshalling, 1 star (as of 2018-11-28)
-    - Nice CLI!
+  - Nice CLI!
 - [kapitan-k/gokvstore](https://github.com/kapitan-k/gokvstore): Not actively maintained (no commits in the last 10+ months), RocksDB only, requires cgo, no automatic (un-)marshalling, no Git tags/ releases, 1 star (as of 2018-11-28)
 
 License
