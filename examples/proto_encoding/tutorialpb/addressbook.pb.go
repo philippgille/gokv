@@ -310,7 +310,7 @@ func file_addressbook_proto_rawDescGZIP() []byte {
 
 var file_addressbook_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_addressbook_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_addressbook_proto_goTypes = []any{
+var file_addressbook_proto_goTypes = []interface{}{
 	(Person_PhoneType)(0),         // 0: tutorial.Person.PhoneType
 	(*Person)(nil),                // 1: tutorial.Person
 	(*AddressBook)(nil),           // 2: tutorial.AddressBook
@@ -335,7 +335,7 @@ func file_addressbook_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_addressbook_proto_msgTypes[0].Exporter = func(v any, i int) any {
+		file_addressbook_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Person); i {
 			case 0:
 				return &v.state
@@ -347,7 +347,7 @@ func file_addressbook_proto_init() {
 				return nil
 			}
 		}
-		file_addressbook_proto_msgTypes[1].Exporter = func(v any, i int) any {
+		file_addressbook_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AddressBook); i {
 			case 0:
 				return &v.state
@@ -359,7 +359,7 @@ func file_addressbook_proto_init() {
 				return nil
 			}
 		}
-		file_addressbook_proto_msgTypes[2].Exporter = func(v any, i int) any {
+		file_addressbook_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Person_PhoneNumber); i {
 			case 0:
 				return &v.state
