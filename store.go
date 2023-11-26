@@ -2,13 +2,13 @@ package gokv
 
 // Store is an abstraction for different key-value store implementations.
 // A store must be able to store, retrieve and delete key-value pairs,
-// with the key being a string and the value being any Go interface{}.
+// with the key being a string and the value being any Go any.
 type Store interface {
 	// Set stores the given value for the given key.
 	// The implementation automatically marshalls the value.
 	// The marshalling format depends on the implementation. It can be JSON, gob etc.
 	// The key must not be "" and the value must not be nil.
-	Set(k string, v interface{}) error
+	Set(k string, v any) error
 	// Get retrieves the value for the given key.
 	// The implementation automatically unmarshalls the value.
 	// The unmarshalling source depends on the implementation. It can be JSON, gob etc.
@@ -18,7 +18,7 @@ type Store interface {
 	// that the passed pointer points to with the values of the retrieved object's values.
 	// If no value is found it returns (false, nil).
 	// The key must not be "" and the pointer must not be nil.
-	Get(k string, v interface{}) (found bool, err error)
+	Get(k string, v any) (found bool, err error)
 	// Delete deletes the stored value for the given key.
 	// Deleting a non-existing key-value pair does NOT lead to an error.
 	// The key must not be "".

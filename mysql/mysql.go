@@ -28,7 +28,7 @@ type Client struct {
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The length of the key must not exceed 255 characters.
 // The key must not be "" and the value must not be nil.
-func (c Client) Set(k string, v interface{}) error {
+func (c Client) Set(k string, v any) error {
 	// It's tempting to remove this "wrapper" method
 	// and just use *sql.Client as embedded field,
 	// But we need this explicit method for a different GoDoc
@@ -43,7 +43,7 @@ func (c Client) Set(k string, v interface{}) error {
 // If no value is found it returns (false, nil).
 // The length of the key must not exceed 255 characters.
 // The key must not be "" and the pointer must not be nil.
-func (c Client) Get(k string, v interface{}) (found bool, err error) {
+func (c Client) Get(k string, v any) (found bool, err error) {
 	// It's tempting to remove this "wrapper" method
 	// and just use *sql.Client as embedded field,
 	// But we need this explicit method for a different GoDoc

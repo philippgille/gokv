@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"go.etcd.io/etcd/client/v3"
-
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/etcd"
 	"github.com/philippgille/gokv/test"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
@@ -147,7 +146,7 @@ func TestNil(t *testing.T) {
 				t.Error("An error was expected")
 			}
 
-			var i interface{} // actually nil
+			var i any // actually nil
 			_, err = client.Get("foo", i)
 			if err == nil {
 				t.Error("An error was expected")

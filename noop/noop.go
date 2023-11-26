@@ -6,7 +6,7 @@ import "github.com/philippgille/gokv/util"
 type Store struct{}
 
 // Set pretends if stores the key. Always return nil error unless the key or value are invalid.
-func (s Store) Set(k string, v interface{}) error {
+func (s Store) Set(k string, v any) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
@@ -15,7 +15,7 @@ func (s Store) Set(k string, v interface{}) error {
 }
 
 // Get pretends it fetches the key. Always return not found and nil error unless the key or value are invalid.
-func (s Store) Get(k string, v interface{}) (found bool, err error) {
+func (s Store) Get(k string, v any) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}

@@ -18,7 +18,7 @@ type PBcodec struct{}
 
 // Marshal encodes a proto message struct into the binary wire format.
 // Passed value can't be any Go value, but must be an object of a proto message struct.
-func (c PBcodec) Marshal(v interface{}) ([]byte, error) {
+func (c PBcodec) Marshal(v any) ([]byte, error) {
 	msg, ok := v.(proto.Message)
 	if !ok {
 		return nil, errors.New("error casting interface to proto")
@@ -28,7 +28,7 @@ func (c PBcodec) Marshal(v interface{}) ([]byte, error) {
 
 // Unmarshal parses a wire-format message in proto message struct.
 // Passed value can't be any Go value, but must be an object of a proto message struct.
-func (c PBcodec) Unmarshal(data []byte, v interface{}) error {
+func (c PBcodec) Unmarshal(data []byte, v any) error {
 	msg, ok := v.(proto.Message)
 	if !ok {
 		return errors.New("error casting interface to proto")

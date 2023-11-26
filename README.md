@@ -36,8 +36,8 @@ Features
 
 ```go
 type Store interface {
-    Set(k string, v interface{}) error
-    Get(k string, v interface{}) (found bool, err error)
+    Set(k string, v any) error
+    Get(k string, v any) (found bool, err error)
     Delete(k string) error
     Close() error
 }
@@ -103,7 +103,7 @@ For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/ph
 
 ### Value types
 
-Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `interface{}` as parameter), including structs, and automatically (un-)marshals the value.
+Most Go packages for key-value stores just accept a `[]byte` as value, which requires developers for example to marshal (and later unmarshal) their structs. `gokv` is meant to be simple and make developers' lifes easier, so it accepts any type (with using `any` as parameter), including structs, and automatically (un-)marshals the value.
 
 The kind of (un-)marshalling is left to the implementation. All implementations in this repository currently support JSON and [gob](https://blog.golang.org/gobs-of-data) by using the `encoding` subpackage in this repository, which wraps the core functionality of the standard library's `encoding/json` and `encoding/gob` packages. See [Marshal formats](#marshal-formats) for details.
 
@@ -249,9 +249,9 @@ Project status
 
 Planned interface methods until `v1.0.0`:
 
-- `List(interface{}) error` / `GetAll(interface{}) error` or similar
+- `List(any) error` / `GetAll(any) error` or similar
 
-The interface might even change until `v1.0.0`. For example one consideration is to change `Get(string, interface{}) (bool, error)` to `Get(string, interface{}) error` (no boolean return value anymore), with the `error` being something like `gokv.ErrNotFound // "Key-value pair not found"` to fulfill the additional role of indicating that the key-value pair wasn't found. But at the moment we prefer the current method signature.
+The interface might even change until `v1.0.0`. For example one consideration is to change `Get(string, any) (bool, error)` to `Get(string, any) error` (no boolean return value anymore), with the `error` being something like `gokv.ErrNotFound // "Key-value pair not found"` to fulfill the additional role of indicating that the key-value pair wasn't found. But at the moment we prefer the current method signature.
 
 Also, more interfaces might be added. For example so that there's a `SimpleStore` and an `AdvancedStore`, with the first one containing only the basic methods and the latter one with advanced features such as key-value pair lifetimes (deletion of key-value pairs after a given time), notification of value changes via Go channels etc. But currently the focus is simplicity, see [Design decisions](#design-decisions).
 
