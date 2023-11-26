@@ -36,7 +36,7 @@ jobs:
       # This starts and stops Docker containers for services like PostgreSQL, Redis etc.
       # Takes up to 10m on GitHub Actions
       # TODO: Change workflow so that when only one module is changed, only that module's tests are run
-      - run: mage test all
+      - run: mage test all docker
 
       # Combining of coverage reports not required with the action, which detects all reports in subdirectories and uploads all of them
       #- run: build/combine-coverage.sh

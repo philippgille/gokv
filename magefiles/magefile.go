@@ -40,7 +40,9 @@ func Build() error {
 }
 
 // Test tests the given module. Pass "all" to test all modules.
-func Test(module string) error {
+// Some packages require a service to run, which will be started in a Docker container.
+// For the `docker` argument you can pass "docker" or "podman".
+func Test(module, docker string) error {
 	if module == "all" {
 		// Helper packages and examples currently don't have tests, so currently for *all* tests we can just iterate all `gokv.Store` implementations
 		// TODO: Add tests for helper and example packages, then change this behavior.
@@ -49,7 +51,7 @@ func Test(module string) error {
 			return err
 		}
 		for _, impl := range impls {
-			err = testImpl(impl)
+			err = testImpl(impl, docker)
 			if err != nil {
 				return err
 			}
@@ -72,7 +74,7 @@ func Test(module string) error {
 		return errors.New("module from parameter not found")
 	}
 
-	return testImpl(module)
+	return testImpl(module, docker)
 }
 
 // Clean cleans the build/test output, like coverage.txt files

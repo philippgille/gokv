@@ -13,7 +13,7 @@ import (
 	"github.com/bitfield/script"
 )
 
-func testImpl(impl string) error {
+func testImpl(impl, docker string) error {
 	fmt.Println("Testing", impl)
 
 	// Implementations that don't require a separate service
@@ -33,15 +33,15 @@ func testImpl(impl string) error {
 
 	// Implementations that require a separate service
 
-	var err error
 	var dockerCmd string
+	var err error
 	var setup func() error
 	// TODO: Check quoting on Windows
 	switch impl {
 	case "cockroachdb":
-		dockerCmd = `docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure`
+		dockerCmd = docker + ` run -d --rm  --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure`
 		setup = func() error {
-			out, err := script.Exec(`docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'`).String()
+			out, err := script.Exec(docker + ` exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'`).String()
 			if err != nil {
 				// Print the output here, as it could be more info than what's in err.
 				fmt.Println(out)
@@ -50,42 +50,42 @@ func testImpl(impl string) error {
 			return nil
 		}
 	case "consul":
-		dockerCmd = `docker run -d --rm --name consul -e CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}' -p 8500:8500 bitnami/consul`
+		dockerCmd = docker + ` run -d --rm  --name consul -e CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}' -p 8500:8500 bitnami/consul`
 	case "datastore": // Google Cloud Datastore via "Cloud Datastore Emulator"
 		// Using the ":slim" or ":alpine" tag would require the emulator to be installed manually.
 		// Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
 		// `--host-port` is required because otherwise the server only listens on localhost IN the container.
-		dockerCmd = `docker run -d --rm --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081`
+		dockerCmd = docker + ` run -d --rm  --name datastore -p 8081:8081 google/cloud-sdk gcloud beta emulators datastore start --no-store-on-disk --project=gokv --host-port=0.0.0.0:8081`
 	case "dynamodb": // DynamoDB via "DynamoDB local"
-		dockerCmd = `docker run -d --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local`
+		dockerCmd = docker + ` run -d --rm  --name dynamodb-local -p 8000:8000 amazon/dynamodb-local`
 	case "etcd":
-		dockerCmd = `docker run -d --rm --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd`
+		dockerCmd = docker + ` run -d --rm  --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd`
 	case "hazelcast":
-		dockerCmd = `docker run -d --rm --name hazelcast -p 5701:5701 hazelcast/hazelcast`
+		dockerCmd = docker + ` run -d --rm  --name hazelcast -p 5701:5701 hazelcast/hazelcast`
 	case "ignite":
-		dockerCmd = `docker run -d --rm --name ignite -p 10800:10800 apacheignite/ignite`
+		dockerCmd = docker + ` run -d --rm  --name ignite -p 10800:10800 apacheignite/ignite`
 	case "memcached":
-		dockerCmd = `docker run -d --rm --name memcached -p 11211:11211 memcached`
+		dockerCmd = docker + ` run -d --rm  --name memcached -p 11211:11211 memcached`
 	case "mongodb":
-		dockerCmd = `docker run -d --rm --name mongodb -p 27017:27017 mongo`
+		dockerCmd = docker + ` run -d --rm  --name mongodb -p 27017:27017 mongo`
 	case "mysql":
-		dockerCmd = `docker run -d --rm --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 mysql`
+		dockerCmd = docker + ` run -d --rm  --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 mysql`
 	case "postgresql":
-		dockerCmd = `docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres:alpine`
+		dockerCmd = docker + ` run -d --rm  --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres:alpine`
 	case "redis":
-		dockerCmd = `docker run -d --rm --name redis -p 6379:6379 redis`
+		dockerCmd = docker + ` run -d --rm  --name redis -p 6379:6379 redis`
 	case "s3": // Amazon S3 via Minio
-		dockerCmd = `docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 minio/minio server /data`
+		dockerCmd = docker + ` run -d --rm  --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 minio/minio server /data`
 	case "tablestorage": // Tablestorage via Azurite
 		// In the past there was this problem: https://github.com/Azure/Azurite/issues/121
 		// With this Docker image:
-		//docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
+		// docker run -d --rm --name azurite -e executable=table -p 10002:10002 arafato/azurite
 		// Now with the official image it still doesn't work. // TODO: Investigate / create GitHub issue.
-		//docker run -d --rm --name azurite -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite-table
+		// docker run -d --rm --name azurite -p 10002:10002 mcr.microsoft.com/azure-storage/azurite azurite-table
 	case "tablestore":
 		// Currently no emulator exists for Alibaba Cloud Table Store.
 	case "zookeeper":
-		dockerCmd = `docker run -d --rm --name zookeeper -p 2181:2181 zookeeper`
+		dockerCmd = docker + ` run -d --rm  --name zookeeper -p 2181:2181 zookeeper`
 	default:
 		return errors.New("unknown `gokv.Store` implementation")
 	}
@@ -114,7 +114,7 @@ func testImpl(impl string) error {
 			containerID = outLines[len(outLines)-2]
 		}
 		defer func() {
-			out, err2 := script.Exec("docker stop " + containerID).String()
+			out, err2 := script.Exec(docker + " stop " + containerID).String()
 			if err2 != nil {
 				// Set err for returning, but only if it's not set yet
 				if err == nil {
