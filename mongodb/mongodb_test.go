@@ -154,7 +154,7 @@ func TestNil(t *testing.T) {
 				t.Error("An error was expected")
 			}
 
-			var i interface{} // actually nil
+			var i any // actually nil
 			_, err = client.Get("foo", i)
 			if err == nil {
 				t.Error("An error was expected")

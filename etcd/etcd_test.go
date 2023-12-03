@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"go.etcd.io/etcd/client/v3"
+	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/etcd"
@@ -147,7 +147,7 @@ func TestNil(t *testing.T) {
 				t.Error("An error was expected")
 			}
 
-			var i interface{} // actually nil
+			var i any // actually nil
 			_, err = client.Get("foo", i)
 			if err == nil {
 				t.Error("An error was expected")

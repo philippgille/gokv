@@ -16,7 +16,7 @@ type Store struct {
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
-func (s Store) Set(k string, v interface{}) error {
+func (s Store) Set(k string, v any) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (s Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (s Store) Get(k string, v interface{}) (found bool, err error) {
+func (s Store) Get(k string, v any) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
