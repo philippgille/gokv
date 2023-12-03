@@ -38,7 +38,7 @@ func testImpl(impl string) (err error) {
 	// TODO: Check quoting on Windows
 	switch impl {
 	case "cockroachdb":
-		dockerCmd = `docker run -d --rm --name cockroachdb -p 26257:26257 cockroachdb/cockroach start-single-node --insecure`
+		dockerCmd = `docker run -d --rm --name cockroachdb -p 26257:26257 --health-cmd='curl -f http://localhost:8080/health?ready=1' cockroachdb/cockroach start-single-node --insecure`
 		setup = func() error {
 			var out string
 			out, err = script.Exec(`docker exec cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'`).String()
@@ -59,23 +59,23 @@ func testImpl(impl string) (err error) {
 	case "dynamodb": // DynamoDB via "DynamoDB local"
 		dockerCmd = `docker run -d --rm --name dynamodb-local -p 8000:8000 amazon/dynamodb-local`
 	case "etcd":
-		dockerCmd = `docker run -d --rm --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd`
+		dockerCmd = `docker run -d --rm --name etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes --health-cmd='etcdctl endpoint health' bitnami/etcd`
 	case "hazelcast":
-		dockerCmd = `docker run -d --rm --name hazelcast -p 5701:5701 hazelcast/hazelcast`
+		dockerCmd = `docker run -d --rm --name hazelcast -p 5701:5701 --health-cmd='curl -f http://localhost:5701/hazelcast/health/node-state' hazelcast/hazelcast`
 	case "ignite":
-		dockerCmd = `docker run -d --rm --name ignite -p 10800:10800 apacheignite/ignite`
+		dockerCmd = `docker run -d --rm --name ignite -p 10800:10800 --health-cmd='${IGNITE_HOME}/bin/control.sh --baseline | grep "Cluster state: active"' apacheignite/ignite`
 	case "memcached":
 		dockerCmd = `docker run -d --rm --name memcached -p 11211:11211 memcached`
 	case "mongodb":
-		dockerCmd = `docker run -d --rm --name mongodb -p 27017:27017 mongo`
+		dockerCmd = `docker run -d --rm --name mongodb -p 27017:27017 --health-cmd='echo "db.runCommand({ ping: 1 }).ok" | mongosh localhost:27017/test --quiet' mongo`
 	case "mysql":
-		dockerCmd = `docker run -d --rm --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 mysql`
+		dockerCmd = `docker run -d --rm --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 --health-cmd='mysqladmin ping -h localhost' mysql`
 	case "postgresql":
-		dockerCmd = `docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 postgres:alpine`
+		dockerCmd = `docker run -d --rm --name postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 --health-cmd='pg_isready -U postgres' postgres:alpine`
 	case "redis":
-		dockerCmd = `docker run -d --rm --name redis -p 6379:6379 redis`
+		dockerCmd = `docker run -d --rm --name redis -p 6379:6379 --health-cmd='redis-cli ping' redis`
 	case "s3": // Amazon S3 via Minio
-		dockerCmd = `docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 minio/minio server /data`
+		dockerCmd = `docker run -d --rm --name s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 --health-cmd='mc ready local' minio/minio server /data`
 	case "tablestorage": // Tablestorage via Azurite
 		// In the past there was this problem: https://github.com/Azure/Azurite/issues/121
 		// With this Docker image:
@@ -85,7 +85,7 @@ func testImpl(impl string) (err error) {
 	case "tablestore":
 		// Currently no emulator exists for Alibaba Cloud Table Store.
 	case "zookeeper":
-		dockerCmd = `docker run -d --rm --name zookeeper -p 2181:2181 zookeeper`
+		dockerCmd = `docker run -d --rm --name zookeeper -p 2181:2181 -e ZOO_4LW_COMMANDS_WHITELIST=ruok --health-cmd='echo ruok | timeout 2 nc -w 2 localhost 2181 | grep imok' zookeeper`
 	default:
 		return errors.New("unknown `gokv.Store` implementation")
 	}
@@ -129,6 +129,8 @@ func testImpl(impl string) (err error) {
 		// Wait for container to be started
 		// TODO: Use a proper health/startup check for this, as many services are ready much quicker than 10s.
 		time.Sleep(10 * time.Second)
+		out, _ = script.Exec("docker inspect --format='{{.State.Health.Status}}' " + containerID).String()
+		fmt.Println(out)
 
 		if setup != nil {
 			err = setup()
