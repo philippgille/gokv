@@ -114,6 +114,7 @@ func testImpl(impl string) (err error) {
 	// For them we skip the Docker stuff but still execute the tests, which can skip on connection error and we can see the skips in the test results.
 	if dockerImage != "" {
 		// Pull Docker image
+		fmt.Printf("Pulling Docker image %s:latest...", dockerImage)
 		var out string
 		out, err = script.Exec("docker pull " + dockerImage + ":latest").String()
 		if err != nil {
@@ -122,6 +123,8 @@ func testImpl(impl string) (err error) {
 			return err
 		}
 		// Start Docker container
+		fmt.Println("Starting Docker container...")
+		fmt.Println(dockerCmd)
 		out, err = script.Exec(dockerCmd).String()
 		if err != nil {
 			fmt.Println(out)
