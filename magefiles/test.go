@@ -158,6 +158,10 @@ func testImpl(impl string) (err error) {
 				fmt.Printf("Waiting for container to be healthy... (%d/10)\n", i+1)
 				time.Sleep(time.Second)
 			}
+			// Return an error if the container isn't healthy yet
+			if out != "healthy" {
+				return errors.New("container didn't become healthy in time")
+			}
 		} else {
 			fmt.Println("Waiting 10 seconds for container due to missing health check...")
 			time.Sleep(10 * time.Second)
