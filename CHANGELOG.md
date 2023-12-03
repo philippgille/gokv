@@ -28,6 +28,11 @@ vNext
 - Improved: Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Improved: Added Windows to CI build matrix (PR [#139](https://github.com/philippgille/gokv/pull/139) by [@glimchb](https://github.com/glimchb))
 - Improved: Updated Mage from 1.13 to 1.15 (PR [#148](https://github.com/philippgille/gokv/pull/148))
+- Improved: Better error handling in Magefile (PR [#151](https://github.com/philippgille/gokv/pull/151))
+- Improved: Use `tparse` for test output (PR [#152](https://github.com/philippgille/gokv/pull/152))
+- Improved: Added Docker health check to test containers (PR [#142](https://github.com/philippgille/gokv/pull/142) by [@glimchb](https://github.com/glimchb))
+- Improved: Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
+- Improved: Various security updates by [@dependabot](https://github.com/apps/dependabot)
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
 - Fixed: Double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
@@ -36,6 +41,7 @@ vNext
 
 - `redis` store now has a default timeout of 2 seconds (previously no timeout). You can customize/remove the timeout via the store's config. (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - `datastore` store: Update of direct dependencies lead to indirect dependency update of `google.golang.org/grpc` from `v1.46.0` to `v1.59.0`, which is incompatible with Go 1.18 due `atomic.Int64` being used, which was introduced in Go 1.19.
+- The `interface{}` to `any` change makes `gokv` incompatible with Go version 1.17 and older. Please open an issue if you're stuck on an old Go version and would like us to revert this change.
 
 v0.6.0 (2019-10-13)
 -------------------
