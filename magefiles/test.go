@@ -146,7 +146,11 @@ func testImpl(impl string) (err error) {
 		// Wait for container to be started
 		if strings.Contains(dockerCmd, "--health-cmd") {
 			for i := 0; i < 10; i++ {
-				out, _ = script.Exec("docker inspect --format='{{.State.Health.Status}}' " + containerID).String()
+				out, err = script.Exec("docker inspect --format='{{.State.Health.Status}}' " + containerID).String()
+				if err != nil {
+					fmt.Println(out)
+					return err
+				}
 				out = strings.ReplaceAll(out, "\n", "")
 				if out == "healthy" {
 					break
