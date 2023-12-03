@@ -145,7 +145,7 @@ func testImpl(impl string) (err error) {
 
 		// Wait for container to be started
 		if strings.Contains(dockerCmd, "--health-cmd") {
-			for i := 0; i < 10; i++ {
+			for i := 0; i < 60; i++ {
 				out, err = script.Exec("docker inspect --format='{{.State.Health.Status}}' " + containerID).String()
 				if err != nil {
 					fmt.Println(out)
@@ -155,7 +155,7 @@ func testImpl(impl string) (err error) {
 				if out == "healthy" {
 					break
 				}
-				fmt.Printf("Waiting for container to be healthy... (%d/10)\n", i+1)
+				fmt.Printf("Waiting for container to be healthy... (%d/60)\n", i+1)
 				time.Sleep(time.Second)
 			}
 			// Return an error if the container isn't healthy yet
