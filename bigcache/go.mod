@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/bigcache
 go 1.20
 
 require (
-	github.com/allegro/bigcache/v2 v2.2.5
+	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/philippgille/gokv/encoding v0.6.0
 	github.com/philippgille/gokv/test v0.6.0
 	github.com/philippgille/gokv/util v0.6.0

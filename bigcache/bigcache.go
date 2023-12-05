@@ -1,9 +1,10 @@
 package bigcache
 
 import (
+	"context"
 	"time"
 
-	"github.com/allegro/bigcache/v2"
+	"github.com/allegro/bigcache/v3"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -115,7 +116,7 @@ func NewStore(options Options) (Store, error) {
 
 	config := bigcache.DefaultConfig(options.Eviction)
 	config.HardMaxCacheSize = options.HardMaxCacheSize
-	cache, err := bigcache.NewBigCache(config)
+	cache, err := bigcache.New(context.Background(), config)
 	if err != nil {
 		return result, err
 	}
