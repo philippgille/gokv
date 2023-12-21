@@ -149,7 +149,7 @@ func NewClient(options Options) (Client, error) {
 	if err != nil {
 		return result, err
 	} else if statusRes == nil {
-		return result, errors.New("The status response from etcd was nil")
+		return result, errors.New("the status response from etcd was nil")
 	}
 
 	result.c = cli
