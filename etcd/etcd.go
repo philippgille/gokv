@@ -6,6 +6,7 @@ import (
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"google.golang.org/grpc"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -129,13 +130,10 @@ func NewClient(options Options) (Client, error) {
 		options.Codec = DefaultOptions.Codec
 	}
 
-	// clientv3.New() should block when a DialTimeout is set,
-	// according to https://github.com/etcd-io/etcd/issues/9829.
-	// TODO: But it doesn't.
-	//cli, err := clientv3.NewFromURLs(options.Endpoints)
 	config := clientv3.Config{
 		Endpoints:   options.Endpoints,
 		DialTimeout: 2 * time.Second,
+		DialOptions: []grpc.DialOption{grpc.WithBlock()},
 	}
 
 	cli, err := clientv3.New(config)
