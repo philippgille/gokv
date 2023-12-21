@@ -40,7 +40,7 @@ func testImpl(impl string) (err error) {
 	switch impl {
 	case "cockroachdb":
 		dockerImage = "cockroachdb/cockroach"
-		dockerCmd += `cockroachdb -p 26257:26257 --health-cmd='curl -f http://localhost:8080/health?ready=1' ` + dockerImage + ` start-single-node --insecure`
+		dockerCmd += `cockroachdb -p 26257:26257 --health-cmd='curl -f http://localhost:8080/health?ready=1' --health-interval 1s ` + dockerImage + ` start-single-node --insecure`
 		setup = func() error {
 			var out string
 			out, err = script.Exec(`docker exec gokv-cockroachdb bash -c './cockroach sql --insecure --execute="create database gokv;"'`).String()
@@ -65,31 +65,31 @@ func testImpl(impl string) (err error) {
 		dockerCmd += `dynamodb-local -p 8000:8000 ` + dockerImage
 	case "etcd":
 		dockerImage = "bitnami/etcd"
-		dockerCmd += `etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes --health-cmd='etcdctl endpoint health' ` + dockerImage
+		dockerCmd += `etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes --health-cmd='etcdctl endpoint health' --health-interval 1s ` + dockerImage
 	case "hazelcast":
 		dockerImage = "hazelcast/hazelcast"
-		dockerCmd += `hazelcast -p 5701:5701 --health-cmd='curl -f http://localhost:5701/hazelcast/health/node-state' ` + dockerImage
+		dockerCmd += `hazelcast -p 5701:5701 --health-cmd='curl -f http://localhost:5701/hazelcast/health/node-state' --health-interval 1s ` + dockerImage
 	case "ignite":
 		dockerImage = "apacheignite/ignite"
-		dockerCmd += `ignite -p 10800:10800 --health-cmd='${IGNITE_HOME}/bin/control.sh --baseline | grep "Cluster state: active"' ` + dockerImage
+		dockerCmd += `ignite -p 10800:10800 --health-cmd='${IGNITE_HOME}/bin/control.sh --baseline | grep "Cluster state: active"' --health-interval 1s ` + dockerImage
 	case "memcached":
 		dockerImage = "memcached"
 		dockerCmd += `memcached -p 11211:11211 ` + dockerImage
 	case "mongodb":
 		dockerImage = "mongo"
-		dockerCmd += `mongodb -p 27017:27017 --health-cmd='echo "db.runCommand({ ping: 1 }).ok" | mongosh localhost:27017/test --quiet' ` + dockerImage
+		dockerCmd += `mongodb -p 27017:27017 --health-cmd='echo "db.runCommand({ ping: 1 }).ok" | mongosh localhost:27017/test --quiet' --health-interval 1s ` + dockerImage
 	case "mysql":
 		dockerImage = "mysql"
-		dockerCmd += `mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 --health-cmd='mysqladmin ping -h localhost' ` + dockerImage
+		dockerCmd += `mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 --health-cmd='mysqladmin ping -h localhost' --health-interval 1s ` + dockerImage
 	case "postgresql":
 		dockerImage = "postgres:alpine"
-		dockerCmd += `postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 --health-cmd='pg_isready -U postgres' ` + dockerImage
+		dockerCmd += `postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 --health-cmd='pg_isready -U postgres' --health-interval 1s ` + dockerImage
 	case "redis":
 		dockerImage = "redis"
-		dockerCmd += `redis -p 6379:6379 --health-cmd='redis-cli ping' ` + dockerImage
+		dockerCmd += `redis -p 6379:6379 --health-cmd='redis-cli ping' --health-interval 1s ` + dockerImage
 	case "s3": // Amazon S3 via Minio
 		dockerImage = "minio/minio"
-		dockerCmd += `s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 --health-cmd='mc ready local' ` + dockerImage + ` server /data`
+		dockerCmd += `s3 -e "MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" -p 9000:9000 --health-cmd='mc ready local' --health-interval 1s ` + dockerImage + ` server /data`
 	case "tablestorage": // Tablestorage via Azurite
 		// In the past there was this problem: https://github.com/Azure/Azurite/issues/121
 		// With this Docker image:
@@ -100,7 +100,7 @@ func testImpl(impl string) (err error) {
 		// Currently no emulator exists for Alibaba Cloud Table Store.
 	case "zookeeper":
 		dockerImage = "zookeeper"
-		dockerCmd += `zookeeper -p 2181:2181 -e ZOO_4LW_COMMANDS_WHITELIST=ruok --health-cmd='echo ruok | timeout 2 nc -w 2 localhost 2181 | grep imok' ` + dockerImage
+		dockerCmd += `zookeeper -p 2181:2181 -e ZOO_4LW_COMMANDS_WHITELIST=ruok --health-cmd='echo ruok | timeout 2 nc -w 2 localhost 2181 | grep imok' --health-interval 1s ` + dockerImage
 	default:
 		return errors.New("unknown `gokv.Store` implementation")
 	}
@@ -148,7 +148,7 @@ func testImpl(impl string) (err error) {
 
 		// Wait for container to be started
 		if strings.Contains(dockerCmd, "--health-cmd") {
-			for i := 0; i < 60; i++ {
+			for i := 0; i < 10; i++ {
 				out, err = script.Exec("docker inspect --format='{{.State.Health.Status}}' " + containerID).String()
 				if err != nil {
 					fmt.Println(out)
@@ -158,7 +158,7 @@ func testImpl(impl string) (err error) {
 				if out == "healthy" {
 					break
 				}
-				fmt.Printf("Waiting for container to be healthy... (%d/60)\n", i+1)
+				fmt.Printf("Waiting for container to be healthy... (%d/10)\n", i+1)
 				time.Sleep(time.Second)
 			}
 			// Return an error if the container isn't healthy yet
