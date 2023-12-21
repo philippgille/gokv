@@ -14,6 +14,7 @@ vNext
 - Added: Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
 - Added: Optional timeout configuration for `redis` store implementation (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Improved: Update `BigCache` dependency to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
+  - Follwed by an update to v3 (PR [#158](https://github.com/philippgille/gokv/pull/158))
 - Improved: Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108) + [#145](https://github.com/philippgille/gokv/pull/145))
   - So except for a few required major version updates, all dependencies are now up-to-date as of 2023-11-12
 - Improved: Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some (PR [#108](https://github.com/philippgille/gokv/pull/108))
@@ -31,8 +32,10 @@ vNext
 - Improved: Better error handling in Magefile (PR [#151](https://github.com/philippgille/gokv/pull/151))
 - Improved: Use `tparse` for test output (PR [#152](https://github.com/philippgille/gokv/pull/152))
 - Improved: Added Docker health check to test containers (PR [#142](https://github.com/philippgille/gokv/pull/142) by [@glimchb](https://github.com/glimchb))
+- Improved: *Use* the Docker health checks to reduce wait time for containers in CI (PR [#154](https://github.com/philippgille/gokv/pull/154))
 - Improved: Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
 - Improved: Various security updates by [@dependabot](https://github.com/apps/dependabot)
+- Improved: Update and improve usage of GitHub Actions dependencies (PR [#156](https://github.com/philippgille/gokv/pull/156))
 - Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
 - Fixed: Double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
