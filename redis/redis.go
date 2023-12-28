@@ -92,6 +92,46 @@ func (c Client) Close() error {
 	return c.c.Close()
 }
 
+// Return all the keys
+func (c Client) Keys() ([]string, error) {
+	var keys []string
+	var cursor uint64
+	var err error
+
+	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+
+	for {
+		var batch []string
+
+		// Check for Timeout here (this is better then using tctx.Done)
+		if err := tctx.Err(); err != nil {
+			return nil, err
+		}
+
+		// Scan returns the next batch of keys
+		if batch, cursor, err = c.c.Scan(tctx, cursor, "*", 10).Result(); err != nil {
+			return nil, err
+		}
+
+		// Append the batch
+		for _, key := range batch {
+			keys = append(keys, key)
+		}
+
+		// Break if the cursor is 0
+		if cursor == 0 {
+			break
+		}
+	}
+
+	if len(keys) == 0 {
+		return nil, nil
+	}
+
+	return keys, nil
+}
+
 // Options are the options for the Redis client.
 type Options struct {
 	// Address of the Redis server, including the port.
