@@ -8,37 +8,51 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
-- Added: New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
+### Added
+
+- New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
   - Usage example added in PR [#144](https://github.com/philippgille/gokv/pull/144)
-- Added: New store implementation: `noop` (PR [#126](https://github.com/philippgille/gokv/pull/126) by [@peczenyj](https://github.com/peczenyj))
-- Added: Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
-- Added: Optional timeout configuration for `redis` store implementation (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
-- Improved: Update `BigCache` dependency to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
-  - Follwed by an update to v3 (PR [#158](https://github.com/philippgille/gokv/pull/158))
-- Improved: Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108) + [#145](https://github.com/philippgille/gokv/pull/145))
+- New store implementation: `noop` (PR [#126](https://github.com/philippgille/gokv/pull/126) by [@peczenyj](https://github.com/peczenyj))
+- Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
+- Optional timeout configuration for `redis` store implementation (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
+
+### Improved
+
+Library:
+
+- Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108) + [#145](https://github.com/philippgille/gokv/pull/145))
   - So except for a few required major version updates, all dependencies are now up-to-date as of 2023-11-12
-- Improved: Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some (PR [#108](https://github.com/philippgille/gokv/pull/108))
-- Improved: Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies (PR [#108](https://github.com/philippgille/gokv/pull/108))
-- Improved: `dyanamodb` tests are now independent of any AWS config/credential file (PR [#108](https://github.com/philippgille/gokv/pull/108))
-- Improved: Migrated CI from Travis CI to GitHub Actions (PR [#110](https://github.com/philippgille/gokv/pull/110))
-- Improved: Migrated from Bash and PowerShell build/test scripts to [Mage](https://github.com/magefile/mage) (PR [#111](https://github.com/philippgille/gokv/pull/111))
+- Major update of `BigCache` dependency
+  - First to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
+  - Later to v3 (PR [#158](https://github.com/philippgille/gokv/pull/158))
+- `dyanamodb` tests are now independent of any AWS config/credential file (PR [#108](https://github.com/philippgille/gokv/pull/108))
+- Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@juze](https://github.com/yuce))
+- Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
+- Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
+- Various security updates by [@dependabot](https://github.com/apps/dependabot)
+
+CI:
+
+- Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some (PR [#108](https://github.com/philippgille/gokv/pull/108))
+- Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies (PR [#108](https://github.com/philippgille/gokv/pull/108))
+- Migrated CI from Travis CI to GitHub Actions (PR [#110](https://github.com/philippgille/gokv/pull/110))
+- Migrated from Bash and PowerShell build/test scripts to [Mage](https://github.com/magefile/mage) (PR [#111](https://github.com/philippgille/gokv/pull/111))
   - With this comes also the improvement that individual modules can now be tested. Like `mage test redis`. For testing all modules there's `mage test all`.
-- Improved: Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@juze](https://github.com/yuce))
-- Improved: Added more Go versions in CI test matrix (PR [#134](https://github.com/philippgille/gokv/pull/134) by [@glimchb](https://github.com/glimchb))
-- Improved: Use GitHub action for Mage (PR [#135](https://github.com/philippgille/gokv/pull/135) by [@glimchb](https://github.com/glimchb))
-- Improved: Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
-- Improved: Added Windows to CI build matrix (PR [#139](https://github.com/philippgille/gokv/pull/139) by [@glimchb](https://github.com/glimchb))
-- Improved: Updated Mage from 1.13 to 1.15 (PR [#148](https://github.com/philippgille/gokv/pull/148))
-- Improved: Better error handling in Magefile (PR [#151](https://github.com/philippgille/gokv/pull/151))
-- Improved: Use `tparse` for test output (PR [#152](https://github.com/philippgille/gokv/pull/152))
-- Improved: Added Docker health check to test containers (PR [#142](https://github.com/philippgille/gokv/pull/142) by [@glimchb](https://github.com/glimchb))
-- Improved: *Use* the Docker health checks to reduce wait time for containers in CI (PR [#154](https://github.com/philippgille/gokv/pull/154))
-- Improved: Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
-- Improved: Various security updates by [@dependabot](https://github.com/apps/dependabot)
-- Improved: Update and improve usage of GitHub Actions dependencies (PR [#156](https://github.com/philippgille/gokv/pull/156))
-- Fixed: `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
+- Added more Go versions in CI test matrix (PR [#134](https://github.com/philippgille/gokv/pull/134) by [@glimchb](https://github.com/glimchb))
+- Use GitHub action for Mage (PR [#135](https://github.com/philippgille/gokv/pull/135) by [@glimchb](https://github.com/glimchb))
+- Added Windows to CI build matrix (PR [#139](https://github.com/philippgille/gokv/pull/139) by [@glimchb](https://github.com/glimchb))
+- Updated Mage from 1.13 to 1.15 (PR [#148](https://github.com/philippgille/gokv/pull/148))
+- Better error handling in Magefile (PR [#151](https://github.com/philippgille/gokv/pull/151))
+- Use `tparse` for test output (PR [#152](https://github.com/philippgille/gokv/pull/152))
+- Added Docker health check to test containers (PR [#142](https://github.com/philippgille/gokv/pull/142) by [@glimchb](https://github.com/glimchb))
+- *Use* the Docker health checks to reduce wait time for containers in CI (PR [#154](https://github.com/philippgille/gokv/pull/154))
+- Update and improve usage of GitHub Actions dependencies (PR [#156](https://github.com/philippgille/gokv/pull/156))
+
+### Fixes
+
+- Fixed `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
-- Fixed: Double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
+- Fixed double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
 
 ### Breaking changes
 
