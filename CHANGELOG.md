@@ -29,6 +29,7 @@ Library:
 - Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@juze](https://github.com/yuce))
 - Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
+- Block on etcd connection fail (PR [#163](https://github.com/philippgille/gokv/pull/163))
 - Various security updates by [@dependabot](https://github.com/apps/dependabot)
 
 CI:
@@ -47,6 +48,8 @@ CI:
 - Added Docker health check to test containers (PR [#142](https://github.com/philippgille/gokv/pull/142) by [@glimchb](https://github.com/glimchb))
 - *Use* the Docker health checks to reduce wait time for containers in CI (PR [#154](https://github.com/philippgille/gokv/pull/154))
 - Update and improve usage of GitHub Actions dependencies (PR [#156](https://github.com/philippgille/gokv/pull/156))
+- Prefix test container names with gokv (PR [#161](https://github.com/philippgille/gokv/pull/161))
+- Reduce test container wait time (PR [#162](https://github.com/philippgille/gokv/pull/162))
 
 ### Fixes
 
