@@ -1,11 +1,16 @@
 package mongodb_test
 
 import (
+	"context"
 	"log"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/globalsign/mgo"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/mongodb"
 	"github.com/philippgille/gokv/test"
@@ -100,11 +105,11 @@ func TestErrors(t *testing.T) {
 
 	// Test bad connection string
 	options := mongodb.Options{
-		ConnectionString: "forceError!",
+		ConnectionString: "mongodb://forceError!",
 	}
 	_, err = mongodb.NewClient(options)
-	if err.Error() != "no reachable servers" {
-		t.Errorf(`Expected a "no reachable servers" error, but instead got: %v`, err)
+	if !strings.Contains(err.Error(), "no such host") {
+		t.Errorf(`Expected a "no such host" error, but instead got: %v`, err)
 	}
 }
 
@@ -188,13 +193,16 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	session, err := mgo.DialWithTimeout("localhost", 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost"))
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
-	defer session.Close()
-	if err = session.Ping(); err != nil {
+	defer client.Disconnect(ctx)
+	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
 	}
