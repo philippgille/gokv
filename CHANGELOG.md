@@ -31,6 +31,7 @@ Library:
 - Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
 - Block on etcd connection fail (PR [#163](https://github.com/philippgille/gokv/pull/163))
 - Various security updates by [@dependabot](https://github.com/apps/dependabot)
+- Switch of used `MongoDB` dependency, from unmaintained `github.com/globalsign/mgo` to official `go.mongodb.org/mongo-driver` (PR [#165](https://github.com/philippgille/gokv/pull/165))
 
 CI:
 
@@ -62,6 +63,7 @@ CI:
 - `redis` store now has a default timeout of 2 seconds (previously no timeout). You can customize/remove the timeout via the store's config. (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - `datastore` store: Update of direct dependencies lead to indirect dependency update of `google.golang.org/grpc` from `v1.46.0` to `v1.59.0`, which is incompatible with Go 1.18 due `atomic.Int64` being used, which was introduced in Go 1.19.
 - The `interface{}` to `any` change makes `gokv` incompatible with Go version 1.17 and older. Please open an issue if you're stuck on an old Go version and would like us to revert this change.
+- The switch of the used MongoDB library from an unmaintained 3rd party library to the official one *might* make it incompatible with old MongoDB servers, or with data that was inserted with a previous version of gokv. This is just a warning - it's not confirmed. (PR [#165](https://github.com/philippgille/gokv/pull/165)
 
 v0.6.0 (2019-10-13)
 -------------------
