@@ -20,8 +20,8 @@ vNext
 
 Library:
 
-- Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108) + [#145](https://github.com/philippgille/gokv/pull/145))
-  - So except for a few required major version updates, all dependencies are now up-to-date as of 2023-11-12
+- Updated dependencies of all modules within the same major version (PR [#108](https://github.com/philippgille/gokv/pull/108) + [#145](https://github.com/philippgille/gokv/pull/145) + [#166](https://github.com/philippgille/gokv/pull/166))
+  - So except for a few required major version updates, all dependencies are now up-to-date as of 2024-01-07
 - Major update of `BigCache` dependency
   - First to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
   - Later to v3 (PR [#158](https://github.com/philippgille/gokv/pull/158))
