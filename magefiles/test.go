@@ -65,7 +65,9 @@ func testImpl(impl string) (err error) {
 		dockerCmd += `dynamodb-local -p 8000:8000 ` + dockerImage
 	case "etcd":
 		dockerImage = "bitnami/etcd"
-		dockerCmd += `etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes --health-cmd='etcdctl endpoint health' --health-interval 1s ` + dockerImage
+		// We need to increase the ulimit for etcd, otherwise it runs into issues
+		// during the concurrency test in the CI environment.
+		dockerCmd += `etcd -p 2379:2379 --env ALLOW_NONE_AUTHENTICATION=yes --health-cmd='etcdctl endpoint health' --health-interval 1s --ulimit nofile=65536:65536 ` + dockerImage
 	case "hazelcast":
 		dockerImage = "hazelcast/hazelcast"
 		dockerCmd += `hazelcast -p 5701:5701 --health-cmd='curl -f http://localhost:5701/hazelcast/health/node-state' --health-interval 1s ` + dockerImage
