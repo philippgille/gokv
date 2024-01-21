@@ -31,13 +31,7 @@ func TestConnection(t *testing.T) {
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
-//
-// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestClient(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
@@ -52,13 +46,7 @@ func TestClient(t *testing.T) {
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
-//
-// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestTypes(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
@@ -73,13 +61,7 @@ func TestTypes(t *testing.T) {
 }
 
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the DynamoDB client.
-//
-// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
-	}
-
 	client := createClient(t, encoding.JSON)
 
 	goroutineCount := 1000
@@ -88,13 +70,7 @@ func TestClientConcurrent(t *testing.T) {
 }
 
 // TestErrors tests some error cases.
-//
-// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestErrors(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test empty key
 	client := createClient(t, encoding.JSON)
 	err := client.Set("", "bar")
@@ -138,13 +114,7 @@ func TestErrors(t *testing.T) {
 }
 
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
-//
-// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestNil(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test setting nil
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
@@ -198,13 +168,7 @@ func TestNil(t *testing.T) {
 }
 
 // TestClose tests if the close method returns any errors.
-//
-// Note: This test is only executed if the initial connection to DynamoDB works.
 func TestClose(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to DynamoDB could be established. Probably not running in a proper test environment.")
-	}
-
 	client := createClient(t, encoding.JSON)
 	err := client.Close()
 	if err != nil {
