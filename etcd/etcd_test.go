@@ -3,6 +3,7 @@ package etcd_test
 import (
 	"context"
 	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -66,6 +67,15 @@ func TestTypes(t *testing.T) {
 func TestClientConcurrent(t *testing.T) {
 	if !checkConnection() {
 		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
+	}
+	// This test always works locally, but depending on the time of day, maybe
+	// depending on how busy GitHub Action infra is, it has issues in CI.
+	// It fails with connection resets and timeouts.
+	// As a temporary workaround we skip the test in CI, but long-term we could
+	// look into config optimizations (etcd server or client), or use our own
+	// GitHub Action runner.
+	if os.Getenv("GITHUB_ACTIONS") == "true" {
+		t.Skip("Skipping test in GitHub Actions. Run this locally before a release!")
 	}
 
 	client := createClient(t, encoding.JSON)
@@ -218,7 +228,7 @@ func checkConnection() bool {
 	// clientv3.New() should block when a DialTimeout is set,
 	// according to https://github.com/etcd-io/etcd/issues/9829.
 	// TODO: But it doesn't.
-	//cli, err := clientv3.NewFromURL("localhost:2379")
+	// cli, err := clientv3.NewFromURL("localhost:2379")
 	config := clientv3.Config{
 		Endpoints:   []string{"localhost:2379"},
 		DialTimeout: 2 * time.Second,
