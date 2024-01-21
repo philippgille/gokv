@@ -21,10 +21,6 @@ var testDbNumber = 15 // 16 DBs by default (unchanged config), starting with 0
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClient(t *testing.T) {
-	if !checkConnection(testDbNumber) {
-		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
@@ -44,10 +40,6 @@ func TestClient(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestTypes(t *testing.T) {
-	if !checkConnection(testDbNumber) {
-		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
@@ -67,10 +59,6 @@ func TestTypes(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkConnection(testDbNumber) {
-		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
-	}
-
 	client := createClient(t, encoding.JSON)
 	defer client.Close()
 
@@ -83,10 +71,6 @@ func TestClientConcurrent(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestErrors(t *testing.T) {
-	if !checkConnection(testDbNumber) {
-		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test empty key
 	client := createClient(t, encoding.JSON)
 	defer client.Close()
@@ -108,10 +92,6 @@ func TestErrors(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestNil(t *testing.T) {
-	if !checkConnection(testDbNumber) {
-		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test setting nil
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
@@ -171,10 +151,6 @@ func TestNil(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Redis works.
 func TestClose(t *testing.T) {
-	if !checkConnection(testDbNumber) {
-		t.Skip("No connection to Redis could be established. Probably not running in a proper test environment.")
-	}
-
 	client := createClient(t, encoding.JSON)
 	err := client.Close()
 	if err != nil {

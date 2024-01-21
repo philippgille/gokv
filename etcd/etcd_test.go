@@ -19,10 +19,6 @@ import (
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestClient(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
@@ -42,10 +38,6 @@ func TestClient(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestTypes(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
@@ -65,9 +57,6 @@ func TestTypes(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestClientConcurrent(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
 	// This test always works locally, but depending on the time of day, maybe
 	// depending on how busy GitHub Action infra is, it has issues in CI.
 	// It fails with connection resets and timeouts.
@@ -90,10 +79,6 @@ func TestClientConcurrent(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestErrors(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test empty key
 	client := createClient(t, encoding.JSON)
 	defer client.Close()
@@ -115,10 +100,6 @@ func TestErrors(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestNil(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
-
 	// Test setting nil
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
@@ -178,10 +159,6 @@ func TestNil(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to etcd works.
 func TestClose(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
-
 	client := createClient(t, encoding.JSON)
 	err := client.Close()
 	if err != nil {
@@ -195,10 +172,6 @@ func TestClose(t *testing.T) {
 //
 // Note: This test is only executed if the initial connection to Memcached works.
 func TestDefaultTimeout(t *testing.T) {
-	if !checkConnection() {
-		t.Skip("No connection to etcd could be established. Probably not running in a proper test environment.")
-	}
-
 	options := etcd.Options{}
 	client, err := etcd.NewClient(options)
 	if err != nil {
