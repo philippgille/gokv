@@ -51,6 +51,7 @@ CI:
 - Update and improve usage of GitHub Actions dependencies (PR [#156](https://github.com/philippgille/gokv/pull/156))
 - Prefix test container names with gokv (PR [#161](https://github.com/philippgille/gokv/pull/161))
 - Reduce test container wait time (PR [#162](https://github.com/philippgille/gokv/pull/162))
+- Add Docker health checks to Consul and Memcached (PR [#168](https://github.com/philippgille/gokv/pull/168))
 
 ### Fixes
 
