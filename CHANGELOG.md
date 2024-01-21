@@ -11,7 +11,9 @@ vNext
 ### Added
 
 - New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
+  - Moved to subdirectory in PR [#138](https://github.com/philippgille/gokv/pull/138)
   - Usage example added in PR [#144](https://github.com/philippgille/gokv/pull/144)
+  - Renamed from `proto` to `protobuf` in PR [#171](https://github.com/philippgille/gokv/pull/171)
 - New store implementation: `noop` (PR [#126](https://github.com/philippgille/gokv/pull/126) by [@peczenyj](https://github.com/peczenyj))
 - Optional timeout configuration for `datastore` store implementation (PR [#133](https://github.com/philippgille/gokv/pull/133) by [@glimchb](https://github.com/glimchb))
 - Optional timeout configuration for `redis` store implementation (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
@@ -33,7 +35,7 @@ Library:
 - Various security updates by [@dependabot](https://github.com/apps/dependabot)
 - Switch of used `MongoDB` dependency, from unmaintained `github.com/globalsign/mgo` to official `go.mongodb.org/mongo-driver` (PR [#165](https://github.com/philippgille/gokv/pull/165))
 
-CI:
+Tests / CI:
 
 - Test script (`build/test.sh`) now starts all required services instead of relying on Travis CI for some (PR [#108](https://github.com/philippgille/gokv/pull/108))
 - Dependency update scripts (`build/update-deps.sh`/`build/update-deps.ps1`) were changed to only update direct dependencies (PR [#108](https://github.com/philippgille/gokv/pull/108))
@@ -51,6 +53,8 @@ CI:
 - Prefix test container names with gokv (PR [#161](https://github.com/philippgille/gokv/pull/161))
 - Reduce test container wait time (PR [#162](https://github.com/philippgille/gokv/pull/162))
 - Add Docker health checks to Consul and Memcached (PR [#168](https://github.com/philippgille/gokv/pull/168))
+- Skip etcd concurrency test in CI (PR [#172](https://github.com/philippgille/gokv/pull/172))
+- Remove test skipping on connection failure from almost all store implementations (PR [#173](https://github.com/philippgille/gokv/pull/173))
 
 ### Fixes
 
