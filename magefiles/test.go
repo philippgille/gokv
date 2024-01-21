@@ -35,6 +35,7 @@ func testImpl(impl string) (err error) {
 
 	var dockerImage string
 	dockerCmd := "docker run -d --rm --name gokv-"
+	var healthExec string
 	var setup func() error
 	// TODO: Check quoting on Windows
 	switch impl {
@@ -53,7 +54,8 @@ func testImpl(impl string) (err error) {
 		}
 	case "consul":
 		dockerImage = "bitnami/consul"
-		dockerCmd += `consul -e CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}' -p 8500:8500 ` + dockerImage
+		dockerCmd += `consul -e CONSUL_LOCAL_CONFIG='{"limits":{"http_max_conns_per_client":1000}}' -p 8500:8500 --health-cmd='curl http://localhost:8500/v1/health/state/passing | grep serfHealth' --health-interval 1s ` + dockerImage
+		healthExec = `docker exec -u root gokv-consul sh -c 'apt update && apt install --yes --no-install-recommends curl'`
 	case "datastore": // Google Cloud Datastore via "Cloud Datastore Emulator"
 		// Using the ":slim" or ":alpine" tag would require the emulator to be installed manually.
 		// Both ways seem to be okay for setting the project: `-e CLOUDSDK_CORE_PROJECT=gokv` and CLI parameter `--project=gokv`
@@ -74,7 +76,8 @@ func testImpl(impl string) (err error) {
 		dockerCmd += `ignite -p 10800:10800 --health-cmd='${IGNITE_HOME}/bin/control.sh --baseline | grep "Cluster state: active"' --health-interval 1s ` + dockerImage
 	case "memcached":
 		dockerImage = "memcached"
-		dockerCmd += `memcached -p 11211:11211 ` + dockerImage
+		dockerCmd += `memcached -p 11211:11211 --health-cmd='echo stats | nc -w 1 localhost 11211' --health-interval 1s ` + dockerImage
+		healthExec = `docker exec -u root gokv-memcached sh -c 'apt update && apt install --yes --no-install-recommends netcat-openbsd'`
 	case "mongodb":
 		dockerImage = "mongo"
 		dockerCmd += `mongodb -p 27017:27017 --health-cmd='echo "db.runCommand({ ping: 1 }).ok" | mongosh localhost:27017/test --quiet' --health-interval 1s ` + dockerImage
@@ -148,7 +151,18 @@ func testImpl(impl string) (err error) {
 
 		// Wait for container to be started
 		if strings.Contains(dockerCmd, "--health-cmd") {
-			for i := 0; i < 10; i++ {
+			// Some containers need extra tooling installed for the health check to work
+			if healthExec != "" {
+				// Run this in the background, to have the counter feedback in the foreground
+				go func() {
+					out, err = script.Exec(healthExec).String()
+					if err != nil {
+						fmt.Printf("Couldn't execute extra health command: %v\nOutput: %s\n", err, out)
+					}
+				}()
+			}
+			// The MySQL container sometimes takes > 10s to become healthy in CI
+			for i := 0; i < 15; i++ {
 				out, err = script.Exec("docker inspect --format='{{.State.Health.Status}}' " + containerID).String()
 				if err != nil {
 					fmt.Println(out)
@@ -158,7 +172,7 @@ func testImpl(impl string) (err error) {
 				if out == "healthy" {
 					break
 				}
-				fmt.Printf("Waiting for container to be healthy... (%d/10)\n", i+1)
+				fmt.Printf("Waiting for container to be healthy... (%d/15)\n", i+1)
 				time.Sleep(time.Second)
 			}
 			// Return an error if the container isn't healthy yet
