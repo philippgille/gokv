@@ -45,7 +45,6 @@ CI:
 - Added Windows to CI build matrix (PR [#139](https://github.com/philippgille/gokv/pull/139) by [@glimchb](https://github.com/glimchb))
 - Updated Mage from 1.13 to 1.15 (PR [#148](https://github.com/philippgille/gokv/pull/148))
 - Better error handling in Magefile (PR [#151](https://github.com/philippgille/gokv/pull/151))
-- Use `tparse` for test output (PR [#152](https://github.com/philippgille/gokv/pull/152))
 - Added Docker health check to test containers (PR [#142](https://github.com/philippgille/gokv/pull/142) by [@glimchb](https://github.com/glimchb))
 - *Use* the Docker health checks to reduce wait time for containers in CI (PR [#154](https://github.com/philippgille/gokv/pull/154))
 - Update and improve usage of GitHub Actions dependencies (PR [#156](https://github.com/philippgille/gokv/pull/156))
