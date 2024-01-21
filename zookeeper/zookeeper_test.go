@@ -15,8 +15,6 @@ import (
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
-//
-// Note: This test is only executed if the initial connection to Apache ZooKeeper works.
 func TestClient(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
@@ -34,8 +32,6 @@ func TestClient(t *testing.T) {
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
-//
-// Note: This test is only executed if the initial connection to Apache ZooKeeper works.
 func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
@@ -53,8 +49,6 @@ func TestTypes(t *testing.T) {
 }
 
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the Apache ZooKeeper client.
-//
-// Note: This test is only executed if the initial connection to Apache ZooKeeper works.
 func TestClientConcurrent(t *testing.T) {
 	client := createClient(t, encoding.JSON)
 	defer client.Close()
@@ -65,8 +59,6 @@ func TestClientConcurrent(t *testing.T) {
 }
 
 // TestErrors tests some error cases.
-//
-// Note: This test is only executed if the initial connection to Apache ZooKeeper works.
 func TestErrors(t *testing.T) {
 	// Test empty key
 	client := createClient(t, encoding.JSON)
@@ -95,8 +87,6 @@ func TestErrors(t *testing.T) {
 }
 
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
-//
-// Note: This test is only executed if the initial connection to Apache ZooKeeper works.
 func TestNil(t *testing.T) {
 	// Test setting nil
 
@@ -154,8 +144,6 @@ func TestNil(t *testing.T) {
 }
 
 // TestClose tests if the close method returns any errors.
-//
-// Note: This test is only executed if the initial connection to Apache ZooKeeper works.
 func TestClose(t *testing.T) {
 	client := createClient(t, encoding.JSON)
 	err := client.Close()

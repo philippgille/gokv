@@ -14,8 +14,6 @@ import (
 
 // TestClient tests if reading from, writing to and deleting from the store works properly.
 // A struct is used as value. See TestTypes() for a test that is simpler but tests all types.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestClient(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
@@ -31,8 +29,6 @@ func TestClient(t *testing.T) {
 }
 
 // TestTypes tests if setting and getting values works with all Go types.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
@@ -48,8 +44,6 @@ func TestTypes(t *testing.T) {
 }
 
 // TestClientConcurrent launches a bunch of goroutines that concurrently work with the Memcached client.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestClientConcurrent(t *testing.T) {
 	client := createClient(t, encoding.JSON)
 
@@ -61,8 +55,6 @@ func TestClientConcurrent(t *testing.T) {
 }
 
 // TestErrors tests some error cases.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestErrors(t *testing.T) {
 	// Test empty key
 	client := createClient(t, encoding.JSON)
@@ -81,8 +73,6 @@ func TestErrors(t *testing.T) {
 }
 
 // TestNil tests the behaviour when passing nil or pointers to nil values to some methods.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestNil(t *testing.T) {
 	// Test setting nil
 
@@ -137,8 +127,6 @@ func TestNil(t *testing.T) {
 }
 
 // TestClose tests if the close method returns any errors.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestClose(t *testing.T) {
 	client := createClient(t, encoding.JSON)
 	err := client.Close()
@@ -150,8 +138,6 @@ func TestClose(t *testing.T) {
 // TestDefaultTimeout tests if the client works with the default timeout.
 // Currently, the createClient() method is used in other tests,
 // which sets the timeout to 2 seconds due to errors during the concurrency test.
-//
-// Note: This test is only executed if the initial connection to Memcached works.
 func TestDefaultTimeout(t *testing.T) {
 	options := memcached.Options{}
 	client, err := memcached.NewClient(options)
