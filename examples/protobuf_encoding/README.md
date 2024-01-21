@@ -1,5 +1,5 @@
-Proto encoding example
-======================
+Protobuf encoding example
+=========================
 
 For this example we already generated the Go file from the `.proto` file, so you can run it with `go run .`.
 
@@ -30,13 +30,13 @@ m := reflectedField.Interface().(map[string][]byte)
 rawVal := m["foo123"]
 fmt.Printf("Raw value: %s\n", rawVal)
 // Prints:
-//	Raw value:
-//	John Doe����johndoe@example.com"
+// Raw value:
+// John Doe����johndoe@example.com"
 //
-//	0123-456789"
+// 0123-456789"
 //
-//	0987-654321*
-//	           󟛪����
+// 0987-654321*
+//            󟛪����
 ```
 
 The reflection usage is only required because the example uses the `gomap` in-memory store. If it was using Redis or another remote store, you could just create a plain (non-`gokv`) client and retrieve the value with that. It would lead to the same result.

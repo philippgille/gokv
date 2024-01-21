@@ -10,7 +10,7 @@ package tutorial;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/philippgille/gokv/examples/proto_encoding/tutorialpb";
+option go_package = "github.com/philippgille/gokv/examples/protobuf_encoding/tutorialpb";
 
 message Person {
   string name = 1;

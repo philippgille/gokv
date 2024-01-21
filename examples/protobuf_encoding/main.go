@@ -5,16 +5,16 @@ import (
 	"math/rand"
 
 	"github.com/philippgille/gokv"
-	"github.com/philippgille/gokv/encoding/proto"
-	"github.com/philippgille/gokv/examples/proto_encoding/tutorialpb"
+	"github.com/philippgille/gokv/encoding/protobuf"
+	"github.com/philippgille/gokv/examples/protobuf_encoding/tutorialpb"
 	"github.com/philippgille/gokv/gomap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func main() {
-	// Create store with customized options (using the proto codec)
+	// Create store with customized options (using the protobuf codec)
 	options := gomap.Options{
-		Codec: proto.Codec,
+		Codec: protobuf.Codec,
 	}
 	store := gomap.NewStore(options)
 	defer store.Close()

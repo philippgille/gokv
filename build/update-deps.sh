@@ -29,6 +29,6 @@ done
 
 # Examples
 (cd "$SCRIPT_DIR"/../examples/redis && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
-(cd "$SCRIPT_DIR"/../examples/proto_encoding && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
+(cd "$SCRIPT_DIR"/../examples/protobuf_encoding && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
 
 cd "$WORKING_DIR"
