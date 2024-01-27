@@ -363,4 +363,9 @@ func InteractWithStore(store gokv.Store, key string, t *testing.T, waitGroup *sy
 	if err != nil {
 		t.Error(err)
 	}
+	// Final write so the caller can iterate over all keys sequentially and check if they exist
+	err = store.Set(key, Foo{})
+	if err != nil {
+		t.Error(err)
+	}
 }
