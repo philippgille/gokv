@@ -9,6 +9,14 @@ require (
 )
 
 require (
-	github.com/go-test/deep v1.0.4 // indirect
+	github.com/go-test/deep v1.1.0 // indirect
 	github.com/philippgille/gokv v0.6.0 // indirect
+)
+
+replace (
+	github.com/philippgille/gokv => ../
+	github.com/philippgille/gokv/encoding => ../encoding
+	github.com/philippgille/gokv/sql => ../sql
+	github.com/philippgille/gokv/test => ../test
+	github.com/philippgille/gokv/util => ../util
 )

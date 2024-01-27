@@ -12,7 +12,7 @@ require (
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/fatih/color v1.14.1 // indirect
-	github.com/go-test/deep v1.0.4 // indirect
+	github.com/go-test/deep v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
@@ -28,4 +28,12 @@ require (
 	github.com/philippgille/gokv v0.6.0 // indirect
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
 	golang.org/x/sys v0.13.0 // indirect
+)
+
+replace (
+	github.com/philippgille/gokv => ../
+	github.com/philippgille/gokv/encoding => ../encoding
+	github.com/philippgille/gokv/sql => ../sql
+	github.com/philippgille/gokv/test => ../test
+	github.com/philippgille/gokv/util => ../util
 )
