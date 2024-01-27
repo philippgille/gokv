@@ -55,12 +55,14 @@ Tests / CI:
 - Add Docker health checks to Consul and Memcached (PR [#168](https://github.com/philippgille/gokv/pull/168))
 - Skip etcd concurrency test in CI (PR [#172](https://github.com/philippgille/gokv/pull/172))
 - Remove test skipping on connection failure from almost all store implementations (PR [#173](https://github.com/philippgille/gokv/pull/173))
+- Add `Replace` target in Magefile (PR [#174](https://github.com/philippgille/gokv/pull/174))
 
 ### Fixes
 
 - Fixed `gomap` data race (PR [#90](https://github.com/philippgille/gokv/pull/90) by [@tdakkota](https://github.com/tdakkota))
   - Includes a regression test covering most (if not all) storage-specific implementations 👍
 - Fixed double CI builds when maintainer pushed a commit to an open PR (PR [#143](https://github.com/philippgille/gokv/pull/143))
+- Fix concurrency tests (PR [#176](https://github.com/philippgille/gokv/pull/176))
 
 ### Breaking changes
 
