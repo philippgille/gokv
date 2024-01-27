@@ -4,6 +4,8 @@ package main
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/bitfield/script"
@@ -82,4 +84,55 @@ func Clean() error {
 		ExecForEach("rm ./{{.}}") // On Windows `rm` works as it's an alias for Remove-Item
 	p.Wait()
 	return p.Error()
+}
+
+// Replace replaces the tagged/versioned gokv dependencies with the local version.
+// This is useful before tagging/releasing a new version of a helper package,
+// to ensure all store implementations work with those latest helper package versions.
+func Replace() error {
+	rootDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	impls, err := script.File("./build/implementations").Slice()
+	if err != nil {
+		return err
+	}
+	replaceText := `
+replace (
+	github.com/philippgille/gokv => ../
+	github.com/philippgille/gokv/encoding => ../encoding
+	github.com/philippgille/gokv/test => ../test
+	github.com/philippgille/gokv/util => ../util
+	github.com/philippgille/gokv/sql => ../sql
+)
+`
+	for _, impl := range impls {
+		modFile := filepath.Join(".", impl, "go.mod")
+		content, err := os.ReadFile(modFile)
+		if err != nil {
+			return err
+		}
+		newContent := string(content) + replaceText
+
+		err = os.WriteFile(modFile, []byte(newContent), os.ModePerm)
+		if err != nil {
+			return err
+		}
+
+		err = os.Chdir(filepath.Join(".", impl))
+		if err != nil {
+			return err
+		}
+		err = sh.Run("go", "mod", "tidy")
+		if err != nil {
+			return err
+		}
+		err = os.Chdir(rootDir)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
