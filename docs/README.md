@@ -11,3 +11,4 @@ Contents
 --------
 
 - [Choosing an implementation](choosing-implementation.md): Covers the fundamental differences between the different `gokv.Store` implementations
+- [Releasing](releasing.md): For maintainers of this repo - how to release a new version
