@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
+v0.7.0
+------
+
+> Note: Tag [`v0.7.0`](https://github.com/philippgille/gokv/tree/v0.7.0) points to v0.7.0 of the root `gokv` module, but the other modules in this repo are then updated and thus tagged separately (as required for Go modules). Check tag [`release/v0.7.0`](https://github.com/philippgille/gokv/tree/release/v0.7.0) for the commit at which the entire repo represents v0.7.0. See [docs/releasing.md](https://github.com/philippgille/gokv/blob/v0.7.0/docs/releasing.md) for details.
+
 ### Added
 
 - New codec: `proto` (for [protocol buffers](https://protobuf.dev/)) (PR [#127](https://github.com/philippgille/gokv/pull/127) by [@glimchb](https://github.com/glimchb))
