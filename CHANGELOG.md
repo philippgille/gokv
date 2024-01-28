@@ -8,10 +8,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 vNext
 -----
 
-v0.7.0
-------
+v0.7.0 (2024-01-28)
+-------------------
 
-> Note: Tag [`v0.7.0`](https://github.com/philippgille/gokv/tree/v0.7.0) points to v0.7.0 of the root `gokv` module, but the other modules in this repo are then updated and thus tagged separately (as required for Go modules). Check tag [`release/v0.7.0`](https://github.com/philippgille/gokv/tree/release/v0.7.0) for the commit at which the entire repo represents v0.7.0. See [docs/releasing.md](https://github.com/philippgille/gokv/blob/v0.7.0/docs/releasing.md) for details.
+> Note: For now we're doing one centralized release across the repository, while also tagging all separate modules individually as required by Go modules. In the future we might update and release the modules more independently.
+
+> Note 2: Tag [`v0.7.0`](https://github.com/philippgille/gokv/tree/v0.7.0) points to v0.7.0 of the root `gokv` module, but the other modules in this repo are then updated and thus tagged separately (as required for Go modules). Check tag [`release/v0.7.0`](https://github.com/philippgille/gokv/tree/release/v0.7.0) for the commit at which the entire repo represents v0.7.0. See [docs/releasing.md](https://github.com/philippgille/gokv/blob/v0.7.0/docs/releasing.md) for details.
 
 ### Added
 
@@ -33,7 +35,7 @@ Library:
   - First to v2 (PR [#89](https://github.com/philippgille/gokv/pull/89) by [@janisz](https://github.com/janisz))
   - Later to v3 (PR [#158](https://github.com/philippgille/gokv/pull/158))
 - `dyanamodb` tests are now independent of any AWS config/credential file (PR [#108](https://github.com/philippgille/gokv/pull/108))
-- Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@juze](https://github.com/yuce))
+- Updated `Hazelcast` dependency to v1.3.0 (PR [#112](https://github.com/philippgille/gokv/pull/112) by [@yuce](https://github.com/yuce))
 - Updated `redis` dependency from v6.15.9 to v9.2.1 (PR [#130](https://github.com/philippgille/gokv/pull/130) by [@glimchb](https://github.com/glimchb))
 - Use `any` instead of `interface{}` (PR [#150](https://github.com/philippgille/gokv/pull/150))
 - Block on etcd connection fail (PR [#163](https://github.com/philippgille/gokv/pull/163))
@@ -75,6 +77,14 @@ Tests / CI:
 - `datastore` store: Update of direct dependencies lead to indirect dependency update of `google.golang.org/grpc` from `v1.46.0` to `v1.59.0`, which is incompatible with Go 1.18 due `atomic.Int64` being used, which was introduced in Go 1.19.
 - The `interface{}` to `any` change makes `gokv` incompatible with Go version 1.17 and older. Please open an issue if you're stuck on an old Go version and would like us to revert this change.
 - The switch of the used MongoDB library from an unmaintained 3rd party library to the official one *might* make it incompatible with old MongoDB servers, or with data that was inserted with a previous version of gokv. This is just a warning - it's not confirmed. (PR [#165](https://github.com/philippgille/gokv/pull/165)
+
+### New Contributors
+
+- [@janisz](https://github.com/janisz) made their first contribution in [#89](https://github.com/philippgille/gokv/pull/89)
+- [@yuce](https://github.com/yuce) made their first contribution in [#112](https://github.com/philippgille/gokv/pull/112)
+- [@peczenyj](https://github.com/peczenyj) made their first contribution in [#126](https://github.com/philippgille/gokv/pull/126)
+- [@dependabot](https://github.com/dependabot) made their first contribution in [#122](https://github.com/philippgille/gokv/pull/122)
+- [@glimchb](https://github.com/glimchb) made their first contribution in [#127](https://github.com/philippgille/gokv/pull/127)
 
 v0.6.0 (2019-10-13)
 -------------------
