@@ -26,7 +26,7 @@ func testImpl(impl string) (err error) {
 		defer os.Chdir("..") // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
 
 		var out string
-		out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
+		out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic -json").Exec("tparse -all -progress").String()
 		fmt.Println(out)
 		return err
 	}
@@ -199,7 +199,7 @@ func testImpl(impl string) (err error) {
 	defer os.Chdir("..") // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
 
 	var out string
-	out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
+	out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic -json").Exec("tparse -all -progress").String()
 	fmt.Println(out)
 
 	// If err is nil, the above deferred functions might set it

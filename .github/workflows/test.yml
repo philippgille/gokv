@@ -24,12 +24,14 @@ jobs:
         with:
           version: v1.15.0
           install-only: true
+      - run: go install -v github.com/mfridman/tparse@v0.13.2
 
       - run: |
+          docker version
           go version
           go env
           mage -version
-          docker version
+          tparse -version
 
       # First build to check for compile errors
       - run: mage build
