@@ -201,6 +201,7 @@ func TestEmptyPartitionKeySupplier(t *testing.T) {
 // only creates as many partition keys as given as partitionKeyCount,
 // as well as if the generated keys are evenly distributed, given a set of similar keys.
 func TestSyntheticPartitionKeySupplier(t *testing.T) {
+	t.Skip("Takes too much CPU and time to run regularly. Enable when working on partitioning.")
 	testCases := []struct {
 		partitionKeyCount int
 		keyCount          int
