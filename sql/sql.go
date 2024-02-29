@@ -16,6 +16,11 @@ type Client struct {
 	Codec      encoding.Codec
 }
 
+// Gets underlying store to allow user manipulate object directly.
+func (c Client) GetStore() *sql.DB {
+	return c.C
+}
+
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.

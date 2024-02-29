@@ -24,6 +24,11 @@ type Client struct {
 	c *sql.Client
 }
 
+// Gets underlying store to allow user manipulate object directly.
+func (c Client) GetStore() *sql.Client {
+	return c.c
+}
+
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The length of the key must not exceed 255 characters.
