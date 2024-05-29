@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/couchbase/gocb/v2"
+
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
 )
