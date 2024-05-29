@@ -2,8 +2,6 @@ module github.com/philippgille/gokv/couchbase
 
 go 1.21
 
-toolchain go1.22.3
-
 require (
 	github.com/couchbase/gocb/v2 v2.8.1
 	github.com/philippgille/gokv/encoding v0.7.0
