@@ -86,6 +86,7 @@ For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/ph
   - [X] [PostgreSQL](https://github.com/postgres/postgres)
 - NoSQL
   - [X] [MongoDB](https://github.com/mongodb/mongo)
+  - [X] [Couchbase](https://couchbase.com)
   - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
 - "NewSQL"
   - [X] [CockroachDB](https://github.com/cockroachdb/cockroach)
