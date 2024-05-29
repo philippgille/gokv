@@ -37,10 +37,13 @@ func (c *Client) Set(k string, v any) error {
 		v = data
 	}
 
-	c.collection.Upsert(k, v, &gocb.UpsertOptions{
+	_, err := c.collection.Upsert(k, v, &gocb.UpsertOptions{
 		Expiry:  c.expiry,
 		Timeout: c.timeOut,
 	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -109,6 +112,7 @@ func (c *Client) Close() error {
 type Options struct {
 	// ConnectionString is the couchbase connection string.
 	ConnectionString string
+
 	// The timeout for operations.
 	// Optional (2 * time.Second by default).
 	Timeout *time.Duration
