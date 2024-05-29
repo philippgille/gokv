@@ -21,6 +21,7 @@ type Client struct {
 	expiry     time.Duration
 }
 
+// Set will create or update the content of the given key on couchbase.
 func (c *Client) Set(k string, v any) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
@@ -43,6 +44,7 @@ func (c *Client) Set(k string, v any) error {
 	return nil
 }
 
+// Get will return the content of the given key from couchbase.
 func (c *Client) Get(k string, v any) (bool, error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
@@ -80,6 +82,7 @@ func (c *Client) rawGet(k string, v any) (bool, error) {
 	return true, nil
 }
 
+// Delete will remove the given key from couchbase.
 func (c *Client) Delete(k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
@@ -96,6 +99,7 @@ func (c *Client) Delete(k string) error {
 	return err
 }
 
+// Close shuts down all buckets in this cluster and invalidates any references this cluster has.
 func (c *Client) Close() error {
 	return c.cluster.Close(nil)
 }
@@ -108,14 +112,33 @@ type Options struct {
 	// Optional (2 * time.Second by default).
 	Timeout *time.Duration
 
-	Authenticator  gocb.Authenticator
-	Username       string
-	Password       string
-	BucketName     string
-	ScopeName      string
+	// Authenticator specifies the authenticator to use with the cluster.
+	Authenticator gocb.Authenticator
+
+	// Username & Password specifies the cluster username and password to
+	// authenticate with.  This is equivalent to passing PasswordAuthenticator
+	// as the Authenticator parameter with the same values
+	Username string
+	Password string
+
+	// BucketName the name of the bucket to perform kv operations.
+	BucketName string
+
+	// ScopeName the name of the scope. Will use default scope by default.
+	ScopeName string
+
+	// CollectionName the name of the collection. Will use default collection by default.
 	CollectionName string
-	Expiry         time.Duration
-	Codec          encoding.Codec
+
+	// Expiry will set the TTL of a given key on Set operations, if present.
+	Expiry time.Duration
+
+	// Codec accepts a given encoding.Codec to use on set / get operations.
+	// If no Codec is set or it is encoding.JSON, we will use nothing, since
+	// the default of couchbase is to use a JSON Transcoder.
+	// By using encoding.Gob we will set a raw binary transcoder to be sure about
+	// the flags and content on couchbase.
+	Codec encoding.Codec
 }
 
 // DefaultOptions is an Options object with default values.
