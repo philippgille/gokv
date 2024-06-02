@@ -148,7 +148,9 @@ type Options struct {
 	// For example calculations, see https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/HowItWorks.ProvisionedThroughput.
 	// For limits, see https://github.com/awsdocs/amazon-dynamodb-developer-guide/blob/c420420a59040c5b3dd44a6e59f7c9e55fc922ef/doc_source/Limits.md#capacity-units-and-provisioned-throughput.md#provisioned-throughput.
 	WriteCapacityUnits int64
-	// If the table doesn't exist yet, gokv creates it.
+	// Should gokv create the table if it doesn't exist
+	CreateTable bool
+	// If the table doesn't exist yet and CreateTable is true, gokv creates it.
 	// If WaitForTableCreation is true, gokv will block until the table is created, with a timeout of 15 seconds.
 	// If the table still doesn't exist after 15 seconds, an error is returned.
 	// If WaitForTableCreation is false, gokv returns the client immediately.
@@ -184,6 +186,7 @@ var DefaultOptions = Options{
 	TableName:            "gokv",
 	ReadCapacityUnits:    5,
 	WriteCapacityUnits:   5,
+	CreateTable:          true,
 	WaitForTableCreation: aws.Bool(true),
 	Codec:                encoding.JSON,
 	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
@@ -261,7 +264,7 @@ func NewClient(options Options) (Client, error) {
 		awsErr, ok := err.(awserr.Error)
 		if !ok {
 			return result, err
-		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException {
+		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException && options.CreateTable {
 			err = createTable(options.TableName, options.ReadCapacityUnits, options.WriteCapacityUnits, *options.WaitForTableCreation, describeTableInput, svc)
 			if err != nil {
 				return result, err
