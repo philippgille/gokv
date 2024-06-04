@@ -1,7 +1,6 @@
 package couchbase_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/philippgille/gokv/couchbase"
@@ -9,20 +8,8 @@ import (
 	"github.com/philippgille/gokv/test"
 )
 
-const (
-	cbConnectionStringEnvVar = "COUCHBASE_SERVER"
-	cbBucketNameEnvVar       = "COUCHBASE_BUCKET"
-	cbUsernameEnvVar         = "COUCHBASE_USERNAME"
-	cbPasswordEnvVar         = "COUCHBASE_PASSWORD"
-)
-
 func TestClient(t *testing.T) {
-	t.Logf("checking for couchbase connection string on env var %q", cbConnectionStringEnvVar)
-
-	connStr, ok := os.LookupEnv(cbConnectionStringEnvVar)
-	if !ok {
-		t.Skipf("unable to connect to couchbase server: env var %q not set", cbConnectionStringEnvVar)
-	}
+	connStr := `couchbase://localhost`
 
 	t.Run("Test client with codec JSON", func(t *testing.T) {
 		client, err := createClient(connStr, encoding.JSON)
@@ -51,9 +38,9 @@ func createClient(connStr string, codec encoding.Codec) (*couchbase.Client, erro
 	options := couchbase.Options{
 		ConnectionString: connStr,
 		Codec:            codec,
-		BucketName:       os.Getenv(cbBucketNameEnvVar),
-		Username:         os.Getenv(cbUsernameEnvVar),
-		Password:         os.Getenv(cbPasswordEnvVar),
+		BucketName:       "test",
+		Username:         "administrator",
+		Password:         "password",
 	}
 
 	return couchbase.NewClient(options)
