@@ -104,6 +104,27 @@ func testImpl(impl string) (err error) {
 	case "zookeeper":
 		dockerImage = "zookeeper"
 		dockerCmd += `zookeeper -p 2181:2181 -e ZOO_4LW_COMMANDS_WHITELIST=ruok --health-cmd='echo ruok | timeout 2 nc -w 2 localhost 2181 | grep imok' --health-interval 1s ` + dockerImage
+	case "couchbase":
+		dockerImage = "couchbase:community-7.6.1"
+		dockerCmd += `couchbase -p 8091-8097:8091-8097 -p 9123:9123 -p 11207:11207 -p 11210:11210 -p 11280:11280 -p 18091-18097:18091-18097 ` + dockerImage
+		setup = func() error {
+			lines := []string{
+				`couchbase-cli cluster-init -c localhost  --cluster-username administrator --cluster-password password  --services data,index,query --cluster-ramsize 1024 --cluster-index-ramsize 256`,
+				`couchbase-cli bucket-create -c localhost  --username administrator --password password  --bucket test --bucket-type couchbase --bucket-ramsize 512`,
+			}
+
+			for _, line := range lines {
+				dockerLine := fmt.Sprintf(`docker exec gokv-couchbase bash -c '%s'`, line)
+
+				if out, err := script.Exec(dockerLine).String(); err != nil {
+					// Print the output here, as it could be more info than what's in err.
+					fmt.Println(out)
+					return err
+				}
+			}
+
+			return nil
+		}
 	default:
 		return errors.New("unknown `gokv.Store` implementation")
 	}
