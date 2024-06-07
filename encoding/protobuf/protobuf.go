@@ -9,7 +9,7 @@ import (
 // Convenience variable for simpler usage in gokv store options.
 //
 //	options := redis.Options{
-//		Encoding: proto.Codec,
+//		Encoding: protobuf.Codec,
 //	}
 var Codec = PBcodec{}
 
