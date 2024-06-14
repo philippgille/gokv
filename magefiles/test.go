@@ -108,14 +108,15 @@ func testImpl(impl string) (err error) {
 		return errors.New("unknown `gokv.Store` implementation")
 	}
 
-	// TODO: until docker images for windows appear, skip those test for windows
-	if dockerImage != "" && runtime.GOOS == "windows" {
-		return nil
-	}
-
 	// For some implementations there's no way to test with a Docker container yet.
 	// For them we skip the Docker stuff but still execute the tests, which can skip on connection error and we can see the skips in the test results.
 	if dockerImage != "" {
+
+		// TODO: until docker images for windows and darwin appear, skip those tests
+		if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+			return nil
+		}
+
 		// Pull Docker image
 		fmt.Printf("Pulling Docker image %s...", dockerImage)
 		var out string
