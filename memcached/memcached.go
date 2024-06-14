@@ -17,6 +17,11 @@ type Client struct {
 	codec encoding.Codec
 }
 
+// Gets underlying store to allow user manipulate object directly.
+func (c Client) GetStore() *memcache.Client {
+	return c.c
+}
+
 // Set stores the given value for the given key.
 // The key must not be longer than 250 bytes (this is a restriction of Memcached).
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
