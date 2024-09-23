@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"errors"
 	gosql "database/sql"
 
 	_ "modernc.org/sqlite"
@@ -102,6 +103,9 @@ func (c Client) Close() error {
 
 // Get retrieves the stored value for the given key.
 func (c Client) Get(k string, v any) (found bool, err error) {
+	if k == "" {
+		return false, errors.New("key must be longer than zero")
+	}
 	if err != nil {
 		return false, err
 	}
@@ -123,6 +127,9 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 
 // Delete deletes the stored value for the given key.
 func (c Client) Delete(k string) error {
+	if k == "" {
+		return errors.New("key must be longer than zero")
+	}
 	tx, err := c.C.Begin() // Start a transaction
 	if err != nil {
 		return err
@@ -135,6 +142,9 @@ func (c Client) Delete(k string) error {
 }
 
 func (c Client) Set(k string, v any) error {
+	if k == "" {
+		return errors.New("key must be longer than zero")
+	}
 	tx, err := c.C.Begin() // Start a transaction
 	if err != nil {
 		return err
