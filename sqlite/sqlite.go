@@ -106,6 +106,9 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	if k == "" {
 		return false, errors.New("key must be longer than zero")
 	}
+	if v == nil {
+		return false, errors.New("value must not be nil")
+	}
 	if err != nil {
 		return false, err
 	}
@@ -144,6 +147,9 @@ func (c Client) Delete(k string) error {
 func (c Client) Set(k string, v any) error {
 	if k == "" {
 		return errors.New("key must be longer than zero")
+	}
+	if v == nil {
+		return errors.New("value must not be nil")
 	}
 	tx, err := c.C.Begin() // Start a transaction
 	if err != nil {
