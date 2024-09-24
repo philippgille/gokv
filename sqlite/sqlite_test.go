@@ -143,8 +143,8 @@ func TestClose(t *testing.T) {
 // checkConnection returns true if a connection could be made, false otherwise.
 func TestCheckConnection(t *testing.T) {
 	client, err := sqlite.NewClient(sqlite.Options{
-		Filename:      "potato.db",
-		Codec:         encoding.JSON,
+		Path:  "potato.db",
+		Codec: encoding.JSON,
 	})
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
@@ -161,8 +161,8 @@ func TestCheckConnection(t *testing.T) {
 
 func createClient(t *testing.T, codec encoding.Codec) sqlite.Client {
 	options := sqlite.Options{
-		Filename:      "potato.db",
-		Codec:         codec,
+		Path:  "potato.db",
+		Codec: codec,
 	}
 	client, err := sqlite.NewClient(options)
 	if err != nil {
