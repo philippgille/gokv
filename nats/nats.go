@@ -12,12 +12,16 @@ import (
 	"github.com/philippgille/gokv/util"
 )
 
+// Client is a gokv.Store implementation for NATS JetStream KV.
 type Client struct {
 	kv    jetstream.KeyValue
 	nc    *nats.Conn
 	codec encoding.Codec
 }
 
+// Set stores the given value for the given key.
+// Values are automatically marshalled to JSON or gob (depending on the configuration).
+// The key must not be "" and the value must not be nil.
 func (c Client) Set(k string, v any) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
@@ -33,6 +37,12 @@ func (c Client) Set(k string, v any) error {
 	return err
 }
 
+// Get retrieves the stored value for the given key.
+// You need to pass a pointer to the value, so in case of a struct
+// the automatic unmarshalling can populate the fields of the object
+// that v points to with the values of the retrieved object's values.
+// If no value is found it returns (false, nil).
+// The key must not be "" and the pointer must not be nil.
 func (c Client) Get(k string, v any) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
@@ -50,6 +60,9 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	return true, c.codec.Unmarshal(entry.Value(), v)
 }
 
+// Delete deletes the stored value for the given key.
+// Deleting a non-existing key-value pair does NOT lead to an error.
+// The key must not be "".
 func (c Client) Delete(k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
@@ -63,6 +76,8 @@ func (c Client) Delete(k string) error {
 	return err
 }
 
+// Close closes the client.
+// It must be called to release resources used by the NATS connection.
 func (c Client) Close() error {
 	if c.nc != nil {
 		c.nc.Close()
@@ -70,21 +85,35 @@ func (c Client) Close() error {
 	return nil
 }
 
+// Options are the options for the NATS client.
 type Options struct {
-	URL               string
-	Bucket            string
+	// URL is the NATS server URL.
+	// Optional ("nats://localhost:4222" by default).
+	URL string
+	// Bucket is the name of the KV bucket to use.
+	// If the bucket doesn't exist, it will be created.
+	// Required.
+	Bucket string
+	// Connection timeout.
+	// Optional (2 seconds by default).
 	ConnectionTimeout *time.Duration
-	Codec             encoding.Codec
+	// Encoding format.
+	// Optional (encoding.JSON by default).
+	Codec encoding.Codec
 }
 
 var _defaultTimeout = 2 * time.Second
 
+// DefaultOptions is an Options object with default values.
+// URL: "nats://localhost:4222", ConnectionTimeout: 2 * time.Second, Codec: encoding.JSON
+// Note: Bucket is required and must be set by the user.
 var DefaultOptions = Options{
 	URL:               "nats://localhost:4222",
 	ConnectionTimeout: &_defaultTimeout,
 	Codec:             encoding.JSON,
 }
 
+// NewClient creates a new NATS client.
 func NewClient(options Options) (Client, error) {
 	result := Client{}
 
