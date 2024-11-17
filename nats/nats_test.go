@@ -232,11 +232,13 @@ func createClient(t *testing.T, codec encoding.Codec) nats.Client {
 		t.Fatal("Test server not running")
 	}
 
-	timeout := 2 * time.Second
+	connectionTimeout := 2 * time.Second
+	operationTimeout := 1 * time.Second
 	options := nats.Options{
 		URL:               ts.ClientURL(),
 		Bucket:            "test-bucket",
-		ConnectionTimeout: &timeout,
+		ConnectionTimeout: &connectionTimeout,
+		OperationTimeout:  &operationTimeout,
 		Codec:             codec,
 	}
 	client, err := nats.NewClient(options)

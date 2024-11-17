@@ -14,9 +14,10 @@ import (
 
 // Client is a gokv.Store implementation for NATS JetStream KV.
 type Client struct {
-	kv    jetstream.KeyValue
-	nc    *nats.Conn
-	codec encoding.Codec
+	kv      jetstream.KeyValue
+	nc      *nats.Conn
+	codec   encoding.Codec
+	timeout time.Duration
 }
 
 // Set stores the given value for the given key.
@@ -32,8 +33,9 @@ func (c Client) Set(k string, v any) error {
 		return err
 	}
 
-	ctx := context.TODO() // Use TODO since context is not available yet.
-	_, err = c.kv.Put(ctx, k, data)
+	ctxWithTimeout, cancel := context.WithTimeout(context.TODO(), c.timeout) // Use TODO since context is not available yet.
+	defer cancel()
+	_, err = c.kv.Put(ctxWithTimeout, k, data)
 	return err
 }
 
@@ -48,8 +50,9 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 		return false, err
 	}
 
-	ctx := context.TODO()
-	entry, err := c.kv.Get(ctx, k)
+	ctxWithTimeout, cancel := context.WithTimeout(context.TODO(), c.timeout)
+	defer cancel()
+	entry, err := c.kv.Get(ctxWithTimeout, k)
 	if err != nil {
 		if errors.Is(err, jetstream.ErrKeyNotFound) {
 			return false, nil
@@ -68,8 +71,9 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	ctx := context.TODO()
-	err := c.kv.Delete(ctx, k)
+	ctxWithTimeout, cancel := context.WithTimeout(context.TODO(), c.timeout)
+	defer cancel()
+	err := c.kv.Delete(ctxWithTimeout, k)
 	if err != nil && errors.Is(err, jetstream.ErrKeyNotFound) {
 		return nil
 	}
@@ -98,6 +102,9 @@ type Options struct {
 	// Connection timeout.
 	// Optional (2 seconds by default).
 	ConnectionTimeout *time.Duration
+	// Operation timeout.
+	// Optional (2 seconds by default).
+	OperationTimeout *time.Duration
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
@@ -111,6 +118,7 @@ var _defaultTimeout = 2 * time.Second
 var DefaultOptions = Options{
 	URL:               "nats://localhost:4222",
 	ConnectionTimeout: &_defaultTimeout,
+	OperationTimeout:  &_defaultTimeout,
 	Codec:             encoding.JSON,
 }
 
@@ -124,6 +132,9 @@ func NewClient(options Options) (Client, error) {
 	}
 	if options.ConnectionTimeout == nil {
 		options.ConnectionTimeout = DefaultOptions.ConnectionTimeout
+	}
+	if options.OperationTimeout == nil {
+		options.OperationTimeout = DefaultOptions.OperationTimeout
 	}
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
@@ -167,6 +178,7 @@ func NewClient(options Options) (Client, error) {
 	// Store the connection in the client,
 	// so it can be closed when Close() is called.
 	result.nc = nc
+	result.timeout = *options.OperationTimeout
 
 	return result, nil
 }
