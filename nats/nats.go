@@ -80,7 +80,7 @@ func (c Client) Delete(k string) error {
 // It must be called to release resources used by the NATS connection.
 func (c Client) Close() error {
 	if c.nc != nil {
-		c.nc.Close()
+		return c.nc.Drain()
 	}
 	return nil
 }
@@ -92,6 +92,7 @@ type Options struct {
 	URL string
 	// Bucket is the name of the KV bucket to use.
 	// If the bucket doesn't exist, it will be created.
+	// To follow a best practice, always create a bucket in advance on the server side.
 	// Required.
 	Bucket string
 	// Connection timeout.
@@ -149,7 +150,10 @@ func NewClient(options Options) (Client, error) {
 		if !errors.Is(err, jetstream.ErrBucketNotFound) {
 			return result, err
 		}
-		// Try to create the bucket if it doesn't exist
+		// Try to create the bucket if it doesn't exist.
+		// It doesn't handle the concurrent creation of the bucket by multiple clients.
+		// CreateOrUpdateKeyValue() might be a solution, but it's not a good practice.
+		// The bucket should be created in advance on the server side, or in a dedicated process.
 		kv, err = js.CreateKeyValue(ctx, jetstream.KeyValueConfig{
 			Bucket: options.Bucket,
 		})
