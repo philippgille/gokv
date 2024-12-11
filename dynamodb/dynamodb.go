@@ -223,6 +223,9 @@ func NewClient(options Options) (Client, error) {
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
 	}
+	if options.DescribeTimeout == 0 {
+		options.DescribeTimeout = DefaultOptions.DescribeTimeout
+	}
 	// Set credentials only if set in the options.
 	// If not set, the SDK uses the shared credentials file or environment variables, which is the preferred way.
 	// Return an error if only one of the values is set.
@@ -306,7 +309,7 @@ func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, 
 		// expires.
 		err := waiter.Wait(context.TODO(), &describeTableInput, 15*time.Second)
 		if err != nil {
-			fmt.Errorf(`The DynamoDB table couldn't be created or took too long to be created: %w`, err)
+			return fmt.Errorf(`the DynamoDB table couldn't be created or took too long to be created: %w`, err)
 		}
 	}
 

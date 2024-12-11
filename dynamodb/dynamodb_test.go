@@ -106,8 +106,8 @@ func TestErrors(t *testing.T) {
 		Region:             region,
 	}
 	_, err = dynamodb.NewClient(options)
-	if strings.Index(err.Error(), "UnrecognizedClientException: The security token included in the request is invalid.") != 0 {
-		t.Errorf("An UnrecognizedClientException was expected, but it seems like it didn't occur. Instead, the error was: %v", err)
+	if !strings.Contains(err.Error(), "UnrecognizedClientException: The security token included in the request is invalid.") {
+		t.Errorf("An UnrecognizedClientException was expected, but it seems like it didn't occur. Instead, the error was: %s", err.Error())
 	}
 }
 
