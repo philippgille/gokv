@@ -173,6 +173,9 @@ type Options struct {
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
+	// Describe Table timeout
+	// Defaults to 5 * time.Second
+	DescribeTimeout time.Duration
 }
 
 // DefaultOptions is an Options object with default values.
@@ -186,6 +189,7 @@ var DefaultOptions = Options{
 	WriteCapacityUnits:   5,
 	WaitForTableCreation: aws.Bool(true),
 	Codec:                encoding.JSON,
+	DescribeTimeout: 5 * time.Second,
 	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
 	// or CustomEndpoint because their Go zero values are fine.
 }
@@ -251,7 +255,7 @@ func NewClient(options Options) (Client, error) {
 	// Create table if it doesn't exist.
 	// Also serves as connection test.
 	// Use context for timeout.
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), options.DescribeTimeout)
 	defer cancel()
 	describeTableInput := awsdynamodb.DescribeTableInput{
 		TableName: &options.TableName,
