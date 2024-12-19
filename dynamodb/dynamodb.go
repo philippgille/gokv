@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	awsdynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -54,7 +57,7 @@ func (c Client) Set(k string, v any) error {
 		TableName: &c.tableName,
 		Item:      item,
 	}
-	_, err = c.c.PutItem(context.TODO(), &putItemInput)
+	_, err = c.c.PutItem(context.Background(), &putItemInput)
 	if err != nil {
 		return err
 	}
@@ -80,7 +83,7 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 		TableName: &c.tableName,
 		Key:       key,
 	}
-	getItemOutput, err := c.c.GetItem(context.TODO(), &getItemInput)
+	getItemOutput, err := c.c.GetItem(context.Background(), &getItemInput)
 	if err != nil {
 		return false, err
 	} else if getItemOutput.Item == nil {
@@ -117,7 +120,7 @@ func (c Client) Delete(k string) error {
 		TableName: &c.tableName,
 		Key:       key,
 	}
-	_, err := c.c.DeleteItem(context.TODO(), &deleteItemInput)
+	_, err := c.c.DeleteItem(context.Background(), &deleteItemInput)
 	return err
 }
 
@@ -231,20 +234,24 @@ func NewClient(options Options) (Client, error) {
 	// Return an error if only one of the values is set.
 	var creds credentials.StaticCredentialsProvider
 	if (options.AWSaccessKeyID != "" && options.AWSsecretAccessKey == "") || (options.AWSaccessKeyID == "" && options.AWSsecretAccessKey != "") {
-		return result, errors.New("When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
+		return result, errors.New("when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
 	} else if options.AWSaccessKeyID != "" {
 		// Due to the previous check we can be sure that in this case AWSsecretAccessKey is not empty as well.
 		creds = credentials.NewStaticCredentialsProvider(options.AWSaccessKeyID, options.AWSsecretAccessKey, ``)
 	}
 
-	config, err := config.LoadDefaultConfig(context.TODO())
+	config, err := config.LoadDefaultConfig(context.Background(), config.WithRetryer(func() aws.Retryer {
+		return retry.NewStandard(func(so *retry.StandardOptions) {
+			so.RateLimiter = ratelimit.NewTokenRateLimit(1000000)
+		})
+	}))
 	if err != nil {
 		return result, fmt.Errorf("failed loading AWS configuration from env: %w", err)
 	}
 	if options.Region != "" {
 		config.Region = options.Region
 	}
-	_, err = creds.Retrieve(context.TODO())
+	_, err = creds.Retrieve(context.Background())
 	if err == nil {
 		config.Credentials = creds
 	}
@@ -297,7 +304,7 @@ func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, 
 			WriteCapacityUnits: &writeCapacityUnits,
 		},
 	}
-	_, err := svc.CreateTable(context.TODO(), &createTableInput)
+	_, err := svc.CreateTable(context.Background(), &createTableInput)
 	if err != nil {
 		return err
 	}
@@ -307,7 +314,7 @@ func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, 
 		waiter := awsdynamodb.NewTableExistsWaiter(svc)
 		// Wait will poll until it gets the resource status, or max wait time
 		// expires.
-		err := waiter.Wait(context.TODO(), &describeTableInput, 15*time.Second)
+		err := waiter.Wait(context.Background(), &describeTableInput, 15*time.Second)
 		if err != nil {
 			return fmt.Errorf(`the DynamoDB table couldn't be created or took too long to be created: %w`, err)
 		}
