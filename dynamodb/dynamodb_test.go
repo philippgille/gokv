@@ -7,11 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
-	"github.com/aws/aws-sdk-go/aws/session"
-	awsdynamodb "github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsdynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 
 	"github.com/philippgille/gokv/dynamodb"
 	"github.com/philippgille/gokv/encoding"
@@ -21,6 +18,7 @@ import (
 // For "DynamoDB local" Docker container.
 // See https://hub.docker.com/r/amazon/dynamodb-local/.
 var customEndpoint = "http://localhost:8000"
+var region = "eu-central-1"
 
 // TestConnection only tests the connection to the local DynamoDB, allowing to work on connection options with `go test -run TestConnection .` for example.
 func TestConnection(t *testing.T) {
@@ -105,11 +103,11 @@ func TestErrors(t *testing.T) {
 	options = dynamodb.Options{
 		AWSaccessKeyID:     "foo",
 		AWSsecretAccessKey: "bar",
-		Region:             endpoints.UsWest2RegionID,
+		Region:             region,
 	}
 	_, err = dynamodb.NewClient(options)
-	if strings.Index(err.Error(), "UnrecognizedClientException: The security token included in the request is invalid.") != 0 {
-		t.Errorf("An UnrecognizedClientException was expected, but it seems like it didn't occur. Instead, the error was: %v", err)
+	if !strings.Contains(err.Error(), "UnrecognizedClientException: The security token included in the request is invalid.") {
+		t.Errorf("An UnrecognizedClientException was expected, but it seems like it didn't occur. Instead, the error was: %s", err.Error())
 	}
 }
 
@@ -178,30 +176,25 @@ func TestClose(t *testing.T) {
 
 // checkConnection returns true if a connection could be made, false otherwise.
 func checkConnection() bool {
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config: aws.Config{
-			CredentialsChainVerboseErrors: aws.Bool(true),
-			// Local DynamoDB requires credentials, and with the shared config disabled these must be explicitly provided.
-			Credentials: credentials.NewStaticCredentials("foo", "foo", ""),
-			Endpoint:    aws.String(customEndpoint),
-			Region:      aws.String(endpoints.EuCentral1RegionID),
-		},
-		Profile:           session.DefaultSharedConfigProfile,
-		SharedConfigState: session.SharedConfigDisable,
-	})
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
+	cfg := aws.Config{
+		// Local DynamoDB requires credentials, and with the shared config disabled these must be explicitly provided.
+		Credentials: aws.CredentialsProviderFunc(func(ctx context.Context) (aws.Credentials, error) {
+			return aws.Credentials{
+				AccessKeyID:     `foo`,
+				SecretAccessKey: `foo`,
+			}, nil
+		}),
+		BaseEndpoint: aws.String(customEndpoint),
+		Region:       region,
 	}
-	svc := awsdynamodb.New(sess)
+	svc := awsdynamodb.NewFromConfig(cfg)
 
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	limit := int64(1)
 	listTablesInput := awsdynamodb.ListTablesInput{
-		Limit: &limit,
+		Limit: aws.Int32(1),
 	}
-	_, err = svc.ListTablesWithContext(timeoutCtx, &listTablesInput)
+	_, err := svc.ListTables(timeoutCtx, &listTablesInput)
 	if err != nil {
 		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
 		return false
@@ -211,7 +204,7 @@ func checkConnection() bool {
 
 func createClient(t *testing.T, codec encoding.Codec) dynamodb.Client {
 	options := dynamodb.Options{
-		Region:             endpoints.EuCentral1RegionID,
+		Region:             region,
 		AWSaccessKeyID:     "foo",
 		AWSsecretAccessKey: "foo",
 		CustomEndpoint:     customEndpoint,

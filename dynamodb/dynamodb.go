@@ -3,13 +3,17 @@ package dynamodb
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	awsdynamodb "github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	awsdynamodb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/aws/smithy-go/ptr"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -23,7 +27,7 @@ var valAttrName = "v"
 
 // Client is a gokv.Store implementation for DynamoDB.
 type Client struct {
-	c         *awsdynamodb.DynamoDB
+	c         *awsdynamodb.Client
 	tableName string
 	codec     encoding.Codec
 }
@@ -42,18 +46,18 @@ func (c Client) Set(k string, v any) error {
 		return err
 	}
 
-	item := make(map[string]*awsdynamodb.AttributeValue)
-	item[keyAttrName] = &awsdynamodb.AttributeValue{
-		S: &k,
+	item := make(map[string]types.AttributeValue)
+	item[keyAttrName] = &types.AttributeValueMemberS{
+		Value: k,
 	}
-	item[valAttrName] = &awsdynamodb.AttributeValue{
-		B: data,
+	item[valAttrName] = &types.AttributeValueMemberB{
+		Value: data,
 	}
 	putItemInput := awsdynamodb.PutItemInput{
 		TableName: &c.tableName,
 		Item:      item,
 	}
-	_, err = c.c.PutItem(&putItemInput)
+	_, err = c.c.PutItem(context.Background(), &putItemInput)
 	if err != nil {
 		return err
 	}
@@ -71,15 +75,15 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 		return false, err
 	}
 
-	key := make(map[string]*awsdynamodb.AttributeValue)
-	key[keyAttrName] = &awsdynamodb.AttributeValue{
-		S: &k,
+	key := make(map[string]types.AttributeValue)
+	key[keyAttrName] = &types.AttributeValueMemberS{
+		Value: k,
 	}
 	getItemInput := awsdynamodb.GetItemInput{
 		TableName: &c.tableName,
 		Key:       key,
 	}
-	getItemOutput, err := c.c.GetItem(&getItemInput)
+	getItemOutput, err := c.c.GetItem(context.Background(), &getItemInput)
 	if err != nil {
 		return false, err
 	} else if getItemOutput.Item == nil {
@@ -92,9 +96,12 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 		// TODO: Maybe return an error? Behaviour should be consistent across all implementations.
 		return false, nil
 	}
-	data := attributeVal.B
+	data, ok := attributeVal.(*types.AttributeValueMemberB)
+	if !ok {
+		return true, fmt.Errorf(`value is not string`)
+	}
 
-	return true, c.codec.Unmarshal(data, v)
+	return true, c.codec.Unmarshal(data.Value, v)
 }
 
 // Delete deletes the stored value for the given key.
@@ -105,15 +112,15 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	key := make(map[string]*awsdynamodb.AttributeValue)
-	key[keyAttrName] = &awsdynamodb.AttributeValue{
-		S: &k,
+	key := make(map[string]types.AttributeValue)
+	key[keyAttrName] = &types.AttributeValueMemberS{
+		Value: k,
 	}
 	deleteItemInput := awsdynamodb.DeleteItemInput{
 		TableName: &c.tableName,
 		Key:       key,
 	}
-	_, err := c.c.DeleteItem(&deleteItemInput)
+	_, err := c.c.DeleteItem(context.Background(), &deleteItemInput)
 	return err
 }
 
@@ -173,6 +180,9 @@ type Options struct {
 	// Encoding format.
 	// Optional (encoding.JSON by default).
 	Codec encoding.Codec
+	// Describe Table timeout
+	// Defaults to 5 * time.Second
+	DescribeTimeout time.Duration
 }
 
 // DefaultOptions is an Options object with default values.
@@ -184,8 +194,9 @@ var DefaultOptions = Options{
 	TableName:            "gokv",
 	ReadCapacityUnits:    5,
 	WriteCapacityUnits:   5,
-	WaitForTableCreation: aws.Bool(true),
+	WaitForTableCreation: ptr.Bool(true),
 	Codec:                encoding.JSON,
+	DescribeTimeout:      5 * time.Second,
 	// No need to set Region, AWSaccessKeyID, AWSsecretAccessKey
 	// or CustomEndpoint because their Go zero values are fine.
 }
@@ -215,53 +226,52 @@ func NewClient(options Options) (Client, error) {
 	if options.Codec == nil {
 		options.Codec = DefaultOptions.Codec
 	}
+	if options.DescribeTimeout == 0 {
+		options.DescribeTimeout = DefaultOptions.DescribeTimeout
+	}
 	// Set credentials only if set in the options.
 	// If not set, the SDK uses the shared credentials file or environment variables, which is the preferred way.
 	// Return an error if only one of the values is set.
-	var creds *credentials.Credentials
+	var creds credentials.StaticCredentialsProvider
 	if (options.AWSaccessKeyID != "" && options.AWSsecretAccessKey == "") || (options.AWSaccessKeyID == "" && options.AWSsecretAccessKey != "") {
-		return result, errors.New("When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
+		return result, errors.New("when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
 	} else if options.AWSaccessKeyID != "" {
 		// Due to the previous check we can be sure that in this case AWSsecretAccessKey is not empty as well.
-		creds = credentials.NewStaticCredentials(options.AWSaccessKeyID, options.AWSsecretAccessKey, "")
+		creds = credentials.NewStaticCredentialsProvider(options.AWSaccessKeyID, options.AWSsecretAccessKey, ``)
 	}
 
-	config := aws.NewConfig()
-	if options.Region != "" {
-		config = config.WithRegion(options.Region)
+	config, err := config.LoadDefaultConfig(context.Background(), config.WithRetryer(func() aws.Retryer {
+		return retry.NewStandard(func(so *retry.StandardOptions) {
+			so.RateLimiter = ratelimit.NewTokenRateLimit(1000000)
+		})
+	}))
+	if err != nil {
+		return result, fmt.Errorf("failed loading AWS configuration from env: %w", err)
 	}
-	if creds != nil {
-		config = config.WithCredentials(creds)
+	if options.Region != "" {
+		config.Region = options.Region
+	}
+	_, err = creds.Retrieve(context.Background())
+	if err == nil {
+		config.Credentials = creds
 	}
 	if options.CustomEndpoint != "" {
-		config = config.WithEndpoint(options.CustomEndpoint)
+		config.BaseEndpoint = &options.CustomEndpoint
 	}
-	// Use shared config file...
-	sessionOpts := session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}
-	// ...but allow overwrite of region and credentials if they are set in the options.
-	sessionOpts.Config.MergeIn(config)
-	session, err := session.NewSessionWithOptions(sessionOpts)
-	if err != nil {
-		return result, err
-	}
-	svc := awsdynamodb.New(session)
+	svc := awsdynamodb.NewFromConfig(config)
 
 	// Create table if it doesn't exist.
 	// Also serves as connection test.
 	// Use context for timeout.
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), options.DescribeTimeout)
 	defer cancel()
 	describeTableInput := awsdynamodb.DescribeTableInput{
 		TableName: &options.TableName,
 	}
-	_, err = svc.DescribeTableWithContext(timeoutCtx, &describeTableInput)
+	_, err = svc.DescribeTable(timeoutCtx, &describeTableInput)
 	if err != nil {
-		awsErr, ok := err.(awserr.Error)
-		if !ok {
-			return result, err
-		} else if awsErr.Code() == awsdynamodb.ErrCodeResourceNotFoundException {
+		var nf *types.ResourceNotFoundException
+		if errors.As(err, &nf) {
 			err = createTable(options.TableName, options.ReadCapacityUnits, options.WriteCapacityUnits, *options.WaitForTableCreation, describeTableInput, svc)
 			if err != nil {
 				return result, err
@@ -278,47 +288,35 @@ func NewClient(options Options) (Client, error) {
 	return result, nil
 }
 
-func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, waitForTableCreation bool, describeTableInput awsdynamodb.DescribeTableInput, svc *awsdynamodb.DynamoDB) error {
-	keyAttrType := "S" // For "string"
-	keyType := "HASH"  // As opposed to "RANGE"
+func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, waitForTableCreation bool, describeTableInput awsdynamodb.DescribeTableInput, svc *awsdynamodb.Client) error {
 	createTableInput := awsdynamodb.CreateTableInput{
 		TableName: &tableName,
-		AttributeDefinitions: []*awsdynamodb.AttributeDefinition{{
+		AttributeDefinitions: []types.AttributeDefinition{{
 			AttributeName: &keyAttrName,
-			AttributeType: &keyAttrType,
+			AttributeType: types.ScalarAttributeTypeS, // For "string"
 		}},
-		KeySchema: []*awsdynamodb.KeySchemaElement{{
+		KeySchema: []types.KeySchemaElement{{
 			AttributeName: &keyAttrName,
-			KeyType:       &keyType,
+			KeyType:       types.KeyTypeHash, // As opposed to "RANGE"
 		}},
-		ProvisionedThroughput: &awsdynamodb.ProvisionedThroughput{
+		ProvisionedThroughput: &types.ProvisionedThroughput{
 			ReadCapacityUnits:  &readCapacityUnits,
 			WriteCapacityUnits: &writeCapacityUnits,
 		},
 	}
-	_, err := svc.CreateTable(&createTableInput)
+	_, err := svc.CreateTable(context.Background(), &createTableInput)
 	if err != nil {
 		return err
 	}
 	// If configured (true by default), block until the table is created.
 	// Typical table creation duration is 10 seconds.
 	if waitForTableCreation {
-		for try := 1; try < 16; try++ {
-			describeTableOutput, err := svc.DescribeTable(&describeTableInput)
-			if err != nil || *describeTableOutput.Table.TableStatus == "CREATING" {
-				time.Sleep(1 * time.Second)
-			} else {
-				break
-			}
-		}
-		// Last try (16th) after 15 seconds of waiting.
-		// Now handle error as such.
-		describeTableOutput, err := svc.DescribeTable(&describeTableInput)
+		waiter := awsdynamodb.NewTableExistsWaiter(svc)
+		// Wait will poll until it gets the resource status, or max wait time
+		// expires.
+		err := waiter.Wait(context.Background(), &describeTableInput, 15*time.Second)
 		if err != nil {
-			return errors.New("The DynamoDB table couldn't be created")
-		}
-		if *describeTableOutput.Table.TableStatus == "CREATING" {
-			return errors.New("The DynamoDB table took too long to be created")
+			return fmt.Errorf(`the DynamoDB table couldn't be created or took too long to be created: %w`, err)
 		}
 	}
 
