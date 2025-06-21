@@ -45,3 +45,5 @@ jobs:
       #- run: build/combine-coverage.sh
       # Upload coverage data to codecov.io
       - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
