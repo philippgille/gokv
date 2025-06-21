@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
           cache-dependency-path: "**/go.sum"
@@ -34,7 +34,7 @@ jobs:
       # First build to check for compile errors
       - run: mage build
       # Then lint, taking `.golangci.yml` into account
-      - uses: golangci/golangci-lint-action@v3
+      - uses: golangci/golangci-lint-action@v8
       # Finally test all modules
       # This starts and stops Docker containers for services like PostgreSQL, Redis etc.
       # Takes up to 10m on GitHub Actions
@@ -44,4 +44,4 @@ jobs:
       # Combining of coverage reports not required with the action, which detects all reports in subdirectories and uploads all of them
       #- run: build/combine-coverage.sh
       # Upload coverage data to codecov.io
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v5
