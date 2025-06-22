@@ -91,14 +91,14 @@ func TestErrors(t *testing.T) {
 		AWSaccessKeyID: "foo",
 	}
 	_, err = dynamodb.NewClient(options)
-	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
+	if err.Error() != "when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	options = dynamodb.Options{
 		AWSsecretAccessKey: "foo",
 	}
 	_, err = dynamodb.NewClient(options)
-	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
+	if err.Error() != "when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	// Bad credentials on actual AWS DynamoDB endpoint (no custom endpoint for local Docker container)

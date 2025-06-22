@@ -77,7 +77,7 @@ func TestErrors(t *testing.T) {
 		PathPrefix: "foo",
 	}
 	_, err = zookeeper.NewClient(options)
-	if err == nil || strings.HasPrefix(err.Error(), "The PathPrefix must start with a \\") == false {
+	if err == nil || strings.HasPrefix(err.Error(), "the PathPrefix must start with a \\") == false {
 		t.Error("Either no or the wrong error was returned")
 	}
 }

@@ -103,7 +103,7 @@ func TestErrors(t *testing.T) {
 	_, err = tablestorage.NewClient(options)
 	if err == nil {
 		t.Error("An error was expected")
-	} else if err.Error() != "The ConnectionString of the passed options is empty" {
+	} else if err.Error() != "the ConnectionString of the passed options is empty" {
 		t.Error("A different error was expected")
 	}
 }
@@ -266,7 +266,7 @@ func checkConnection() bool {
 	// This is the standard storage emulator connection string,
 	// see https://github.com/Azure/Azurite/blob/v3.17.1/README.md#connection-strings.
 	// And it leads to a regular emulator client. But the Go SDK doesn't seem to work with it. // TODO: Investigate / create GitHub issue.
-	//connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+	// connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
 	// Alternatively test with a provided conn string for example for the real Azure.
 	connString, found := os.LookupEnv(connectionStringEnvVar)
 	if !found {
@@ -292,7 +292,7 @@ func createClient(t *testing.T, codec encoding.Codec) tablestorage.Client {
 	// This is the standard storage emulator connection string,
 	// see https://github.com/Azure/Azurite/blob/v3.17.1/README.md#connection-strings.
 	// And it leads to a regular emulator client. But the Go SDK doesn't seem to work with it. // TODO: Investigate / create GitHub issue.
-	//connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+	// connString := "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
 	// Alternatively test with a provided conn string for example for the real Azure.
 	connString, found := os.LookupEnv(connectionStringEnvVar)
 	if !found {

@@ -84,6 +84,11 @@ func testImpl(impl string) (err error) {
 	case "mysql":
 		dockerImage = "mysql"
 		dockerCmd += `mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 --health-cmd='mysqladmin ping -h localhost' --health-interval 1s ` + dockerImage
+		// MySQL requires some extra time after the container is healthy
+		setup = func() error {
+			time.Sleep(5 * time.Second)
+			return nil
+		}
 	case "postgresql":
 		dockerImage = "postgres:alpine"
 		dockerCmd += `postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 --health-cmd='pg_isready -U postgres' --health-interval 1s ` + dockerImage
