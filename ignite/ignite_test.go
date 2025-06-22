@@ -1,12 +1,7 @@
 package ignite_test
 
 import (
-	"log"
-	"net"
 	"testing"
-	"time"
-
-	orig "github.com/amsokol/ignite-go-client/binary/v1"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/ignite"
@@ -141,28 +136,6 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	connInfo := orig.ConnInfo{
-		Dialer: net.Dialer{
-			Timeout: 2 * time.Second,
-		},
-		Host:    "localhost",
-		Major:   1,
-		Minor:   1,
-		Network: "tcp",
-		Port:    10800,
-		// Go zero values for Username, Password, Patch and TLSConfig.
-	}
-	c, err := orig.Connect(connInfo)
-	if err != nil {
-		log.Printf("Couldn't connect during checkConnection(). Error: %v\n", err)
-		return false
-	}
-	defer c.Close()
-	return c.Connected()
 }
 
 func createClient(t *testing.T, codec encoding.Codec) ignite.Client {

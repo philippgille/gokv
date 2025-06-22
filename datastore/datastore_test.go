@@ -1,13 +1,8 @@
 package datastore_test
 
 import (
-	"context"
-	"fmt"
 	"os"
 	"testing"
-	"time"
-
-	gcpdatastore "cloud.google.com/go/datastore"
 
 	"github.com/philippgille/gokv/datastore"
 	"github.com/philippgille/gokv/encoding"
@@ -145,38 +140,6 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	err := os.Setenv("DATASTORE_EMULATOR_HOST", "localhost:8081")
-	if err != nil {
-		fmt.Printf("Emulator environment variable couldn't be set: %v\n", err)
-		return false
-	}
-	dsClient, err := gcpdatastore.NewClient(context.Background(), "gokv")
-	if err != nil {
-		fmt.Printf("Client couldn't be created: %v\n", err)
-		return false
-	}
-	defer dsClient.Close()
-
-	// Let's use AllocateIDs() as connection test.
-	// It takes incomplete keys and returns valid keys.
-	tctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-	keys := []*gcpdatastore.Key{
-		{
-			Kind: "gokv",
-		},
-	}
-	_, err = dsClient.AllocateIDs(tctx, keys)
-	if err != nil {
-		fmt.Printf("Connection attempt to Cloud Datastore failed: %v\n", err)
-		return false
-	}
-
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) datastore.Client {

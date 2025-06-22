@@ -1,13 +1,9 @@
 package etcd_test
 
 import (
-	"context"
-	"log"
 	"os"
 	"testing"
 	"time"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/etcd"
@@ -180,36 +176,6 @@ func TestDefaultTimeout(t *testing.T) {
 	if *vPtr != "bar" {
 		t.Errorf("Expectec %v, but was %v", "bar", *vPtr)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	// clientv3.New() should block when a DialTimeout is set,
-	// according to https://github.com/etcd-io/etcd/issues/9829.
-	// TODO: But it doesn't.
-	// cli, err := clientv3.NewFromURL("localhost:2379")
-	config := clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
-		DialTimeout: 2 * time.Second,
-	}
-
-	cli, err := clientv3.New(config)
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	defer cli.Close()
-
-	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	statusRes, err := cli.Status(ctxWithTimeout, "localhost:2379")
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	} else if statusRes == nil {
-		return false
-	}
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) etcd.Client {

@@ -23,7 +23,7 @@ func testImpl(impl string) (err error) {
 		if err = os.Chdir("./" + impl); err != nil {
 			return err
 		}
-		defer os.Chdir("..") // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
+		defer func() { _ = os.Chdir("..") }() // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
 
 		var out string
 		out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()
@@ -196,7 +196,7 @@ func testImpl(impl string) (err error) {
 	if err != nil {
 		return err
 	}
-	defer os.Chdir("..") // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
+	defer func() { _ = os.Chdir("..") }() // This swallows the error in case there is one, but that's okay as the mage process is exited anyway
 
 	var out string
 	out, err = script.Exec("go test -v -race -coverprofile=coverage.txt -covermode=atomic").String()

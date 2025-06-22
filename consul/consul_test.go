@@ -1,12 +1,9 @@
 package consul_test
 
 import (
-	"log"
 	"strconv"
 	"testing"
 	"time"
-
-	"github.com/hashicorp/consul/api"
 
 	"github.com/philippgille/gokv/consul"
 	"github.com/philippgille/gokv/encoding"
@@ -134,24 +131,6 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	client, err := api.NewClient(api.DefaultConfig())
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	res, err := client.Status().Leader()
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	} else if res == "" {
-		log.Println("Status().Leader() response is empty")
-		return false
-	}
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) consul.Client {

@@ -1,15 +1,8 @@
 package mongodb_test
 
 import (
-	"context"
-	"log"
 	"strings"
 	"testing"
-	"time"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/mongodb"
@@ -153,24 +146,6 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost"))
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	defer client.Disconnect(ctx)
-	if err = client.Ping(ctx, readpref.Primary()); err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) mongodb.Client {

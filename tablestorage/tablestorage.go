@@ -20,8 +20,10 @@ var valAttrName = "v"
 // see: https://github.com/Azure/azure-sdk-for-go/blob/7971189ecf5a584b9211f2527737f94bb979644e/storage/entity_test.go#L31
 // and: https://docs.microsoft.com/en-us/rest/api/storageservices/setting-timeouts-for-table-service-operations.
 // Also, 1 millisecond would timeout during the test, which doesn't happen though.
-var opTimeout = uint(1)
-var setupTimeout = uint(2)
+var (
+	opTimeout    = uint(1)
+	setupTimeout = uint(2)
+)
 
 // Client is a gokv.Store implementation for Table Storage.
 type Client struct {
@@ -92,7 +94,7 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	retrievedVal := entity.Properties[valAttrName]
 	data, ok := retrievedVal.([]byte)
 	if !ok {
-		return true, fmt.Errorf("The value belonging to the key was expected to be a slice of bytes, but wasn't. Key: %v", k)
+		return true, fmt.Errorf("the value belonging to the key was expected to be a slice of bytes, but wasn't. Key: %v", k)
 	}
 
 	return true, c.codec.Unmarshal(data, v)
@@ -194,7 +196,7 @@ func NewClient(options Options) (Client, error) {
 
 	// Precondition check
 	if options.ConnectionString == "" {
-		return result, errors.New("The ConnectionString of the passed options is empty")
+		return result, errors.New("the ConnectionString of the passed options is empty")
 	}
 
 	// Set default values

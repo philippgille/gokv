@@ -11,8 +11,10 @@ import (
 	"github.com/philippgille/gokv/sql"
 )
 
-const defaultDBname = "gokv"
-const keyLength = "255"
+const (
+	defaultDBname = "gokv"
+	keyLength     = "255"
+)
 
 // It's a code smell to work with a hard coded number,
 // but the error doesn't seem to be defined as constant or variable
@@ -118,9 +120,10 @@ func NewClient(options Options) (Client, error) {
 	if options.TableName == "" {
 		options.TableName = DefaultOptions.TableName
 	}
-	if options.MaxOpenConnections == 0 {
+	switch options.MaxOpenConnections {
+	case 0:
 		options.MaxOpenConnections = DefaultOptions.MaxOpenConnections
-	} else if options.MaxOpenConnections == -1 {
+	case -1:
 		options.MaxOpenConnections = 0 // 0 actually leads to the MySQL driver using no connection limit.
 	}
 	if options.Codec == nil {

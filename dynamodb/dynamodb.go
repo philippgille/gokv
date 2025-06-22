@@ -220,7 +220,7 @@ func NewClient(options Options) (Client, error) {
 	// Return an error if only one of the values is set.
 	var creds *credentials.Credentials
 	if (options.AWSaccessKeyID != "" && options.AWSsecretAccessKey == "") || (options.AWSaccessKeyID == "" && options.AWSsecretAccessKey != "") {
-		return result, errors.New("When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
+		return result, errors.New("when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
 	} else if options.AWSaccessKeyID != "" {
 		// Due to the previous check we can be sure that in this case AWSsecretAccessKey is not empty as well.
 		creds = credentials.NewStaticCredentials(options.AWSaccessKeyID, options.AWSsecretAccessKey, "")
@@ -315,10 +315,10 @@ func createTable(tableName string, readCapacityUnits, writeCapacityUnits int64, 
 		// Now handle error as such.
 		describeTableOutput, err := svc.DescribeTable(&describeTableInput)
 		if err != nil {
-			return errors.New("The DynamoDB table couldn't be created")
+			return errors.New("the DynamoDB table couldn't be created")
 		}
 		if *describeTableOutput.Table.TableStatus == "CREATING" {
-			return errors.New("The DynamoDB table took too long to be created")
+			return errors.New("the DynamoDB table took too long to be created")
 		}
 	}
 

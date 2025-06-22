@@ -1,8 +1,6 @@
 package postgresql_test
 
 import (
-	"database/sql"
-	"log"
 	"testing"
 
 	"github.com/philippgille/gokv/encoding"
@@ -150,24 +148,6 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	db, err := sql.Open("postgres", "postgres://postgres:secret@localhost:5432/?sslmode=disable")
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) postgresql.Client {

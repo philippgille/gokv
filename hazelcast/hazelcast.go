@@ -62,7 +62,7 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	}
 	data, ok := hazelcastValue.([]byte)
 	if !ok {
-		return false, fmt.Errorf("The returned value for key %v was expected to be a slice of bytes, but was type: %T", k, hazelcastValue)
+		return false, fmt.Errorf("the returned value for key %v was expected to be a slice of bytes, but was type: %T", k, hazelcastValue)
 	}
 
 	return true, c.codec.Unmarshal(data, v)
@@ -83,8 +83,7 @@ func (c Client) Delete(k string) error {
 // Close closes the client.
 // This must be called to properly shut down connections and services (e.g. HeartBeatService).
 func (c Client) Close() error {
-	c.c.Shutdown(context.Background())
-	return nil
+	return c.c.Shutdown(context.Background())
 }
 
 // Options are the options for the Hazelcast client.

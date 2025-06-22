@@ -1,12 +1,8 @@
 package zookeeper_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/samuel/go-zookeeper/zk"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/test"
@@ -150,25 +146,6 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	c, _, err := zk.Connect([]string{"localhost:2181"}, 2*time.Second, zk.WithLogInfo(false))
-	if err != nil {
-		fmt.Printf("Connect error: %v\n", err)
-		return false
-	}
-	defer c.Close()
-
-	// Check connection
-	_, _, err = c.Children("/")
-	if err != nil {
-		fmt.Printf("Connection test error: %v\n", err)
-		return false
-	}
-
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) zookeeper.Client {

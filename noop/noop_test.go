@@ -84,6 +84,6 @@ func assertEqualError(t *testing.T, err error, expectedErrMsg string) {
 }
 
 var (
-	errInvalidKey   = errors.New("The passed key is an empty string, which is invalid")
-	errInvalidValue = errors.New("The passed value is nil, which is not allowed")
+	errInvalidKey   = errors.New("the passed key is an empty string, which is invalid")
+	errInvalidValue = errors.New("the passed value is nil, which is not allowed")
 )

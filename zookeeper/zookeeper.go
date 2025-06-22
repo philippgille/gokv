@@ -121,7 +121,7 @@ func NewClient(options Options) (Client, error) {
 
 	// Precondition check
 	if options.PathPrefix != "" && !strings.HasPrefix(options.PathPrefix, "/") {
-		return result, errors.New("The PathPrefix must start with a \\")
+		return result, errors.New("the PathPrefix must start with a \\")
 	}
 
 	// Set default values
@@ -168,7 +168,7 @@ func NewClient(options Options) (Client, error) {
 			for _, pathElem := range baseNodes {
 				// No path elem should be empty, because that would mean a PathPrefix containing "//" was used
 				if pathElem == "" {
-					return result, errors.New("Invalid PathPrefix containing \"//\"")
+					return result, errors.New("invalid PathPrefix containing \"//\"")
 				}
 				nodeToCreate += pathElem
 				_, _, err = c.Get(nodeToCreate)
