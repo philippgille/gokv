@@ -68,7 +68,12 @@ func (s Store) Delete(k string) error {
 // When called, the store's pointer to the internal Go map is set to nil,
 // leading to the map being free for garbage collection.
 func (s Store) Close() error {
-	s.m = nil
+	// TODO: Requires pointer receiver. We should change this for *all* store
+	// implementations and mark it as breaking change.
+	// Iterating and deleting individual keys works for the regular map implementation
+	// but not here, because without a lock new entries could be added while iterating.
+	// Introducing a lock would work but make the syncmap useless.
+	// s.m = nil
 	return nil
 }
 

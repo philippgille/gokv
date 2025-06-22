@@ -1,7 +1,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -52,7 +51,7 @@ func (s Store) Set(k string, v any) error {
 	// File lock and file handling.
 	lock.Lock()
 	defer lock.Unlock()
-	return ioutil.WriteFile(filePath, data, 0600)
+	return os.WriteFile(filePath, data, 0o600)
 }
 
 // Get retrieves the stored value for the given key.
@@ -80,7 +79,7 @@ func (s Store) Get(k string, v any) (found bool, err error) {
 	// File lock and file handling.
 	lock.RLock()
 	// Deferring the unlocking would lead to the unmarshalling being done during the lock, which is bad for performance.
-	data, err := ioutil.ReadFile(filePath)
+	data, err := os.ReadFile(filePath)
 	lock.RUnlock()
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -124,7 +123,11 @@ func (s Store) Delete(k string) error {
 // Close closes the store.
 // When called, some resources of the store are left for garbage collection.
 func (s Store) Close() error {
-	s.fileLocks = nil
+	s.locksLock.Lock()
+	defer s.locksLock.Unlock()
+	for k := range s.fileLocks {
+		delete(s.fileLocks, k)
+	}
 	return nil
 }
 
@@ -185,7 +188,7 @@ func NewStore(options Options) (Store, error) {
 		options.Codec = DefaultOptions.Codec
 	}
 
-	err := os.MkdirAll(options.Directory, 0700)
+	err := os.MkdirAll(options.Directory, 0o700)
 	if err != nil {
 		return result, err
 	}

@@ -59,7 +59,7 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	}
 	data, ok := dataIface.([]byte)
 	if !ok {
-		return true, fmt.Errorf("The value for key %v is expected to be a slice of bytes, but its type is: %T", k, dataIface)
+		return true, fmt.Errorf("the value for key %v is expected to be a slice of bytes, but its type is: %T", k, dataIface)
 	}
 
 	return true, c.codec.Unmarshal(data, v)

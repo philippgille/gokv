@@ -88,16 +88,16 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	if len(getRowResponse.Columns) == 0 {
 		return false, nil
 	} else if len(getRowResponse.Columns) > 1 {
-		return false, errors.New("The returned GetRowResponse should only contain one column, but it contains more than one")
+		return false, errors.New("the returned GetRowResponse should only contain one column, but it contains more than one")
 	}
 	attributeColumn := getRowResponse.Columns[0]
 	if attributeColumn == nil {
-		return true, errors.New("A key-value pair for the key was found, but it didn't contain a value")
+		return true, errors.New("a key-value pair for the key was found, but it didn't contain a value")
 	}
 	dataIface := attributeColumn.Value
 	data, ok := dataIface.([]byte)
 	if !ok {
-		return false, errors.New("The returned value was expected to be a slice of bytes, but it wasn't")
+		return false, errors.New("the returned value was expected to be a slice of bytes, but it wasn't")
 	}
 
 	return true, c.codec.Unmarshal(data, v)
@@ -179,13 +179,13 @@ func NewClient(options Options) (Client, error) {
 
 	// Precondition check
 	if options.EndpointURL == "" {
-		return result, errors.New("The EndpointURL of the passed options is empty")
+		return result, errors.New("the EndpointURL of the passed options is empty")
 	} else if options.InstanceName == "" {
-		return result, errors.New("The InstanceName of the passed options is empty")
+		return result, errors.New("the InstanceName of the passed options is empty")
 	} else if options.AccessKeyID == "" {
-		return result, errors.New("The AccessKeyID of the passed options is empty")
+		return result, errors.New("the AccessKeyID of the passed options is empty")
 	} else if options.AccessKeySecret == "" {
-		return result, errors.New("The AccessKeySecret of the passed options is empty")
+		return result, errors.New("the AccessKeySecret of the passed options is empty")
 	}
 
 	// Set default values
@@ -211,7 +211,7 @@ func NewClient(options Options) (Client, error) {
 	// Just try to create directly and ignore the error if it's "OTSObjectAlreadyExist",
 	// because this way we always have to make just one request instead of sometimes one and sometimes two
 	// (one for checking if the table exists and one for creating the table).
-	var primaryKeyType = tablestore.PrimaryKeyType_STRING
+	primaryKeyType := tablestore.PrimaryKeyType_STRING
 	createtableRequest := tablestore.CreateTableRequest{
 		ReservedThroughput: &tablestore.ReservedThroughput{
 			Readcap:  options.ReservedReadCap,

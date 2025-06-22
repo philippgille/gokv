@@ -1,7 +1,6 @@
 package bbolt_test
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -138,7 +137,7 @@ func TestNil(t *testing.T) {
 // TestClose tests if the close method returns any errors.
 func TestClose(t *testing.T) {
 	store, path := createStore(t, encoding.JSON)
-	defer os.RemoveAll(path)
+	defer func() { _ = os.RemoveAll(path) }()
 	err := store.Close()
 	if err != nil {
 		t.Error(err)
@@ -182,7 +181,7 @@ func createStore(t *testing.T, codec encoding.Codec) (bbolt.Store, string) {
 }
 
 func generateRandomTempDbPath(t *testing.T) string {
-	path, err := ioutil.TempDir(os.TempDir(), "bbolt")
+	path, err := os.MkdirTemp(os.TempDir(), "bbolt")
 	if err != nil {
 		t.Fatalf("Generating random DB path failed: %v", err)
 	}

@@ -76,7 +76,7 @@ func (c Client) Set(k string, v any) error {
 		K: k,
 		V: data,
 	}
-	_, err = c.c.ReplaceOne(context.Background(), bson.D{{"_id", k}}, item, setOpt)
+	_, err = c.c.ReplaceOne(context.Background(), bson.D{{Key: "_id", Value: k}}, item, setOpt)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 	}
 
 	item := new(item)
-	err = c.c.FindOne(context.Background(), bson.D{{"_id", k}}).Decode(item)
+	err = c.c.FindOne(context.Background(), bson.D{{Key: "_id", Value: k}}).Decode(item)
 	// If no value was found return false
 	if err == mongo.ErrNoDocuments {
 		return false, nil
@@ -116,7 +116,7 @@ func (c Client) Delete(k string) error {
 		return err
 	}
 
-	_, err := c.c.DeleteOne(context.Background(), bson.D{{"_id", k}})
+	_, err := c.c.DeleteOne(context.Background(), bson.D{{Key: "_id", Value: k}})
 	// No need to check for mongo.ErrNoDocuments, because DeleteOne() doesn't return
 	// any error if no document was deleted. This differs from a previous version
 	// where we used mgo.

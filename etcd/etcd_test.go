@@ -1,13 +1,9 @@
 package etcd_test
 
 import (
-	"context"
-	"log"
 	"os"
 	"testing"
 	"time"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/etcd"
@@ -20,14 +16,14 @@ func TestClient(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestStore(client, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestStore(client, t)
 	})
 }
@@ -37,14 +33,14 @@ func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestTypes(client, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestTypes(client, t)
 	})
 }
@@ -62,7 +58,7 @@ func TestClientConcurrent(t *testing.T) {
 	}
 
 	client := createClient(t, encoding.JSON)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	goroutineCount := 1000
 
@@ -73,7 +69,7 @@ func TestClientConcurrent(t *testing.T) {
 func TestErrors(t *testing.T) {
 	// Test empty key
 	client := createClient(t, encoding.JSON)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	err := client.Set("", "bar")
 	if err == nil {
 		t.Error("Expected an error")
@@ -94,7 +90,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -103,7 +99,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -115,7 +111,7 @@ func TestNil(t *testing.T) {
 	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
 			client := createClient(t, codec)
-			defer client.Close()
+			defer func() { _ = client.Close() }()
 
 			// Prep
 			err := client.Set("foo", test.Foo{Bar: "baz"})
@@ -163,7 +159,7 @@ func TestDefaultTimeout(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	err = client.Set("foo", "bar")
 	if err != nil {
@@ -180,36 +176,6 @@ func TestDefaultTimeout(t *testing.T) {
 	if *vPtr != "bar" {
 		t.Errorf("Expectec %v, but was %v", "bar", *vPtr)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	// clientv3.New() should block when a DialTimeout is set,
-	// according to https://github.com/etcd-io/etcd/issues/9829.
-	// TODO: But it doesn't.
-	// cli, err := clientv3.NewFromURL("localhost:2379")
-	config := clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
-		DialTimeout: 2 * time.Second,
-	}
-
-	cli, err := clientv3.New(config)
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	defer cli.Close()
-
-	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	statusRes, err := cli.Status(ctxWithTimeout, "localhost:2379")
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	} else if statusRes == nil {
-		return false
-	}
-	return true
 }
 
 func createClient(t *testing.T, codec encoding.Codec) etcd.Client {

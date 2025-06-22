@@ -1,11 +1,8 @@
 package memcached_test
 
 import (
-	"log"
 	"testing"
 	"time"
-
-	"github.com/bradfitz/gomemcache/memcache"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/memcached"
@@ -160,17 +157,6 @@ func TestDefaultTimeout(t *testing.T) {
 	if *vPtr != "bar" {
 		t.Errorf("Expectec %v, but was %v", "bar", *vPtr)
 	}
-}
-
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	mc := memcache.New("localhost:11211")
-	_, err := mc.Get("foo")
-	if err == nil || err == memcache.ErrCacheMiss {
-		return true
-	}
-	log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-	return false
 }
 
 func createClient(t *testing.T, codec encoding.Codec) memcached.Client {

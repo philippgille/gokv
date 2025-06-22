@@ -146,7 +146,7 @@ func NewClient(options Options) (Client, error) {
 
 	// Precondition check
 	if options.ProjectID == "" {
-		return result, errors.New("The ProjectID in the options must not be empty")
+		return result, errors.New("the ProjectID in the options must not be empty")
 	}
 
 	// Set default values

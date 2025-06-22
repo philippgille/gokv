@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	// Store, retrieve, print and delete a value
 	interactWithStore(client)

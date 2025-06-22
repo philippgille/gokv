@@ -72,12 +72,13 @@ func (s Store) Delete(k string) error {
 }
 
 // Close closes the store.
-// When called, the store's pointer to the internal Go map is set to nil,
-// leading to the map being free for garbage collection.
+// When called, the store's internal Go map's entries are deleted.
 func (s Store) Close() error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	s.m = nil
+	for k := range s.m {
+		delete(s.m, k)
+	}
 	return nil
 }
 

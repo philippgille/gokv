@@ -11,8 +11,10 @@ import (
 	"github.com/philippgille/gokv/sql"
 )
 
-const defaultDBname = "gokv"
-const keyLength = "255"
+const (
+	defaultDBname = "gokv"
+	keyLength     = "255"
+)
 
 // It's a code smell to work with a hard coded number,
 // but the error doesn't seem to be defined as constant or variable
@@ -118,9 +120,10 @@ func NewClient(options Options) (Client, error) {
 	if options.TableName == "" {
 		options.TableName = DefaultOptions.TableName
 	}
-	if options.MaxOpenConnections == 0 {
+	switch options.MaxOpenConnections {
+	case 0:
 		options.MaxOpenConnections = DefaultOptions.MaxOpenConnections
-	} else if options.MaxOpenConnections == -1 {
+	case -1:
 		options.MaxOpenConnections = 0 // 0 actually leads to the MySQL driver using no connection limit.
 	}
 	if options.Codec == nil {
@@ -163,7 +166,7 @@ func NewClient(options Options) (Client, error) {
 		// Also, we must replace the current value that the db pointer points to by the new db,
 		// because calling "USE" on a database only works for the single connection that's used
 		// instead of for all connections in the pool.
-		db.Close()
+		_ = db.Close()
 		db = newDB
 	}
 
@@ -226,8 +229,8 @@ func createDB(cfg *gosqldriver.Config, db *gosql.DB) error {
 	tempDB, err := gosql.Open("mysql", dsnWithoutDBname)
 	// This temporary DB must be closed.
 	// But let's not return an error in case closing this temporary DB fails.
-	// TODO: Maybe DO return an error? If yes, also change GolangCI-Lint configuration to not exclude this warning.
-	defer tempDB.Close()
+	// TODO: Maybe DO return an error?
+	defer func() { _ = tempDB.Close() }()
 	if err != nil {
 		return err
 	}

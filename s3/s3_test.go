@@ -1,15 +1,11 @@
 package s3_test
 
 import (
-	"log"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
-	"github.com/aws/aws-sdk-go/aws/session"
-	awss3 "github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/s3"
@@ -82,24 +78,24 @@ func TestErrors(t *testing.T) {
 		AWSaccessKeyID:     "foo",
 		AWSsecretAccessKey: "bar",
 	}
-	client, err = s3.NewClient(options)
-	if err.Error() != "The BucketName in the options must not be empty" {
+	_, err = s3.NewClient(options)
+	if err.Error() != "the BucketName in the options must not be empty" {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	options = s3.Options{
 		BucketName:     "gokv",
 		AWSaccessKeyID: "foo",
 	}
-	client, err = s3.NewClient(options)
-	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
+	_, err = s3.NewClient(options)
+	if err.Error() != "when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	options = s3.Options{
 		BucketName:         "gokv",
 		AWSsecretAccessKey: "foo",
 	}
-	client, err = s3.NewClient(options)
-	if err.Error() != "When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
+	_, err = s3.NewClient(options)
+	if err.Error() != "when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey" {
 		t.Error("An error was expected, but didn't occur.")
 	}
 	// Bad credentials on actual AWS S3 endpoint (no custom endpoint for local Docker container)
@@ -178,30 +174,15 @@ func TestClose(t *testing.T) {
 	}
 }
 
-// checkConnection returns true if a connection could be made, false otherwise.
-func checkConnection() bool {
-	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
-	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
-	// No S3ForcePathStyle required because we're not accessing a specific bucket here.
-	sess, err := session.NewSession(aws.NewConfig().WithRegion(endpoints.EuCentral1RegionID).WithEndpoint(customEndpoint))
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-	svc := awss3.New(sess)
-
-	_, err = svc.ListBuckets(&awss3.ListBucketsInput{})
-	if err != nil {
-		log.Printf("An error occurred during testing the connection to the server: %v\n", err)
-		return false
-	}
-
-	return true
-}
-
 func createClient(t *testing.T, codec encoding.Codec) s3.Client {
-	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
-	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+	err := os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+	if err != nil {
+		t.Fatal(err)
+	}
 	options := s3.Options{
 		BucketName:             "gokv",
 		Region:                 endpoints.EuCentral1RegionID,

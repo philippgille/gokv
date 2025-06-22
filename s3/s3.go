@@ -3,7 +3,7 @@ package s3
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -77,7 +77,7 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 		// TODO: Maybe return an error? Behaviour should be consistent across all implementations.
 		return false, nil
 	}
-	data, err := ioutil.ReadAll(getObjectOutput.Body)
+	data, err := io.ReadAll(getObjectOutput.Body)
 	if err != nil {
 		return true, err
 	}
@@ -176,7 +176,7 @@ func NewClient(options Options) (Client, error) {
 
 	// Precondition check
 	if options.BucketName == "" {
-		return result, errors.New("The BucketName in the options must not be empty")
+		return result, errors.New("the BucketName in the options must not be empty")
 	}
 
 	// Set default values
@@ -189,7 +189,7 @@ func NewClient(options Options) (Client, error) {
 	// Return an error if only one of the values is set.
 	var creds *credentials.Credentials
 	if (options.AWSaccessKeyID != "" && options.AWSsecretAccessKey == "") || (options.AWSaccessKeyID == "" && options.AWSsecretAccessKey != "") {
-		return result, errors.New("When passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
+		return result, errors.New("when passing credentials via options, you need to set BOTH AWSaccessKeyID AND AWSsecretAccessKey")
 	} else if options.AWSaccessKeyID != "" {
 		// Due to the previous check we can be sure that in this case AWSsecretAccessKey is not empty as well.
 		creds = credentials.NewStaticCredentials(options.AWSaccessKeyID, options.AWSsecretAccessKey, "")

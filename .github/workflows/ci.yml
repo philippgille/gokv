@@ -1,0 +1,118 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        go: [ '1.21', '1.22', '1.23', '1.24' ]
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: "**/go.sum"
+      - uses: magefile/mage-action@v3
+        with:
+          version: v1.15.0
+          install-only: true
+
+      - run: |
+          go version
+          go env
+          mage -version
+          docker version
+
+      - run: mage build
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.24
+          cache-dependency-path: "**/go.sum"
+      - uses: magefile/mage-action@v3
+        with:
+          version: v1.15.0
+          install-only: true
+
+      - run: |
+          go version
+          go env
+          mage -version
+          docker version
+
+      # Lint, taking `.golangci.yml` into account
+      - uses: golangci/golangci-lint-action@v8
+      # Above only runs the linter in the root directory. There's a param to adjust
+      # it, but still only to run in one subdirectory. But we need to run it in
+      # dozens. After the step the CLI is still installed, so we can reuse it.
+      # TODO: It could be useful to have a `mage lint` target for local execution.
+      - run: |
+          repo_root=$(pwd)
+          go_module_dirs=$(find . -name "go.mod" -exec dirname {} \;)
+          for go_module_dir in $go_module_dirs; do
+            echo "Running golangci-lint in $go_module"
+            cd $go_module_dir
+            # Special handling for magefiles due to the build tag
+            if [ $go_module_dir = "./magefiles" ]; then
+              golangci-lint run --config "${repo_root}/.golangci.yml" --build-tags=mage
+            else
+              golangci-lint run --config "${repo_root}/.golangci.yml"
+            fi
+            cd -
+          done
+
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        go: [ '1.21', '1.22', '1.23', '1.24' ]
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: "**/go.sum"
+      - uses: magefile/mage-action@v3
+        with:
+          version: v1.15.0
+          install-only: true
+
+      - run: |
+          go version
+          go env
+          mage -version
+          docker version
+
+      # Test all modules
+      # This starts and stops Docker containers for services like PostgreSQL, Redis etc.
+      # Takes up to 10m on GitHub Actions
+      # TODO: Change workflow so that when only one module is changed, only that module's tests are run
+      - run: mage test all
+
+      # Combining of coverage reports not required with the action, which detects all reports in subdirectories and uploads all of them
+      #- run: build/combine-coverage.sh
+      # Upload coverage data to codecov.io
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

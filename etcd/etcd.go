@@ -120,7 +120,7 @@ func NewClient(options Options) (Client, error) {
 	result := Client{}
 
 	// Set default values
-	if options.Endpoints == nil || len(options.Endpoints) == 0 {
+	if len(options.Endpoints) == 0 {
 		options.Endpoints = DefaultOptions.Endpoints
 	}
 	if options.Timeout == nil {

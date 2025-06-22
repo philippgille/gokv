@@ -1,7 +1,6 @@
 package noop_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/philippgille/gokv"
@@ -42,18 +41,18 @@ func TestInputValidation(t *testing.T) {
 
 	{
 		err := s.Set("", 1)
-		assertEqualError(t, err, errInvalidKey.Error())
+		assertEqualError(t, err, errInvalidKey)
 	}
 
 	{
 		err := s.Set("foo", nil)
-		assertEqualError(t, err, errInvalidValue.Error())
+		assertEqualError(t, err, errInvalidValue)
 	}
 
 	{
 		var v int
 		found, err := s.Get("", &v)
-		assertEqualError(t, err, errInvalidKey.Error())
+		assertEqualError(t, err, errInvalidKey)
 		if found {
 			t.Error("A value was found, but no value was expected")
 		}
@@ -61,7 +60,7 @@ func TestInputValidation(t *testing.T) {
 
 	{
 		found, err := s.Get("foo", nil)
-		assertEqualError(t, err, errInvalidValue.Error())
+		assertEqualError(t, err, errInvalidValue)
 		if found {
 			t.Error("A value was found, but no value was expected")
 		}
@@ -69,7 +68,7 @@ func TestInputValidation(t *testing.T) {
 
 	{
 		err := s.Delete("")
-		assertEqualError(t, err, errInvalidKey.Error())
+		assertEqualError(t, err, errInvalidKey)
 	}
 }
 
@@ -83,7 +82,10 @@ func assertEqualError(t *testing.T, err error, expectedErrMsg string) {
 	}
 }
 
+// TODO: We updated error capitalization in the utils package after v0.7.0, but
+// as long as utils doesn't have a v0.8.0 release, we can't import it yet and have
+// to match on the old error messages.
 var (
-	errInvalidKey   = errors.New("The passed key is an empty string, which is invalid")
-	errInvalidValue = errors.New("The passed value is nil, which is not allowed")
+	errInvalidKey   = "The passed key is an empty string, which is invalid"
+	errInvalidValue = "The passed value is nil, which is not allowed"
 )
