@@ -1,17 +1,5 @@
 # https://golangci-lint.run/usage/configuration/#config-file
 version: "2"
-linters:
-  exclusions:
-    rules:
-      - linters:
-          - staticcheck
-        path: (bigcache/bigcache_test\.go|bigcache\\bigcache_test\.go)
-        text: SA5001
-      - linters:
-          - staticcheck
-        path: (mysql/mysql_test\.go|mysql\\mysql_test\.go)
-        text: SA5001
-      - linters:
-          - staticcheck
-        path: (mysql/mysql\.go|mysql\\mysql\.go)
-        text: SA5001.*tempDB\.Close\(\)
+# linters:
+#   exclusions:
+#     rules:
