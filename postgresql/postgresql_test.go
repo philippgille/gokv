@@ -89,7 +89,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -98,7 +98,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -110,7 +110,7 @@ func TestNil(t *testing.T) {
 	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
 			client := createClient(t, codec)
-			defer client.Close()
+			defer func() { _ = client.Close() }()
 
 			// Prep
 			err := client.Set("foo", test.Foo{Bar: "baz"})
@@ -143,7 +143,7 @@ func TestNil(t *testing.T) {
 // TestClose tests if the close method returns any errors.
 func TestClose(t *testing.T) {
 	client := createClient(t, encoding.JSON)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	err := client.Close()
 	if err != nil {
 		t.Error(err)

@@ -175,8 +175,14 @@ func TestClose(t *testing.T) {
 }
 
 func createClient(t *testing.T, codec encoding.Codec) s3.Client {
-	os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
-	os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+	err := os.Setenv("AWS_ACCESS_KEY_ID", "AKIAIOSFODNN7EXAMPLE")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = os.Setenv("AWS_SECRET_ACCESS_KEY", "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
+	if err != nil {
+		t.Fatal(err)
+	}
 	options := s3.Options{
 		BucketName:             "gokv",
 		Region:                 endpoints.EuCentral1RegionID,

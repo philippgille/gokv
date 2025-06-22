@@ -136,7 +136,7 @@ func TestNil(t *testing.T) {
 // TestClose tests if the close method returns any errors.
 func TestClose(t *testing.T) {
 	store, path := createStore(t, encoding.JSON)
-	defer os.RemoveAll(path)
+	defer func() { _ = os.RemoveAll(path) }()
 	err := store.Close()
 	if err != nil {
 		t.Error(err)

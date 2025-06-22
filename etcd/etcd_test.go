@@ -16,14 +16,14 @@ func TestClient(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestStore(client, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestStore(client, t)
 	})
 }
@@ -33,14 +33,14 @@ func TestTypes(t *testing.T) {
 	// Test with JSON
 	t.Run("JSON", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestTypes(client, t)
 	})
 
 	// Test with gob
 	t.Run("gob", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		test.TestTypes(client, t)
 	})
 }
@@ -58,7 +58,7 @@ func TestClientConcurrent(t *testing.T) {
 	}
 
 	client := createClient(t, encoding.JSON)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	goroutineCount := 1000
 
@@ -69,7 +69,7 @@ func TestClientConcurrent(t *testing.T) {
 func TestErrors(t *testing.T) {
 	// Test empty key
 	client := createClient(t, encoding.JSON)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	err := client.Set("", "bar")
 	if err == nil {
 		t.Error("Expected an error")
@@ -90,7 +90,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with JSON marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.JSON)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -99,7 +99,7 @@ func TestNil(t *testing.T) {
 
 	t.Run("set nil with Gob marshalling", func(t *testing.T) {
 		client := createClient(t, encoding.Gob)
-		defer client.Close()
+		defer func() { _ = client.Close() }()
 		err := client.Set("foo", nil)
 		if err == nil {
 			t.Error("Expected an error")
@@ -111,7 +111,7 @@ func TestNil(t *testing.T) {
 	createTest := func(codec encoding.Codec) func(t *testing.T) {
 		return func(t *testing.T) {
 			client := createClient(t, codec)
-			defer client.Close()
+			defer func() { _ = client.Close() }()
 
 			// Prep
 			err := client.Set("foo", test.Foo{Bar: "baz"})
@@ -159,7 +159,7 @@ func TestDefaultTimeout(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	err = client.Set("foo", "bar")
 	if err != nil {

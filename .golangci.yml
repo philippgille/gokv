@@ -2,12 +2,6 @@
 version: "2"
 linters:
   exclusions:
-    generated: lax
-    presets:
-      - comments
-      - common-false-positives
-      - legacy
-      - std-error-handling
     rules:
       - linters:
           - staticcheck
@@ -21,14 +15,3 @@ linters:
           - staticcheck
         path: (mysql/mysql\.go|mysql\\mysql\.go)
         text: SA5001.*tempDB\.Close\(\)
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
-formatters:
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$

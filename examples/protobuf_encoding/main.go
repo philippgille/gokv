@@ -17,7 +17,7 @@ func main() {
 		Codec: protobuf.Codec,
 	}
 	store := gomap.NewStore(options)
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	// Store, retrieve and print a value
 	interactWithStore(store)
