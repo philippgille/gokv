@@ -1,10 +1,11 @@
-name: test
+name: ci
 on:
   push:
     branches:
       - master
   pull_request:
 jobs:
+
   build:
     strategy:
       fail-fast: false
@@ -31,11 +32,61 @@ jobs:
           mage -version
           docker version
 
-      # First build to check for compile errors
       - run: mage build
-      # Then lint, taking `.golangci.yml` into account
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.24
+          cache-dependency-path: "**/go.sum"
+      - uses: magefile/mage-action@v3
+        with:
+          version: v1.15.0
+          install-only: true
+
+      - run: |
+          go version
+          go env
+          mage -version
+          docker version
+
+      # Lint, taking `.golangci.yml` into account
       - uses: golangci/golangci-lint-action@v8
-      # Finally test all modules
+
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        go: [ '1.21', '1.22', '1.23', '1.24' ]
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: "**/go.sum"
+      - uses: magefile/mage-action@v3
+        with:
+          version: v1.15.0
+          install-only: true
+
+      - run: |
+          go version
+          go env
+          mage -version
+          docker version
+
+      # Test all modules
       # This starts and stops Docker containers for services like PostgreSQL, Redis etc.
       # Takes up to 10m on GitHub Actions
       # TODO: Change workflow so that when only one module is changed, only that module's tests are run
