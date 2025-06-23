@@ -89,6 +89,9 @@ func testImpl(impl string) (err error) {
 			time.Sleep(5 * time.Second)
 			return nil
 		}
+	case "pgx":
+		dockerImage = "postgres:alpine"
+		dockerCmd += `postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=pgx -p 5433:5432 --health-cmd='pg_isready -U postgres' --health-interval 1s ` + dockerImage
 	case "postgresql":
 		dockerImage = "postgres:alpine"
 		dockerCmd += `postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=gokv -p 5432:5432 --health-cmd='pg_isready -U postgres' --health-interval 1s ` + dockerImage

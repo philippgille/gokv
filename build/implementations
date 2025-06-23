@@ -16,6 +16,7 @@ memcached
 mongodb
 mysql
 noop
+pgx
 postgresql
 redis
 s3
