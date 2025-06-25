@@ -63,6 +63,7 @@ For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/ph
   - [X] [bbolt](https://github.com/etcd-io/bbolt) (formerly known as [Bolt / Bolt DB](https://github.com/boltdb/bolt))
   - [X] [BadgerDB](https://github.com/dgraph-io/badger)
   - [X] [LevelDB / goleveldb](https://github.com/syndtr/goleveldb)
+  - [x] [SQLite](https://gitlab.com/cznic/sqlite) (using modernc.org/sqlite for cgo-free sqlite support)
   - [X] Local files (one file per key-value pair, with the key being the filename and the value being the file content)
 - Distributed store
   - [X] [Redis](https://github.com/antirez/redis)
