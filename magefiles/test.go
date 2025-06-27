@@ -73,7 +73,7 @@ func testImpl(impl string) (err error) {
 		dockerCmd += `hazelcast -p 5701:5701 --health-cmd='curl -f http://localhost:5701/hazelcast/health/node-state' --health-interval 1s ` + dockerImage
 	case "ignite":
 		dockerImage = "apacheignite/ignite"
-		dockerCmd += `ignite -p 10800:10800 --health-cmd='${IGNITE_HOME}/bin/control.sh --baseline | grep "Cluster state: active"' --health-interval 1s ` + dockerImage
+		dockerCmd += `ignite -p 10800:10800 --health-cmd='${IGNITE_HOME}/bin/control.sh --baseline | grep "Cluster state: ACTIVE"' --health-interval 1s ` + dockerImage
 	case "memcached":
 		dockerImage = "memcached"
 		dockerCmd += `memcached -p 11211:11211 --health-cmd='echo stats | nc -w 1 localhost 11211' --health-interval 1s ` + dockerImage
