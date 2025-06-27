@@ -84,6 +84,7 @@ For the Godoc of specific implementations, see <https://pkg.go.dev/github.com/ph
 - SQL
   - [X] [MySQL](https://github.com/mysql/mysql-server)
   - [X] [PostgreSQL](https://github.com/postgres/postgres)
+  - [X] [pgx](https://github.com/jackc/pgx)
 - NoSQL
   - [X] [MongoDB](https://github.com/mongodb/mongo)
   - [ ] [Apache Cassandra](https://github.com/apache/cassandra)
