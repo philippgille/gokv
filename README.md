@@ -2,7 +2,7 @@ gokv
 ====
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/philippgille/gokv.svg)](https://pkg.go.dev/github.com/philippgille/gokv)
-[![Build status](https://github.com/philippgille/gokv/actions/workflows/test.yml/badge.svg)](https://github.com/philippgille/gokv/actions/workflows/test.yml)
+[![Build status](https://github.com/philippgille/gokv/actions/workflows/ci.yml/badge.svg)](https://github.com/philippgille/gokv/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/philippgille/gokv)](https://goreportcard.com/report/github.com/philippgille/gokv)
 [![codecov](https://codecov.io/gh/philippgille/gokv/branch/master/graph/badge.svg)](https://codecov.io/gh/philippgille/gokv)
 [![GitHub Releases](https://img.shields.io/github/release/philippgille/gokv.svg)](https://github.com/philippgille/gokv/releases)
