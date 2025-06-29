@@ -4,6 +4,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -134,5 +135,65 @@ replace (
 			return err
 		}
 	}
+	return nil
+}
+
+// Lint lints the given module. Pass "all" to lint all modules.
+func Lint(module string) error {
+	rootDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	var dirs []string
+	if module == "all" {
+		// Gather every module directory
+		mods, err := script.FindFiles(".").Match("go.mod").Slice()
+		if err != nil {
+			return err
+		}
+		for _, mod := range mods {
+			dirs = append(dirs, filepath.Dir(mod))
+		}
+	} else {
+		// Validate specified module
+		modDir := filepath.Join(".", module)
+		modFile := filepath.Join(modDir, "go.mod")
+		if _, err := os.Stat(modFile); err != nil {
+			if os.IsNotExist(err) {
+				return errors.New("module " + module + " not found")
+			}
+			return err
+		}
+		dirs = []string{modDir}
+	}
+
+	// Run golangci-lint in each determined directory
+	for _, dir := range dirs {
+		fmt.Printf("Running golangci-lint in %s\n", dir)
+
+		if err := os.Chdir(dir); err != nil {
+			return err
+		}
+
+		cmd := "golangci-lint run"
+		// golangci-lint doesn't look for the config file in the repo root, so we
+		// have to pass it explicitly.
+		cmd += " --config " + filepath.Join(rootDir, ".golangci.yml")
+		if filepath.Base(dir) == "magefiles" {
+			cmd += " --build-tags=mage"
+		}
+
+		out, err := script.Exec(cmd).String()
+		fmt.Println(out)
+		if err != nil {
+			return err
+		}
+
+		if err := os.Chdir(rootDir); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

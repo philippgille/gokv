@@ -56,26 +56,11 @@ jobs:
           mage -version
           docker version
 
-      # Lint, taking `.golangci.yml` into account
+      # We use the golangci-lint GitHub Action only for installing the tool.
+      # It doesn't automatically lint in submodules, and instead of writing a Bash
+      # script here in our workflow that we can't run locally, we use Mage instead.
       - uses: golangci/golangci-lint-action@v8
-      # Above only runs the linter in the root directory. There's a param to adjust
-      # it, but still only to run in one subdirectory. But we need to run it in
-      # dozens. After the step the CLI is still installed, so we can reuse it.
-      # TODO: It could be useful to have a `mage lint` target for local execution.
-      - run: |
-          repo_root=$(pwd)
-          go_module_dirs=$(find . -name "go.mod" -exec dirname {} \;)
-          for go_module_dir in $go_module_dirs; do
-            echo "Running golangci-lint in $go_module"
-            cd $go_module_dir
-            # Special handling for magefiles due to the build tag
-            if [ $go_module_dir = "./magefiles" ]; then
-              golangci-lint run --config "${repo_root}/.golangci.yml" --build-tags=mage
-            else
-              golangci-lint run --config "${repo_root}/.golangci.yml"
-            fi
-            cd -
-          done
+      - run: mage lint all
 
   test:
     needs: build
