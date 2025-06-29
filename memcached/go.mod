@@ -3,7 +3,7 @@ module github.com/philippgille/gokv/memcached
 go 1.20
 
 require (
-	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874
+	github.com/bradfitz/gomemcache v0.0.0-20250403215159-8d39553ac7cf
 	github.com/philippgille/gokv/encoding v0.7.0
 	github.com/philippgille/gokv/test v0.7.0
 	github.com/philippgille/gokv/util v0.7.0

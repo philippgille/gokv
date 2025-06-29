@@ -14,21 +14,25 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 export GO111MODULE=on
 
+get_direct_dependencies() {
+  go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all
+}
+
 # Helper packages
 array=( encoding sql test util )
 for MODULE_NAME in "${array[@]}"; do
     echo "updating $MODULE_NAME"
-    (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
+    (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go get $(get_direct_dependencies) && go mod tidy) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
 done
 
 # Implementations
 cat "$SCRIPT_DIR"/implementations | while read -r MODULE_NAME; do
     echo "updating $MODULE_NAME"
-    (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
+    (cd "$SCRIPT_DIR"/../"$MODULE_NAME" && go get $(get_direct_dependencies) && go mod tidy) || (cd "$WORKING_DIR" && echo " failed" && exit 1)
 done
 
 # Examples
-(cd "$SCRIPT_DIR"/../examples/redis && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
-(cd "$SCRIPT_DIR"/../examples/protobuf_encoding && go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
+(cd "$SCRIPT_DIR"/../examples/redis && go get $(get_direct_dependencies) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
+(cd "$SCRIPT_DIR"/../examples/protobuf_encoding && go get $(get_direct_dependencies) && go mod tidy) || (cd "$WORKING_DIR" && echo "update failed" && exit 1)
 
 cd "$WORKING_DIR"
