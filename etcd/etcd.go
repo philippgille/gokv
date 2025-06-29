@@ -6,7 +6,6 @@ import (
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
-	"google.golang.org/grpc"
 
 	"github.com/philippgille/gokv/encoding"
 	"github.com/philippgille/gokv/util"
@@ -133,7 +132,10 @@ func NewClient(options Options) (Client, error) {
 	config := clientv3.Config{
 		Endpoints:   options.Endpoints,
 		DialTimeout: 2 * time.Second,
-		DialOptions: []grpc.DialOption{grpc.WithBlock()},
+		// No need for the DialOptions thanks to the explicit Status check below,
+		// and even though it's supported as of etcd client v3.6.1, they might move
+		// to the new gRPC `NewClient` at any time, which doesn't support it.
+		// DialOptions: []grpc.DialOption{grpc.WithBlock()},
 	}
 
 	cli, err := clientv3.New(config)
