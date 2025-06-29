@@ -56,6 +56,10 @@ jobs:
           mage -version
           docker version
 
+      # We use the golangci-lint GitHub Action only for installing the tool.
+      # It doesn't automatically lint in submodules, and instead of writing a Bash
+      # script here in our workflow that we can't run locally, we use Mage instead.
+      - uses: golangci/golangci-lint-action@v8
       - run: mage lint all
 
   test:
