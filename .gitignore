@@ -17,5 +17,6 @@
 coverage.txt
 # LevelDB DB files that are created during LevelDB tests
 /leveldb/leveldb
+/sqlite/*.db
 
 /examples/examples
