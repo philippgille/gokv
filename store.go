@@ -1,5 +1,9 @@
 package gokv
 
+import (
+	"context"
+)
+
 // Store is an abstraction for different key-value store implementations.
 // A store must be able to store, retrieve and delete key-value pairs,
 // with the key being a string and the value being any Go interface{}.
@@ -9,6 +13,8 @@ type Store interface {
 	// The marshalling format depends on the implementation. It can be JSON, gob etc.
 	// The key must not be "" and the value must not be nil.
 	Set(k string, v any) error
+	// SetWithContext is exactly like Set function just with added context as first argument.
+	SetWithContext(ctx context.Context, k string, v any) error
 	// Get retrieves the value for the given key.
 	// The implementation automatically unmarshalls the value.
 	// The unmarshalling source depends on the implementation. It can be JSON, gob etc.
@@ -19,10 +25,14 @@ type Store interface {
 	// If no value is found it returns (false, nil).
 	// The key must not be "" and the pointer must not be nil.
 	Get(k string, v any) (found bool, err error)
+	// GetWithContext is exactly like Get function just with added context as first argument.
+	GetWithContext(ctx context.Context, k string, v any) (found bool, err error)
 	// Delete deletes the stored value for the given key.
 	// Deleting a non-existing key-value pair does NOT lead to an error.
 	// The key must not be "".
 	Delete(k string) error
+	// DeleteWithContext is exactly like Delete function just with added context as first argument.
+	DeleteWithContext(ctx context.Context, k string) error
 	// Close must be called when the work with the key-value store is done.
 	// Most (if not all) implementations are meant to be used long-lived,
 	// so only call Close() at the very end.

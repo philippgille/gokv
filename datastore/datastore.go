@@ -35,6 +35,13 @@ type Client struct {
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
 func (c Client) Set(k string, v any) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	return c.SetWithContext(ctx, k, v)
+}
+
+// SetWithContext is exactly like Set function just with added context as first argument.
+func (c Client) SetWithContext(ctx context.Context, k string, v any) error {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return err
 	}
@@ -45,8 +52,6 @@ func (c Client) Set(k string, v any) error {
 		return err
 	}
 
-	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
-	defer cancel()
 	key := datastore.Key{
 		Kind: kind,
 		Name: k,
@@ -54,7 +59,7 @@ func (c Client) Set(k string, v any) error {
 	src := entity{
 		V: data,
 	}
-	_, err = c.c.Put(tctx, &key, &src)
+	_, err = c.c.Put(ctx, &key, &src)
 
 	return err
 }
@@ -66,18 +71,23 @@ func (c Client) Set(k string, v any) error {
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
 func (c Client) Get(k string, v any) (found bool, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	return c.GetWithContext(ctx, k, v)
+}
+
+// GetWithContext is exactly like Get function just with added context as first argument.
+func (c Client) GetWithContext(ctx context.Context, k string, v any) (found bool, err error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
-	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
-	defer cancel()
 	key := datastore.Key{
 		Kind: kind,
 		Name: k,
 	}
 	dst := new(entity)
-	err = c.c.Get(tctx, &key, dst)
+	err = c.c.Get(ctx, &key, dst)
 	if err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return false, nil
@@ -93,17 +103,22 @@ func (c Client) Get(k string, v any) (found bool, err error) {
 // Deleting a non-existing key-value pair does NOT lead to an error.
 // The key must not be "".
 func (c Client) Delete(k string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
+	defer cancel()
+	return c.DeleteWithContext(ctx, k)
+}
+
+// DeleteWithContext is exactly like Delete function just with added context as first argument.
+func (c Client) DeleteWithContext(ctx context.Context, k string) error {
 	if err := util.CheckKey(k); err != nil {
 		return err
 	}
 
-	tctx, cancel := context.WithTimeout(context.Background(), c.timeOut)
-	defer cancel()
 	key := datastore.Key{
 		Kind: kind,
 		Name: k,
 	}
-	return c.c.Delete(tctx, &key)
+	return c.c.Delete(ctx, &key)
 }
 
 // Close closes the client.
