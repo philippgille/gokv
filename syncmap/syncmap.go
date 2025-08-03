@@ -13,6 +13,11 @@ type Store struct {
 	codec encoding.Codec
 }
 
+// Gets underlying store to allow user manipulate object directly.
+func (s Store) GetStore() *sync.Map {
+	return s.m
+}
+
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.

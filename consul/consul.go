@@ -14,6 +14,11 @@ type Client struct {
 	codec  encoding.Codec
 }
 
+// Gets underlying store to allow user manipulate object directly.
+func (c Client) GetStore() *api.KV {
+	return c.c
+}
+
 // Set stores the given value for the given key.
 // Values are automatically marshalled to JSON or gob (depending on the configuration).
 // The key must not be "" and the value must not be nil.
